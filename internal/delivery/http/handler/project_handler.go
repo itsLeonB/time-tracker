@@ -35,3 +35,15 @@ func (ph *ProjectHandler) Create() gin.HandlerFunc {
 		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(project))
 	}
 }
+
+func (ph *ProjectHandler) GetAll() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		projects, err := ph.projectService.GetAll()
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, model.NewSuccessJSON(projects))
+	}
+}
