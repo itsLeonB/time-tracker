@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 	"github.com/itsLeonB/time-tracker/internal/model"
 	"github.com/rotisserie/eris"
@@ -83,13 +81,13 @@ func (tr *taskRepositoryGorm) Log(task *model.Task, action string) (*model.TaskL
 func (tr *taskRepositoryGorm) GetLatestLog(task *model.Task) (*model.TaskLog, error) {
 	var latestLog model.TaskLog
 
-	err := tr.db.Where("task_id = ?", task.ID).Order("created_at DESC").First(&latestLog).Error
+	err := tr.db.Where("task_id = ?", task.ID).Order("created_at DESC").FirstOrInit(&latestLog).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
-
 		return nil, eris.Wrap(err, "error querying")
+	}
+
+	if latestLog.ID == uuid.Nil {
+		return nil, nil
 	}
 
 	return &latestLog, nil

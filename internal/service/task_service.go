@@ -55,8 +55,13 @@ func (ts *taskServiceImpl) Log(id uuid.UUID, action string) (*model.TaskLog, err
 		return nil, err
 	}
 
+	// should always start with START action
+	if latestLog == nil && action == constant.LOG_ACTION.STOP {
+		return nil, eris.New("task is not started")
+	}
+
 	// should alternate actions
-	if latestLog.Action == action {
+	if latestLog != nil && latestLog.Action == action {
 		return nil, eris.New("action cannot be the same with last log")
 	}
 

@@ -1,0 +1,37 @@
+# Exclude version control directories
+.git
+.gitignore
+
+# Exclude dependencies and build artifacts
+vendor/
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Exclude Go build outputs
+*.o
+*.a
+*.out
+
+# Exclude test binaries and coverage reports
+*.test
+*.cover
+coverage/
+
+# Exclude IDE/editor configuration files
+.vscode/
+.idea/
+*.iml
+
+# Exclude logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Exclude Docker-related files not needed in the image
+docker-compose.override.yml
+
+# Exclude CI/CD
