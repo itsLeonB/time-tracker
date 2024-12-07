@@ -24,8 +24,8 @@ func (pr *projectRepositoryGorm) Insert(project *model.Project) (*model.Project,
 	return project, nil
 }
 
-func (pr *projectRepositoryGorm) GetAll() ([]model.Project, error) {
-	var projects []model.Project
+func (pr *projectRepositoryGorm) GetAll() ([]*model.Project, error) {
+	var projects []*model.Project
 
 	err := pr.db.Find(&projects).Error
 	if err != nil {
@@ -62,4 +62,22 @@ func (pr *projectRepositoryGorm) Delete(project *model.Project) error {
 	}
 
 	return nil
+}
+
+func (pr *projectRepositoryGorm) Find(options *model.FindProjectOptions) ([]*model.Project, error) {
+	var projects []*model.Project
+
+	query := pr.db
+	if options != nil {
+		if options.Name != "" {
+			query = query.Where("name ILIKE %?%", options.Name)
+		}
+	}
+
+	err := query.Find(&projects).Error
+	if err != nil {
+		return nil, eris.Wrap(err, "error querying")
+	}
+
+	return projects, nil
 }

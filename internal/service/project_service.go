@@ -18,7 +18,7 @@ func (ps *projectServiceImpl) Create(name string) (*model.Project, error) {
 	return ps.projectRepository.Insert(&model.Project{Name: name})
 }
 
-func (ps *projectServiceImpl) GetAll() ([]model.Project, error) {
+func (ps *projectServiceImpl) GetAll() ([]*model.Project, error) {
 	return ps.projectRepository.GetAll()
 }
 
@@ -35,4 +35,17 @@ func (ps *projectServiceImpl) Update(id uuid.UUID, name string) (*model.Project,
 
 func (ps *projectServiceImpl) Delete(id uuid.UUID) error {
 	return ps.projectRepository.Delete(&model.Project{ID: id})
+}
+
+func (ps *projectServiceImpl) FirstByQuery(options model.FindProjectOptions) (*model.Project, error) {
+	projects, err := ps.projectRepository.Find(&options)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(projects) == 0 {
+		return nil, nil
+	}
+
+	return projects[0], nil
 }
