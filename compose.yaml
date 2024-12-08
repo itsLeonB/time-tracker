@@ -1,11 +1,36 @@
 services:
   postgres:
+    container_name: time_tracker_db
     image: postgres:16-alpine
     ports:
-      - 5433:5432
+      - ${DB_PORT:-5432}:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=time_tracker_db
+      - POSTGRES_PASSWORD="${DB_PASSWORD:-postgres}"
+      - POSTGRES_USER="${DB_USER:-postgres}"
+      - POSTGRES_DB="${DB_NAME:-time_tracker_db}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-time_tracker_db}"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+
+  app:
+    container_name: time_tracker
+    build:
+      context: .
+      dockerfile: ./ci/Dockerfile
+      args:
+        - APP_PORT=${APP_PORT:-8000}
+    ports:
+      - ${APP_PORT:-8000}:${APP_PORT:-8000}
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

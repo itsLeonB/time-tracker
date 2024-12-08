@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS projects (
 CREATE TABLE IF NOT EXISTS tasks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    number TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -22,3 +23,9 @@ CREATE TABLE IF NOT EXISTS task_logs (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);
+
+CREATE INDEX IF NOT EXISTS idx_tasks_number ON tasks(number);
+
+CREATE INDEX IF NOT EXISTS idx_task_logs_task_id ON task_logs(task_id);
