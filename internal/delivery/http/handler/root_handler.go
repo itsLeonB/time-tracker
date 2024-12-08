@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,10 @@ func (h *RootHandler) HealthCheck() gin.HandlerFunc {
 
 func (h *RootHandler) NotFound() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusNotFound, model.NewErrorJSON(errors.New("route is not found")))
+		ctx.JSON(http.StatusNotFound, model.NewErrorJSON(&model.ErrorResponse{
+			Type:    "RouteNotFoundError",
+			Message: "Route is not found",
+		}))
 	}
 
 }
