@@ -8,7 +8,7 @@ import (
 type ProjectService interface {
 	Create(name string) (*model.Project, error)
 	GetAll() ([]*model.Project, error)
-	GetByID(id uuid.UUID) (*model.Project, error)
+	GetByID(options *model.QueryOptions) (*model.Project, error)
 	Update(id uuid.UUID, name string) (*model.Project, error)
 	Delete(id uuid.UUID) error
 	FirstByQuery(options model.FindProjectOptions) (*model.Project, error)

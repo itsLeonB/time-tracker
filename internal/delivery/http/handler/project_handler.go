@@ -2,8 +2,10 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/model"
 	"github.com/itsLeonB/time-tracker/internal/service"
@@ -48,6 +50,48 @@ func (ph *ProjectHandler) GetAll() gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, model.NewSuccessJSON(projects))
+	}
+}
+
+func (ph *ProjectHandler) GetByID() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		parsedId, err := uuid.Parse(id)
+		if err != nil {
+			_ = ctx.Error(apperror.BadRequestError(
+				eris.Wrap(err, "error parsing UUID"),
+			))
+			return
+		}
+
+		options := model.QueryOptions{
+			Params: &model.QueryParams{
+				ProjectID: parsedId,
+			},
+		}
+
+		date := ctx.Query("date")
+		if date == "today" {
+			options.Params.Date = time.Now()
+		} else if date != "" {
+			timestamp, err := time.Parse(time.DateOnly, date)
+			if err != nil {
+				_ = ctx.Error(apperror.BadRequestError(
+					eris.Wrap(err, "error parsing date"),
+				))
+				return
+			}
+
+			options.Params.Date = timestamp
+		}
+
+		project, err := ph.projectService.GetByID(&options)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, model.NewSuccessJSON(project))
 	}
 }
 
