@@ -135,10 +135,8 @@ func (tr *taskRepositoryGorm) Find(options *model.QueryOptions) ([]*model.Task, 
 
 	if options != nil {
 		if options.Params != nil {
-			for key, value := range options.Params {
-				if key == "number" {
-					query = query.Where("number ILIKE ?", fmt.Sprintf("%%%s%%", value))
-				}
+			if options.Params.Number != "" {
+				query = query.Where("number ILIKE ?", fmt.Sprintf("%%%s%%", options.Params.Number))
 			}
 		}
 	}

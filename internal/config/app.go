@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +18,28 @@ import (
 
 type App struct {
 	Router *gin.Engine
+	config *config
+}
+
+type config struct {
+	env  string
+	port string
+}
+
+func (a *App) loadConfig() {
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		log.Println("APP_ENV is not set, using default value: debug")
+		env = "debug"
+	}
+
+	port := os.Getenv("APP_PORT")
+	if port == "" {
+		log.Println("APP_PORT is not set, using default value: 8000")
+		port = "8000"
+	}
+
+	a.config = &config{env, port}
 }
 
 func SetupApp() *App {
@@ -25,17 +48,22 @@ func SetupApp() *App {
 	services := provider.ProvideServices(repositories)
 	handlers := provider.ProvideHandlers(services)
 
-	gin.SetMode(os.Getenv("APP_ENV"))
+	a := new(App)
+	a.loadConfig()
+
+	gin.SetMode(a.config.env)
 	r := gin.Default()
 	r.Use(middleware.HandleError())
 	r = route.SetupRoutes(r, handlers)
 
-	return &App{r}
+	a.Router = r
+
+	return a
 }
 
 func (a *App) Serve() {
 	srv := http.Server{
-		Addr:    ":" + os.Getenv("APP_PORT"),
+		Addr:    fmt.Sprintf(":%s", a.config.port),
 		Handler: a.Router,
 	}
 

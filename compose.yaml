@@ -12,13 +12,13 @@ services:
       - POSTGRES_DB=${DB_NAME:-time_tracker_db}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-time_tracker_db}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   app:
     container_name: time_tracker
-    build: 
+    build:
       context: .
       dockerfile: ./ci/Dockerfile
       args:
@@ -30,7 +30,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    restart: unless-stopped      
+    restart: unless-stopped
 
 volumes:
   postgres-data:

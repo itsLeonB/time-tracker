@@ -8,15 +8,25 @@ import (
 )
 
 type Task struct {
-	ID        uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	ProjectID uuid.UUID  `json:"project_id"`
-	Number    string     `json:"number"`
-	Name      string     `json:"name"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	Points    int        `json:"points" gorm:"-"`
-	TimeSpent *TimeSpent `json:"time_spent" gorm:"-"`
-	Logs      []TaskLog  `json:"logs,omitempty" gorm:"foreignKey:TaskID"`
+	ID         uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	ProjectID  uuid.UUID  `json:"projectId"`
+	Number     string     `json:"number"`
+	Name       string     `json:"name"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
+	InProgress bool       `json:"inProgress" gorm:"-"`
+	Points     float64    `json:"points" gorm:"-"`
+	TimeSpent  *TimeSpent `json:"timeSpent" gorm:"-"`
+	Logs       []TaskLog  `json:"logs,omitempty" gorm:"foreignKey:TaskID"`
+}
+
+func (task *Task) DetermineProgress() {
+	if len(task.Logs) == 0 {
+		task.InProgress = false
+		return
+	}
+
+	task.InProgress = task.Logs[len(task.Logs)-1].Action == constant.LogAction.Start
 }
 
 func (task *Task) CalculateTotalTime() {
@@ -47,17 +57,17 @@ func (t *Task) TableName() string {
 }
 
 type NewTaskRequest struct {
-	ProjectID uuid.UUID `json:"project_id" binding:"required"`
+	ProjectID uuid.UUID `json:"projectId" binding:"required"`
 	Number    string    `json:"number" binding:"required"`
 	Name      string    `json:"name" binding:"required"`
 }
 
 type TaskLog struct {
 	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	TaskID    uuid.UUID `json:"task_id"`
+	TaskID    uuid.UUID `json:"taskId"`
 	Action    string    `json:"action"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (tl *TaskLog) TableName() string {

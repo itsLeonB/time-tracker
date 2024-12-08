@@ -115,14 +115,26 @@ func (th *TaskHandler) Find() gin.HandlerFunc {
 }
 
 func constructQueryOptions(ctx *gin.Context) *model.QueryOptions {
+	options := new(model.QueryOptions)
+
+	withLogs := ctx.Query("withLogs")
+	if withLogs == "true" {
+		options.WithLogs = true
+	}
+
+	params := constructQueryParams(ctx)
+	if params != nil {
+		options.Params = params
+	}
+
+	return options
+}
+
+func constructQueryParams(ctx *gin.Context) *model.QueryParams {
 	number := ctx.Query("number")
 	if number == "" {
 		return nil
 	}
 
-	return &model.QueryOptions{
-		Params: map[string]any{
-			"number": number,
-		},
-	}
+	return &model.QueryParams{Number: number}
 }

@@ -55,7 +55,7 @@ func (ts *taskServiceImpl) Find(options *model.QueryOptions) ([]*model.Task, err
 	}
 
 	for _, task := range tasks {
-		ts.populateAdditionalTaskFields(task)
+		ts.populateAdditionalTaskFields(task, options)
 	}
 
 	return tasks, nil
@@ -67,14 +67,22 @@ func (ts *taskServiceImpl) GetByNumber(number string) (*model.Task, error) {
 		return nil, err
 	}
 
-	ts.populateAdditionalTaskFields(task)
+	ts.populateAdditionalTaskFields(task, nil)
 
 	return task, nil
 }
 
-func (ts *taskServiceImpl) populateAdditionalTaskFields(task *model.Task) {
+func (ts *taskServiceImpl) populateAdditionalTaskFields(
+	task *model.Task,
+	options *model.QueryOptions,
+) {
+	task.DetermineProgress()
 	task.CalculateTotalTime()
 	task.Points = ts.pointStrategy.CalculatePoints(task)
+
+	if options != nil && !options.WithLogs {
+		task.Logs = nil
+	}
 }
 
 func (ts *taskServiceImpl) Update(id uuid.UUID, name string) (*model.Task, error) {

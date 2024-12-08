@@ -1,21 +1,16 @@
 package strategy
 
 import (
-	"math"
-
 	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/util"
 )
 
 type hourBasedPointStrategy struct{}
 
-func NewHourBasedPointStrategy() PointStrategy {
-	return &hourBasedPointStrategy{}
-}
-
-func (ps *hourBasedPointStrategy) CalculatePoints(task *model.Task) int {
+func (ps *hourBasedPointStrategy) CalculatePoints(task *model.Task) float64 {
 	if task.TimeSpent == nil {
 		return 0
 	}
 
-	return int(math.Ceil(task.TimeSpent.Hours))
+	return util.Round(task.TimeSpent.Hours, 1)
 }

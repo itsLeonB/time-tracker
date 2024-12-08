@@ -10,16 +10,7 @@ import (
 )
 
 func NewGormDB() *gorm.DB {
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_SSL_MODE"),
-		os.Getenv("DB_TIME_ZONE"),
-	)
+	dsn := getDsn()
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -27,4 +18,26 @@ func NewGormDB() *gorm.DB {
 	}
 
 	return db
+}
+
+func getDsn() string {
+	return fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
+		getRequiredEnv("DB_HOST"),
+		getRequiredEnv("DB_USER"),
+		getRequiredEnv("DB_PASSWORD"),
+		getRequiredEnv("DB_NAME"),
+		getRequiredEnv("DB_PORT"),
+		getRequiredEnv("DB_SSL_MODE"),
+		getRequiredEnv("DB_TIME_ZONE"),
+	)
+}
+
+func getRequiredEnv(key string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		log.Fatalf("%s is not set", key)
+	}
+
+	return val
 }

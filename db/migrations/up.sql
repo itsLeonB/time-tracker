@@ -23,3 +23,9 @@ CREATE TABLE IF NOT EXISTS task_logs (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);
+
+CREATE INDEX IF NOT EXISTS idx_tasks_number ON tasks(number);
+
+CREATE INDEX IF NOT EXISTS idx_task_logs_task_id ON task_logs(task_id);
