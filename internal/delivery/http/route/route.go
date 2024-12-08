@@ -9,6 +9,10 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers) *gin.Engine {
 	router.HandleMethodNotAllowed = true
 	router.ContextWithFallback = true
 
+	router.NoRoute(handlers.Root.NotFound())
+	router.GET("", handlers.Root.Root())
+	router.GET("/health", handlers.Root.HealthCheck())
+
 	projectRoutes := router.Group("/projects")
 	projectRoutes.POST("", handlers.Project.Create())
 	projectRoutes.GET("", handlers.Project.GetAll())

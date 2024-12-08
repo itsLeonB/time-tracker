@@ -5,9 +5,9 @@ import (
 )
 
 type JSONResponse struct {
-	Success bool  `json:"success"`
-	Data    any   `json:"data,omitempty"`
-	Error   error `json:"error,omitempty"`
+	Success bool   `json:"success"`
+	Data    any    `json:"data,omitempty"`
+	Error   string `json:"error,omitempty"`
 }
 
 func NewSuccessJSON(data any) *JSONResponse {
@@ -20,7 +20,7 @@ func NewSuccessJSON(data any) *JSONResponse {
 func NewErrorJSON(err error) *JSONResponse {
 	return &JSONResponse{
 		Success: false,
-		Error:   err,
+		Error:   err.Error(),
 	}
 }
 
