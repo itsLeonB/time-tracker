@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/model"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ func NewTaskRepository(db *gorm.DB) TaskRepository {
 func (tr *taskRepositoryGorm) Insert(task *model.Task) (*model.Task, error) {
 	err := tr.db.Create(task).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error inserting")
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgInsertError))
 	}
 
 	return task, nil
@@ -31,7 +32,7 @@ func (tr *taskRepositoryGorm) GetAll() ([]*model.Task, error) {
 
 	err := tr.db.Find(&tasks).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error querying")
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
 
 	return tasks, nil
@@ -42,7 +43,11 @@ func (tr *taskRepositoryGorm) GetByID(id uuid.UUID) (*model.Task, error) {
 
 	err := tr.db.First(&task, "id = ?", id).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error querying")
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
 
 	return &task, nil
@@ -51,13 +56,13 @@ func (tr *taskRepositoryGorm) GetByID(id uuid.UUID) (*model.Task, error) {
 func (tr *taskRepositoryGorm) GetByNumber(number string) (*model.Task, error) {
 	var task model.Task
 
-	err := tr.db.Preload("Logs").FirstOrInit(&task, "number = ?", number).Error
+	err := tr.db.Preload("Logs").First(&task, "number = ?", number).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error querying")
-	}
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
 
-	if task.ID == uuid.Nil {
-		return nil, nil
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
 
 	return &task, nil
@@ -66,7 +71,7 @@ func (tr *taskRepositoryGorm) GetByNumber(number string) (*model.Task, error) {
 func (tr *taskRepositoryGorm) Update(task *model.Task) (*model.Task, error) {
 	err := tr.db.Save(task).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error updating")
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgUpdateError))
 	}
 
 	return task, nil
@@ -75,7 +80,7 @@ func (tr *taskRepositoryGorm) Update(task *model.Task) (*model.Task, error) {
 func (tr *taskRepositoryGorm) Delete(task *model.Task) error {
 	err := tr.db.Delete(task).Error
 	if err != nil {
-		return eris.Wrap(err, "error deleting")
+		return apperror.InternalServerError(eris.Wrap(err, apperror.MsgDeleteError))
 	}
 
 	return nil
@@ -89,7 +94,7 @@ func (tr *taskRepositoryGorm) Log(task *model.Task, action string) (*model.TaskL
 
 	err := tr.db.Create(newLog).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error inserting")
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgInsertError))
 	}
 
 	return newLog, nil
@@ -98,13 +103,13 @@ func (tr *taskRepositoryGorm) Log(task *model.Task, action string) (*model.TaskL
 func (tr *taskRepositoryGorm) GetLatestLog(task *model.Task) (*model.TaskLog, error) {
 	var latestLog model.TaskLog
 
-	err := tr.db.Where("task_id = ?", task.ID).Order("created_at DESC").FirstOrInit(&latestLog).Error
+	err := tr.db.Where("task_id = ?", task.ID).Order("created_at DESC").First(&latestLog).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error querying")
-	}
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
 
-	if latestLog.ID == uuid.Nil {
-		return nil, nil
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
 
 	return &latestLog, nil
@@ -115,7 +120,7 @@ func (tr *taskRepositoryGorm) GetLogs(task *model.Task) ([]*model.TaskLog, error
 
 	err := tr.db.Where("task_id = ?", task.ID).Order("created_at ASC").Find(&logs).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error querying")
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
 
 	return logs, nil
@@ -127,6 +132,7 @@ func (tr *taskRepositoryGorm) Find(options *model.QueryOptions) ([]*model.Task, 
 	query := tr.db.Preload("Logs", func(db *gorm.DB) *gorm.DB {
 		return db.Order("task_logs.created_at ASC")
 	})
+
 	if options != nil {
 		if options.Params != nil {
 			for key, value := range options.Params {
@@ -139,7 +145,7 @@ func (tr *taskRepositoryGorm) Find(options *model.QueryOptions) ([]*model.Task, 
 
 	err := query.Find(&tasks).Error
 	if err != nil {
-		return nil, eris.Wrap(err, "error querying")
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
 
 	return tasks, nil

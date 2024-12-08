@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/google/uuid"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/constant"
 	"github.com/itsLeonB/time-tracker/internal/model"
 	"github.com/itsLeonB/time-tracker/internal/repository"
@@ -27,7 +28,9 @@ func (ts *taskServiceImpl) Create(request *model.NewTaskRequest) (*model.Task, e
 		return nil, err
 	}
 	if task != nil {
-		return nil, eris.New("task with the same number already exists")
+		return nil, apperror.ConflictError(
+			eris.Errorf("task number: %s already exists", request.Number),
+		)
 	}
 
 	return ts.taskRepository.Insert(&model.Task{
@@ -90,6 +93,9 @@ func (ts *taskServiceImpl) Log(id uuid.UUID, action string) (*model.TaskLog, err
 	if err != nil {
 		return nil, err
 	}
+	if task == nil {
+		return nil, apperror.NotFoundError(eris.Errorf("task ID: %s is not found", id))
+	}
 
 	return ts.createLog(task, action)
 }
@@ -100,7 +106,7 @@ func (ts *taskServiceImpl) LogByNumber(number string, action string) (*model.Tas
 		return nil, err
 	}
 	if task == nil {
-		return nil, eris.New("task not found")
+		return nil, apperror.NotFoundError(eris.Errorf("task number: %s is not found", number))
 	}
 
 	return ts.createLog(task, action)
@@ -113,13 +119,17 @@ func (ts *taskServiceImpl) createLog(task *model.Task, action string) (*model.Ta
 	}
 
 	// should always start with START action
-	if latestLog == nil && action == constant.LOG_ACTION.STOP {
-		return nil, eris.New("task is not started")
+	if latestLog == nil && action == constant.LogAction.Stop {
+		return nil, apperror.BadRequestError(
+			eris.Errorf("task ID: %s is not yet started", task.ID),
+		)
 	}
 
 	// should alternate actions
 	if latestLog != nil && latestLog.Action == action {
-		return nil, eris.New("action cannot be the same with last log")
+		return nil, apperror.BadRequestError(
+			eris.Errorf("task ID: %s is already %s", task.ID, action),
+		)
 	}
 
 	log, err := ts.taskRepository.Log(task, action)

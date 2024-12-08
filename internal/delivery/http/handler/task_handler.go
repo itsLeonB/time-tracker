@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/model"
 	"github.com/itsLeonB/time-tracker/internal/service"
 	"github.com/rotisserie/eris"
@@ -23,7 +24,9 @@ func (th *TaskHandler) Create() gin.HandlerFunc {
 		request := new(model.NewTaskRequest)
 		err := ctx.ShouldBindJSON(request)
 		if err != nil {
-			_ = ctx.Error(eris.Wrap(err, "error reading request body"))
+			_ = ctx.Error(apperror.BadRequestError(
+				eris.Wrap(err, apperror.MsgBindJsonError),
+			))
 			return
 		}
 
@@ -54,7 +57,9 @@ func (th *TaskHandler) Log() gin.HandlerFunc {
 		request := new(model.NewLogRequest)
 		err := ctx.ShouldBindJSON(request)
 		if err != nil {
-			_ = ctx.Error(eris.Wrap(err, "error reading request body"))
+			_ = ctx.Error(apperror.BadRequestError(
+				eris.Wrap(err, apperror.MsgBindJsonError),
+			))
 			return
 		}
 
@@ -79,7 +84,9 @@ func (th *TaskHandler) LogByNumber() gin.HandlerFunc {
 		request := new(model.LogByNumberRequest)
 		err := ctx.ShouldBindJSON(request)
 		if err != nil {
-			_ = ctx.Error(eris.Wrap(err, "error reading request body"))
+			_ = ctx.Error(apperror.BadRequestError(
+				eris.Wrap(err, apperror.MsgBindJsonError),
+			))
 			return
 		}
 

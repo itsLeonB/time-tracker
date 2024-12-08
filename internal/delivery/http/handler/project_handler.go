@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/model"
 	"github.com/itsLeonB/time-tracker/internal/service"
 	"github.com/rotisserie/eris"
@@ -22,7 +23,9 @@ func (ph *ProjectHandler) Create() gin.HandlerFunc {
 		request := new(model.NewProjectRequest)
 		err := ctx.ShouldBindJSON(request)
 		if err != nil {
-			_ = ctx.Error(eris.Wrap(err, "error reading request body"))
+			_ = ctx.Error(apperror.BadRequestError(
+				eris.Wrap(err, apperror.MsgBindJsonError),
+			))
 			return
 		}
 

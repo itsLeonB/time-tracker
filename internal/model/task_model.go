@@ -27,7 +27,7 @@ func (task *Task) CalculateTotalTime() {
 			startLog := task.Logs[i]
 			stopLog := task.Logs[i+1]
 
-			if startLog.Action == constant.LOG_ACTION.START && stopLog.Action == constant.LOG_ACTION.STOP {
+			if startLog.Action == constant.LogAction.Start && stopLog.Action == constant.LogAction.Stop {
 				duration := stopLog.CreatedAt.Sub(startLog.CreatedAt)
 				totalTime += duration
 			}

@@ -1,9 +1,9 @@
 package constant
 
-var LOG_ACTION = struct {
-	START string
-	STOP  string
+var LogAction = struct {
+	Start string
+	Stop  string
 }{
-	START: "START",
-	STOP:  "STOP",
+	Start: "START",
+	Stop:  "STOP",
 }
