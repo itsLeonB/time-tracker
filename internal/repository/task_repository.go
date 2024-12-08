@@ -2,10 +2,12 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/util"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
@@ -137,6 +139,17 @@ func (tr *taskRepositoryGorm) Find(options *model.QueryOptions) ([]*model.Task, 
 		if options.Params != nil {
 			if options.Params.Number != "" {
 				query = query.Where("number ILIKE ?", fmt.Sprintf("%%%s%%", options.Params.Number))
+			}
+
+			if options.Params.ProjectID != uuid.Nil {
+				query = query.Where("project_id = ?", options.Params.ProjectID)
+			}
+
+			if options.Params.Date != (time.Time{}) {
+				query = query.Where("created_at >= ? AND created_at <= ?",
+					util.StartOfDay(options.Params.Date),
+					util.EndOfDay(options.Params.Date),
+				)
 			}
 		}
 	}

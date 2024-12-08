@@ -13,8 +13,11 @@ type Services struct {
 func ProvideServices(repositories *Repositories) *Services {
 	pointStrategy := strategy.NewHourBasedPointStrategy()
 
+	taskService := service.NewTaskService(repositories.Task, pointStrategy)
+	projectService := service.NewProjectService(repositories.Project, taskService)
+
 	return &Services{
-		Project: service.NewProjectService(repositories.Project),
-		Task:    service.NewTaskService(repositories.Task, pointStrategy),
+		Project: projectService,
+		Task:    taskService,
 	}
 }

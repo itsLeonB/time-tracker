@@ -82,10 +82,3 @@ type LogByNumberRequest struct {
 	Number string `json:"number" binding:"required"`
 	Action string `json:"action" binding:"required,oneof=START STOP"`
 }
-
-type TimeSpent struct {
-	Duration time.Duration `json:"duration"`
-	Minutes  float64       `json:"minutes"`
-	Hours    float64       `json:"hours"`
-	String   string        `json:"string"`
-}

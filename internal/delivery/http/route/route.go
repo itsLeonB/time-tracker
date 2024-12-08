@@ -16,6 +16,7 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers) *gin.Engine {
 	projectRoutes := router.Group("/projects")
 	projectRoutes.POST("", handlers.Project.Create())
 	projectRoutes.GET("", handlers.Project.GetAll())
+	projectRoutes.GET("/:id", handlers.Project.GetByID())
 	projectRoutes.GET("/first", handlers.Project.FirstByQuery())
 
 	taskRoutes := router.Group("/tasks")

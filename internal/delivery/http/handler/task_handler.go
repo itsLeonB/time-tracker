@@ -65,7 +65,9 @@ func (th *TaskHandler) Log() gin.HandlerFunc {
 
 		parsedId, err := uuid.Parse(ctx.Param("id"))
 		if err != nil {
-			_ = ctx.Error(eris.Wrap(err, "error parsing UUID"))
+			_ = ctx.Error(apperror.BadRequestError(
+				eris.Wrap(err, "error parsing UUID"),
+			))
 			return
 		}
 
