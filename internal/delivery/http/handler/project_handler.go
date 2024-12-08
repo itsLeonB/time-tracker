@@ -47,3 +47,18 @@ func (ph *ProjectHandler) GetAll() gin.HandlerFunc {
 		ctx.JSON(http.StatusOK, model.NewSuccessJSON(projects))
 	}
 }
+
+func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		name := ctx.Query("name")
+		options := model.FindProjectOptions{Name: name}
+
+		project, err := ph.projectService.FirstByQuery(options)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, model.NewSuccessJSON(project))
+	}
+}

@@ -27,7 +27,7 @@ func (th *TaskHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		task, err := th.taskService.Create(request.ProjectID, request.Name)
+		task, err := th.taskService.Create(request)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -74,27 +74,48 @@ func (th *TaskHandler) Log() gin.HandlerFunc {
 	}
 }
 
-func (th *TaskHandler) GetTotalTime() gin.HandlerFunc {
+func (th *TaskHandler) LogByNumber() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		parsedId, err := uuid.Parse(ctx.Param("id"))
+		request := new(model.LogByNumberRequest)
+		err := ctx.ShouldBindJSON(request)
 		if err != nil {
-			_ = ctx.Error(eris.Wrap(err, "error parsing UUID"))
+			_ = ctx.Error(eris.Wrap(err, "error reading request body"))
 			return
 		}
 
-		totalTime, err := th.taskService.GetTotalTime(parsedId)
+		log, err := th.taskService.LogByNumber(request.Number, request.Action)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		response := model.TotalTimeResponse{
-			Duration: *totalTime,
-			Minutes:  totalTime.Minutes(),
-			Hours:    totalTime.Hours(),
-			String:   totalTime.String(),
+		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(log))
+	}
+}
+
+func (th *TaskHandler) Find() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		queryOptions := constructQueryOptions(ctx)
+		tasks, err := th.taskService.Find(queryOptions)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(response))
+		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+	}
+
+}
+
+func constructQueryOptions(ctx *gin.Context) *model.QueryOptions {
+	number := ctx.Query("number")
+	if number == "" {
+		return nil
+	}
+
+	return &model.QueryOptions{
+		Params: map[string]any{
+			"number": number,
+		},
 	}
 }

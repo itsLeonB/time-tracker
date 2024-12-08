@@ -4,15 +4,42 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/itsLeonB/time-tracker/internal/constant"
 )
 
 type Task struct {
-	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	ProjectID uuid.UUID `json:"project_id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	TaskLogs  []TaskLog `json:"task_logs,omitempty"`
+	ID        uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	ProjectID uuid.UUID  `json:"project_id"`
+	Number    string     `json:"number"`
+	Name      string     `json:"name"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	Points    int        `json:"points" gorm:"-"`
+	TimeSpent *TimeSpent `json:"time_spent" gorm:"-"`
+	Logs      []TaskLog  `json:"logs,omitempty" gorm:"foreignKey:TaskID"`
+}
+
+func (task *Task) CalculateTotalTime() {
+	var totalTime time.Duration
+
+	for i := 0; i < len(task.Logs); i += 2 {
+		if i+1 < len(task.Logs) {
+			startLog := task.Logs[i]
+			stopLog := task.Logs[i+1]
+
+			if startLog.Action == constant.LOG_ACTION.START && stopLog.Action == constant.LOG_ACTION.STOP {
+				duration := stopLog.CreatedAt.Sub(startLog.CreatedAt)
+				totalTime += duration
+			}
+		}
+	}
+
+	task.TimeSpent = &TimeSpent{
+		Duration: totalTime,
+		Minutes:  totalTime.Minutes(),
+		Hours:    totalTime.Hours(),
+		String:   totalTime.String(),
+	}
 }
 
 func (t *Task) TableName() string {
@@ -21,6 +48,7 @@ func (t *Task) TableName() string {
 
 type NewTaskRequest struct {
 	ProjectID uuid.UUID `json:"project_id" binding:"required"`
+	Number    string    `json:"number" binding:"required"`
 	Name      string    `json:"name" binding:"required"`
 }
 
@@ -40,7 +68,12 @@ type NewLogRequest struct {
 	Action string `json:"action" binding:"required,oneof=START STOP"`
 }
 
-type TotalTimeResponse struct {
+type LogByNumberRequest struct {
+	Number string `json:"number" binding:"required"`
+	Action string `json:"action" binding:"required,oneof=START STOP"`
+}
+
+type TimeSpent struct {
 	Duration time.Duration `json:"duration"`
 	Minutes  float64       `json:"minutes"`
 	Hours    float64       `json:"hours"`

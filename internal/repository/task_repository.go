@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/itsLeonB/time-tracker/internal/model"
 	"github.com/rotisserie/eris"
@@ -24,8 +26,8 @@ func (tr *taskRepositoryGorm) Insert(task *model.Task) (*model.Task, error) {
 	return task, nil
 }
 
-func (tr *taskRepositoryGorm) GetAll() ([]model.Task, error) {
-	var tasks []model.Task
+func (tr *taskRepositoryGorm) GetAll() ([]*model.Task, error) {
+	var tasks []*model.Task
 
 	err := tr.db.Find(&tasks).Error
 	if err != nil {
@@ -41,6 +43,21 @@ func (tr *taskRepositoryGorm) GetByID(id uuid.UUID) (*model.Task, error) {
 	err := tr.db.First(&task, "id = ?", id).Error
 	if err != nil {
 		return nil, eris.Wrap(err, "error querying")
+	}
+
+	return &task, nil
+}
+
+func (tr *taskRepositoryGorm) GetByNumber(number string) (*model.Task, error) {
+	var task model.Task
+
+	err := tr.db.Preload("Logs").FirstOrInit(&task, "number = ?", number).Error
+	if err != nil {
+		return nil, eris.Wrap(err, "error querying")
+	}
+
+	if task.ID == uuid.Nil {
+		return nil, nil
 	}
 
 	return &task, nil
@@ -93,8 +110,8 @@ func (tr *taskRepositoryGorm) GetLatestLog(task *model.Task) (*model.TaskLog, er
 	return &latestLog, nil
 }
 
-func (tr *taskRepositoryGorm) GetLogs(task *model.Task) ([]model.TaskLog, error) {
-	var logs []model.TaskLog
+func (tr *taskRepositoryGorm) GetLogs(task *model.Task) ([]*model.TaskLog, error) {
+	var logs []*model.TaskLog
 
 	err := tr.db.Where("task_id = ?", task.ID).Order("created_at ASC").Find(&logs).Error
 	if err != nil {
@@ -102,4 +119,28 @@ func (tr *taskRepositoryGorm) GetLogs(task *model.Task) ([]model.TaskLog, error)
 	}
 
 	return logs, nil
+}
+
+func (tr *taskRepositoryGorm) Find(options *model.QueryOptions) ([]*model.Task, error) {
+	var tasks []*model.Task
+
+	query := tr.db.Preload("Logs", func(db *gorm.DB) *gorm.DB {
+		return db.Order("task_logs.created_at ASC")
+	})
+	if options != nil {
+		if options.Params != nil {
+			for key, value := range options.Params {
+				if key == "number" {
+					query = query.Where("number ILIKE ?", fmt.Sprintf("%%%s%%", value))
+				}
+			}
+		}
+	}
+
+	err := query.Find(&tasks).Error
+	if err != nil {
+		return nil, eris.Wrap(err, "error querying")
+	}
+
+	return tasks, nil
 }
