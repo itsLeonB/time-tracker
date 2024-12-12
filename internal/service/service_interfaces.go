@@ -10,25 +10,26 @@ import (
 type UserService interface {
 	FindByEmail(ctx context.Context, email string) (*model.User, error)
 	Create(ctx context.Context, user *model.User) error
+	ValidateUser(ctx context.Context) (*model.User, error)
 }
 
 type ProjectService interface {
-	Create(name string) (*model.Project, error)
-	GetAll() ([]*model.Project, error)
-	GetByID(options *model.QueryOptions) (*model.Project, error)
-	Update(id uuid.UUID, name string) (*model.Project, error)
-	Delete(id uuid.UUID) error
-	FirstByQuery(options model.FindProjectOptions) (*model.Project, error)
+	Create(ctx context.Context, name string) (*model.Project, error)
+	GetAll(ctx context.Context) ([]*model.Project, error)
+	GetByID(ctx context.Context, options *model.QueryOptions) (*model.Project, error)
+	Update(ctx context.Context, id uuid.UUID, name string) (*model.Project, error)
+	Delete(ctx context.Context, id uuid.UUID) error
+	FirstByQuery(ctx context.Context, options *model.FindProjectOptions) (*model.Project, error)
 }
 
 type TaskService interface {
-	Create(request *model.NewTaskRequest) (*model.Task, error)
-	GetAll() ([]*model.Task, error)
-	GetByID(id uuid.UUID) (*model.Task, error)
-	GetByNumber(number string) (*model.Task, error)
-	Update(id uuid.UUID, name string) (*model.Task, error)
-	Delete(id uuid.UUID) error
-	Log(id uuid.UUID, action string) (*model.TaskLog, error)
-	LogByNumber(number string, action string) (*model.TaskLog, error)
-	Find(options *model.QueryOptions) ([]*model.Task, error)
+	Create(ctx context.Context, request *model.NewTaskRequest) (*model.Task, error)
+	GetAll(ctx context.Context) ([]*model.Task, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error)
+	GetByNumber(ctx context.Context, number string) (*model.Task, error)
+	Update(ctx context.Context, id uuid.UUID, name string) (*model.Task, error)
+	Delete(ctx context.Context, id uuid.UUID) error
+	Log(ctx context.Context, id uuid.UUID, action string) (*model.TaskLog, error)
+	LogByNumber(ctx context.Context, number string, action string) (*model.TaskLog, error)
+	Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error)
 }

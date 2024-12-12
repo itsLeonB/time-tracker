@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/model"
@@ -11,35 +13,60 @@ import (
 type projectServiceImpl struct {
 	projectRepository repository.ProjectRepository
 	taskService       TaskService
+	userService       UserService
 }
 
 func NewProjectService(
 	projectRepository repository.ProjectRepository,
 	taskService TaskService,
+	userService UserService,
 ) ProjectService {
-	return &projectServiceImpl{projectRepository, taskService}
+	return &projectServiceImpl{projectRepository, taskService, userService}
 }
 
-func (ps *projectServiceImpl) Create(name string) (*model.Project, error) {
-	return ps.projectRepository.Insert(&model.Project{Name: name})
-}
-
-func (ps *projectServiceImpl) GetAll() ([]*model.Project, error) {
-	return ps.projectRepository.GetAll()
-}
-
-func (ps *projectServiceImpl) GetByID(options *model.QueryOptions) (*model.Project, error) {
-	project, err := ps.projectRepository.GetByID(options.Params.ProjectID)
+func (ps *projectServiceImpl) Create(ctx context.Context, name string) (*model.Project, error) {
+	user, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if project == nil {
-		return nil, apperror.NotFoundError(
-			eris.Errorf("project with ID: %s not found", options.Params.ProjectID),
-		)
+
+	existingProject, err := ps.projectRepository.GetByName(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	if existingProject != nil {
+		return nil, apperror.ConflictError(eris.Errorf("project with name: %s already exists", name))
 	}
 
-	tasks, err := ps.taskService.Find(options)
+	newProject := &model.Project{
+		UserID: user.ID,
+		Name:   name,
+	}
+
+	return ps.projectRepository.Insert(ctx, newProject)
+}
+
+func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]*model.Project, error) {
+	_, err := ps.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return ps.projectRepository.GetAll(ctx)
+}
+
+func (ps *projectServiceImpl) GetByID(ctx context.Context, options *model.QueryOptions) (*model.Project, error) {
+	_, err := ps.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	project, err := ps.getProject(ctx, options.Params.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+
+	tasks, err := ps.taskService.Find(ctx, options)
 	if err != nil {
 		return nil, err
 	}
@@ -53,22 +80,45 @@ func (ps *projectServiceImpl) GetByID(options *model.QueryOptions) (*model.Proje
 	project.TimeSpent = timeSpent
 
 	return project, nil
-
 }
 
-func (ps *projectServiceImpl) Update(id uuid.UUID, name string) (*model.Project, error) {
-	return ps.projectRepository.Update(&model.Project{
-		ID:   id,
-		Name: name,
-	})
+func (ps *projectServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (*model.Project, error) {
+	_, err := ps.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	project, err := ps.getProject(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	project.Name = name
+
+	return ps.projectRepository.Update(ctx, project)
 }
 
-func (ps *projectServiceImpl) Delete(id uuid.UUID) error {
-	return ps.projectRepository.Delete(&model.Project{ID: id})
+func (ps *projectServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
+	_, err := ps.userService.ValidateUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	project, err := ps.getProject(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return ps.projectRepository.Delete(ctx, project)
 }
 
-func (ps *projectServiceImpl) FirstByQuery(options model.FindProjectOptions) (*model.Project, error) {
-	projects, err := ps.projectRepository.Find(&options)
+func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *model.FindProjectOptions) (*model.Project, error) {
+	_, err := ps.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	projects, err := ps.projectRepository.Find(ctx, options)
 	if err != nil {
 		return nil, err
 	}
@@ -78,4 +128,18 @@ func (ps *projectServiceImpl) FirstByQuery(options model.FindProjectOptions) (*m
 	}
 
 	return projects[0], nil
+}
+
+func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {
+	project, err := ps.projectRepository.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if project == nil {
+		return nil, apperror.NotFoundError(
+			eris.Errorf("project with ID: %s not found", id),
+		)
+	}
+
+	return project, nil
 }
