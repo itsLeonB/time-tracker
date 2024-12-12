@@ -2,10 +2,11 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/itsLeonB/time-tracker/internal/delivery/http/middleware"
 	"github.com/itsLeonB/time-tracker/internal/provider"
 )
 
-func SetupRoutes(router *gin.Engine, handlers *provider.Handlers) {
+func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *provider.Services) {
 	router.HandleMethodNotAllowed = true
 	router.ContextWithFallback = true
 
@@ -17,13 +18,15 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers) {
 	authRoutes.POST("/register", handlers.Auth.HandleRegister())
 	authRoutes.POST("/login", handlers.Auth.HandleLogin())
 
-	projectRoutes := router.Group("/projects")
+	authenticatedRoutes := router.Group("", middleware.Authorize(services.JWT))
+
+	projectRoutes := authenticatedRoutes.Group("/projects")
 	projectRoutes.POST("", handlers.Project.Create())
 	projectRoutes.GET("", handlers.Project.GetAll())
 	projectRoutes.GET("/:id", handlers.Project.GetByID())
 	projectRoutes.GET("/first", handlers.Project.FirstByQuery())
 
-	taskRoutes := router.Group("/tasks")
+	taskRoutes := authenticatedRoutes.Group("/tasks")
 	taskRoutes.POST("", handlers.Task.Create())
 	taskRoutes.GET("", handlers.Task.Find())
 	taskRoutes.POST("/:id/logs", handlers.Task.Log())

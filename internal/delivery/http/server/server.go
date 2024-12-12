@@ -33,7 +33,7 @@ func SetupServer() *Server {
 	gin.SetMode(configs.App.Env)
 	r := gin.Default()
 	r.Use(middleware.HandleError())
-	route.SetupRoutes(r, handlers)
+	route.SetupRoutes(r, handlers, services)
 
 	return &Server{
 		Router: r,
