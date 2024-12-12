@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/constant"
@@ -13,17 +15,24 @@ import (
 type taskServiceImpl struct {
 	taskRepository repository.TaskRepository
 	pointStrategy  strategy.PointStrategy
+	userService    UserService
 }
 
 func NewTaskService(
 	taskRepository repository.TaskRepository,
 	pointStrategy strategy.PointStrategy,
+	userService UserService,
 ) TaskService {
-	return &taskServiceImpl{taskRepository, pointStrategy}
+	return &taskServiceImpl{taskRepository, pointStrategy, userService}
 }
 
-func (ts *taskServiceImpl) Create(request *model.NewTaskRequest) (*model.Task, error) {
-	task, err := ts.taskRepository.GetByNumber(request.Number)
+func (ts *taskServiceImpl) Create(ctx context.Context, request *model.NewTaskRequest) (*model.Task, error) {
+	user, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	task, err := ts.taskRepository.GetByNumber(ctx, request.Number)
 	if err != nil {
 		return nil, err
 	}
@@ -33,23 +42,41 @@ func (ts *taskServiceImpl) Create(request *model.NewTaskRequest) (*model.Task, e
 		)
 	}
 
-	return ts.taskRepository.Insert(&model.Task{
+	newTask := &model.Task{
+		UserID:    user.ID,
 		ProjectID: request.ProjectID,
 		Number:    request.Number,
 		Name:      request.Name,
-	})
+	}
+
+	return ts.taskRepository.Insert(ctx, newTask)
 }
 
-func (ts *taskServiceImpl) GetAll() ([]*model.Task, error) {
-	return ts.taskRepository.GetAll()
+func (ts *taskServiceImpl) GetAll(ctx context.Context) ([]*model.Task, error) {
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return ts.taskRepository.GetAll(ctx)
 }
 
-func (ts *taskServiceImpl) GetByID(id uuid.UUID) (*model.Task, error) {
-	return ts.taskRepository.GetByID(id)
+func (ts *taskServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error) {
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return ts.taskRepository.GetByID(ctx, id)
 }
 
-func (ts *taskServiceImpl) Find(options *model.QueryOptions) ([]*model.Task, error) {
-	tasks, err := ts.taskRepository.Find(options)
+func (ts *taskServiceImpl) Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error) {
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	tasks, err := ts.taskRepository.Find(ctx, options)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +88,13 @@ func (ts *taskServiceImpl) Find(options *model.QueryOptions) ([]*model.Task, err
 	return tasks, nil
 }
 
-func (ts *taskServiceImpl) GetByNumber(number string) (*model.Task, error) {
-	task, err := ts.taskRepository.GetByNumber(number)
+func (ts *taskServiceImpl) GetByNumber(ctx context.Context, number string) (*model.Task, error) {
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	task, err := ts.getTaskByNumber(ctx, number)
 	if err != nil {
 		return nil, err
 	}
@@ -85,19 +117,52 @@ func (ts *taskServiceImpl) populateAdditionalTaskFields(
 	}
 }
 
-func (ts *taskServiceImpl) Update(id uuid.UUID, name string) (*model.Task, error) {
-	return ts.taskRepository.Update(&model.Task{
-		ID:   id,
-		Name: name,
-	})
+func (ts *taskServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (*model.Task, error) {
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	task, err := ts.getTask(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	task.Name = name
+
+	return ts.taskRepository.Update(ctx, task)
 }
 
-func (ts *taskServiceImpl) Delete(id uuid.UUID) error {
-	return ts.taskRepository.Delete(&model.Task{ID: id})
+func (ts *taskServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	task, err := ts.getTask(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return ts.taskRepository.Delete(ctx, task)
 }
 
-func (ts *taskServiceImpl) Log(id uuid.UUID, action string) (*model.TaskLog, error) {
-	task, err := ts.taskRepository.GetByID(id)
+func (ts *taskServiceImpl) Log(ctx context.Context, id uuid.UUID, action string) (*model.TaskLog, error) {
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	task, err := ts.getTask(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return ts.createLog(ctx, task, action)
+}
+
+func (ts *taskServiceImpl) getTask(ctx context.Context, id uuid.UUID) (*model.Task, error) {
+	task, err := ts.taskRepository.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -105,11 +170,11 @@ func (ts *taskServiceImpl) Log(id uuid.UUID, action string) (*model.TaskLog, err
 		return nil, apperror.NotFoundError(eris.Errorf("task ID: %s is not found", id))
 	}
 
-	return ts.createLog(task, action)
+	return task, nil
 }
 
-func (ts *taskServiceImpl) LogByNumber(number string, action string) (*model.TaskLog, error) {
-	task, err := ts.taskRepository.GetByNumber(number)
+func (ts *taskServiceImpl) getTaskByNumber(ctx context.Context, number string) (*model.Task, error) {
+	task, err := ts.taskRepository.GetByNumber(ctx, number)
 	if err != nil {
 		return nil, err
 	}
@@ -117,11 +182,25 @@ func (ts *taskServiceImpl) LogByNumber(number string, action string) (*model.Tas
 		return nil, apperror.NotFoundError(eris.Errorf("task number: %s is not found", number))
 	}
 
-	return ts.createLog(task, action)
+	return task, nil
 }
 
-func (ts *taskServiceImpl) createLog(task *model.Task, action string) (*model.TaskLog, error) {
-	latestLog, err := ts.taskRepository.GetLatestLog(task)
+func (ts *taskServiceImpl) LogByNumber(ctx context.Context, number string, action string) (*model.TaskLog, error) {
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	task, err := ts.getTaskByNumber(ctx, number)
+	if err != nil {
+		return nil, err
+	}
+
+	return ts.createLog(ctx, task, action)
+}
+
+func (ts *taskServiceImpl) createLog(ctx context.Context, task *model.Task, action string) (*model.TaskLog, error) {
+	latestLog, err := ts.taskRepository.GetLatestLog(ctx, task)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +219,7 @@ func (ts *taskServiceImpl) createLog(task *model.Task, action string) (*model.Ta
 		)
 	}
 
-	log, err := ts.taskRepository.Log(task, action)
+	log, err := ts.taskRepository.Log(ctx, task, action)
 	if err != nil {
 		return nil, err
 	}

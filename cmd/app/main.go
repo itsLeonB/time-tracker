@@ -1,8 +1,11 @@
 package main
 
-import "github.com/itsLeonB/time-tracker/internal/config"
+import (
+	"github.com/itsLeonB/time-tracker/internal/delivery/http/server"
+	_ "github.com/joho/godotenv/autoload"
+)
 
 func main() {
-	app := config.SetupApp()
-	app.Serve()
+	srv := server.SetupServer()
+	srv.Serve()
 }

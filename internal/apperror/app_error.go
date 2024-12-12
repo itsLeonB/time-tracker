@@ -48,3 +48,12 @@ func BadRequestError(err error) *AppError {
 		Message:        "Bad request",
 	}
 }
+
+func UnauthorizedError(err error) *AppError {
+	return &AppError{
+		Err:            err,
+		HttpStatusCode: http.StatusUnauthorized,
+		Type:           "UnauthorizedError",
+		Message:        "Unauthorized",
+	}
+}

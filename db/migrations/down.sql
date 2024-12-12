@@ -5,3 +5,4 @@ DROP TABLE IF EXISTS task_logs;
 DROP TYPE task_log_action;
 DROP TABLE IF EXISTS tasks;
 DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS users;

@@ -31,7 +31,7 @@ func (ph *ProjectHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		project, err := ph.projectService.Create(request.Name)
+		project, err := ph.projectService.Create(ctx, request.Name)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -43,7 +43,7 @@ func (ph *ProjectHandler) Create() gin.HandlerFunc {
 
 func (ph *ProjectHandler) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		projects, err := ph.projectService.GetAll()
+		projects, err := ph.projectService.GetAll(ctx)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -85,7 +85,7 @@ func (ph *ProjectHandler) GetByID() gin.HandlerFunc {
 			options.Params.Date = timestamp
 		}
 
-		project, err := ph.projectService.GetByID(&options)
+		project, err := ph.projectService.GetByID(ctx, &options)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -98,9 +98,9 @@ func (ph *ProjectHandler) GetByID() gin.HandlerFunc {
 func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		name := ctx.Query("name")
-		options := model.FindProjectOptions{Name: name}
+		options := &model.FindProjectOptions{Name: name}
 
-		project, err := ph.projectService.FirstByQuery(options)
+		project, err := ph.projectService.FirstByQuery(ctx, options)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
