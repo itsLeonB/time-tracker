@@ -9,6 +9,7 @@ import (
 
 type Task struct {
 	ID         uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID     uuid.UUID  `json:"userId"`
 	ProjectID  uuid.UUID  `json:"projectId"`
 	Number     string     `json:"number"`
 	Name       string     `json:"name"`

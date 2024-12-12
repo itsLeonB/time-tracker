@@ -1,9 +1,16 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	"github.com/itsLeonB/time-tracker/internal/model"
 )
+
+type UserRepository interface {
+	FindByEmail(ctx context.Context, email string) (*model.User, error)
+	Insert(ctx context.Context, user *model.User) error
+}
 
 type ProjectRepository interface {
 	Insert(project *model.Project) (*model.Project, error)

@@ -5,13 +5,17 @@ import (
 	"github.com/itsLeonB/time-tracker/internal/provider"
 )
 
-func SetupRoutes(router *gin.Engine, handlers *provider.Handlers) *gin.Engine {
+func SetupRoutes(router *gin.Engine, handlers *provider.Handlers) {
 	router.HandleMethodNotAllowed = true
 	router.ContextWithFallback = true
 
 	router.NoRoute(handlers.Root.NotFound())
 	router.GET("", handlers.Root.Root())
 	router.GET("/health", handlers.Root.HealthCheck())
+
+	authRoutes := router.Group("/auth")
+	authRoutes.POST("/register", handlers.Auth.HandleRegister())
+	authRoutes.POST("/login", handlers.Auth.HandleLogin())
 
 	projectRoutes := router.Group("/projects")
 	projectRoutes.POST("", handlers.Project.Create())
@@ -24,6 +28,4 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers) *gin.Engine {
 	taskRoutes.GET("", handlers.Task.Find())
 	taskRoutes.POST("/:id/logs", handlers.Task.Log())
 	taskRoutes.POST("/log-by-number", handlers.Task.LogByNumber())
-
-	return router
 }

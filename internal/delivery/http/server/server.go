@@ -1,4 +1,4 @@
-package config
+package server
 
 import (
 	"context"
@@ -11,59 +11,39 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/itsLeonB/time-tracker/internal/config"
 	"github.com/itsLeonB/time-tracker/internal/delivery/http/middleware"
 	"github.com/itsLeonB/time-tracker/internal/delivery/http/route"
 	"github.com/itsLeonB/time-tracker/internal/provider"
 )
 
-type App struct {
+type Server struct {
 	Router *gin.Engine
-	config *config
+	Config *config.Config
 }
 
-type config struct {
-	env  string
-	port string
-}
+func SetupServer() *Server {
+	configs := config.LoadConfig()
 
-func (a *App) loadConfig() {
-	env := os.Getenv("APP_ENV")
-	if env == "" {
-		log.Println("APP_ENV is not set, using default value: debug")
-		env = "debug"
-	}
-
-	port := os.Getenv("APP_PORT")
-	if port == "" {
-		log.Println("APP_PORT is not set, using default value: 8000")
-		port = "8000"
-	}
-
-	a.config = &config{env, port}
-}
-
-func SetupApp() *App {
-	db := NewGormDB()
+	db := config.NewGormDB(configs.DB)
 	repositories := provider.ProvideRepositories(db)
-	services := provider.ProvideServices(repositories)
+	services := provider.ProvideServices(configs, repositories)
 	handlers := provider.ProvideHandlers(services)
 
-	a := new(App)
-	a.loadConfig()
-
-	gin.SetMode(a.config.env)
+	gin.SetMode(configs.App.Env)
 	r := gin.Default()
 	r.Use(middleware.HandleError())
-	r = route.SetupRoutes(r, handlers)
+	route.SetupRoutes(r, handlers)
 
-	a.Router = r
-
-	return a
+	return &Server{
+		Router: r,
+		Config: configs,
+	}
 }
 
-func (a *App) Serve() {
+func (a *Server) Serve() {
 	srv := http.Server{
-		Addr:    fmt.Sprintf(":%s", a.config.port),
+		Addr:    fmt.Sprintf(":%s", a.Config.App.Port),
 		Handler: a.Router,
 	}
 

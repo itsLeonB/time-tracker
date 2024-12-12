@@ -1,9 +1,16 @@
 package service
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	"github.com/itsLeonB/time-tracker/internal/model"
 )
+
+type UserService interface {
+	FindByEmail(ctx context.Context, email string) (*model.User, error)
+	Create(ctx context.Context, user *model.User) error
+}
 
 type ProjectService interface {
 	Create(name string) (*model.Project, error)
