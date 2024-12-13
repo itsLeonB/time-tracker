@@ -43,14 +43,14 @@ func (j *jwtHS256) CreateToken(data map[string]any) (string, error) {
 	return signed, nil
 }
 
-func (p *jwtHS256) VerifyToken(tokenstr string) (*JWTClaims, error) {
+func (j *jwtHS256) VerifyToken(tokenstr string) (*JWTClaims, error) {
 	token, err := jwt.ParseWithClaims(
 		tokenstr,
 		&JWTClaims{},
 		func(token *jwt.Token) (interface{}, error) {
-			return []byte(p.secretKey), nil
+			return []byte(j.secretKey), nil
 		},
-		jwt.WithIssuer(p.issuer),
+		jwt.WithIssuer(j.issuer),
 		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}),
 		jwt.WithExpirationRequired(),
 	)
@@ -60,7 +60,7 @@ func (p *jwtHS256) VerifyToken(tokenstr string) (*JWTClaims, error) {
 
 	claims, ok := token.Claims.(*JWTClaims)
 	if !ok {
-		return nil, eris.Wrap(err, "error parsing token claims")
+		return nil, eris.Errorf("error parsing token claims")
 	}
 
 	return claims, nil

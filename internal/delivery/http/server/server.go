@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsLeonB/time-tracker/internal/config"
@@ -19,7 +18,7 @@ import (
 
 type Server struct {
 	Router *gin.Engine
-	Config *config.Config
+	config *config.Config
 }
 
 func SetupServer() *Server {
@@ -37,14 +36,14 @@ func SetupServer() *Server {
 
 	return &Server{
 		Router: r,
-		Config: configs,
+		config: configs,
 	}
 }
 
-func (a *Server) Serve() {
+func (s *Server) Serve() {
 	srv := http.Server{
-		Addr:    fmt.Sprintf(":%s", a.Config.App.Port),
-		Handler: a.Router,
+		Addr:    fmt.Sprintf(":%s", s.config.App.Port),
+		Handler: s.Router,
 	}
 
 	go func() {
@@ -61,7 +60,7 @@ func (a *Server) Serve() {
 
 	ctx, cancel := context.WithTimeout(
 		context.Background(),
-		5*time.Second,
+		s.config.App.Timeout,
 	)
 	defer cancel()
 

@@ -29,6 +29,10 @@ func (us *userServiceImpl) Create(ctx context.Context, user *model.User) error {
 
 func (us *userServiceImpl) ValidateUser(ctx context.Context) (*model.User, error) {
 	id := ctx.Value(constant.ContextUserID)
+	if id == nil {
+		return nil, eris.Errorf("id is not set in context")
+	}
+
 	userID, err := uuid.Parse(id.(string))
 	if err != nil {
 		return nil, eris.Wrap(err, "error parsing UUID")
@@ -39,7 +43,7 @@ func (us *userServiceImpl) ValidateUser(ctx context.Context) (*model.User, error
 		return nil, err
 	}
 	if user == nil {
-		return nil, apperror.NotFoundError(eris.Wrap(err, "user not found"))
+		return nil, apperror.NotFoundError(eris.Errorf("user not found"))
 	}
 
 	return user, nil
