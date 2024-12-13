@@ -66,7 +66,7 @@ func (s *Server) Serve() {
 
 	err := srv.Shutdown(ctx)
 	if err != nil {
-		log.Fatalf("error shutting down: %e", err)
+		log.Fatalf("error shutting down: %s", err.Error())
 	}
 
 	log.Println("server successfully shutdown")
