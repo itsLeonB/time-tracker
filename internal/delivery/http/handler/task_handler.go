@@ -30,7 +30,7 @@ func (th *TaskHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		task, err := th.taskService.Create(request)
+		task, err := th.taskService.Create(ctx, request)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -42,7 +42,7 @@ func (th *TaskHandler) Create() gin.HandlerFunc {
 
 func (th *TaskHandler) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		tasks, err := th.taskService.GetAll()
+		tasks, err := th.taskService.GetAll(ctx)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -71,7 +71,7 @@ func (th *TaskHandler) Log() gin.HandlerFunc {
 			return
 		}
 
-		log, err := th.taskService.Log(parsedId, request.Action)
+		log, err := th.taskService.Log(ctx, parsedId, request.Action)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -92,7 +92,7 @@ func (th *TaskHandler) LogByNumber() gin.HandlerFunc {
 			return
 		}
 
-		log, err := th.taskService.LogByNumber(request.Number, request.Action)
+		log, err := th.taskService.LogByNumber(ctx, request.Number, request.Action)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -105,7 +105,7 @@ func (th *TaskHandler) LogByNumber() gin.HandlerFunc {
 func (th *TaskHandler) Find() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		queryOptions := constructQueryOptions(ctx)
-		tasks, err := th.taskService.Find(queryOptions)
+		tasks, err := th.taskService.Find(ctx, queryOptions)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
