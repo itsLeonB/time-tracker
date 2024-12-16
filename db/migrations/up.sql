@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-)
+);
 
 CREATE TABLE IF NOT EXISTS projects (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -39,3 +39,7 @@ CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_number ON tasks(number);
 
 CREATE INDEX IF NOT EXISTS idx_task_logs_task_id ON task_logs(task_id);
+
+ALTER TABLE projects ADD CONSTRAINT unique_projects_name_user_id UNIQUE (user_id, name);
+
+ALTER TABLE tasks ADD CONSTRAINT unique_tasks_number_user_id UNIQUE (user_id, number);
