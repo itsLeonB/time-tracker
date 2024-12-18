@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/itsLeonB/time-tracker/internal/apperror"
 	strategy "github.com/itsLeonB/time-tracker/internal/delivery/http/middleware/strategy/error"
@@ -16,6 +18,7 @@ func HandleError(errorStrategyMap *strategy.ErrorStrategyMap) gin.HandlerFunc {
 			handledError, ok := err.Err.(*apperror.AppError)
 			if !ok {
 				handledError = eris.Unwrap(err.Err)
+				log.Println(eris.ToString(err.Err, true))
 			}
 
 			errorStrategy := errorStrategyMap.DetermineStrategy(handledError)

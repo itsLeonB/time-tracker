@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
 	"github.com/itsLeonB/time-tracker/internal/config"
 	"github.com/rotisserie/eris"
 )
@@ -55,6 +57,10 @@ func (j *jwtHS256) VerifyToken(tokenstr string) (*JWTClaims, error) {
 		jwt.WithExpirationRequired(),
 	)
 	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, apperror.UnauthorizedError(err)
+		}
+
 		return nil, eris.Wrap(err, "error parsing token")
 	}
 
