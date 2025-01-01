@@ -14,14 +14,21 @@ type projectServiceImpl struct {
 	projectRepository repository.ProjectRepository
 	taskService       TaskService
 	userService       UserService
+	taskRepository    repository.TaskRepository
 }
 
 func NewProjectService(
 	projectRepository repository.ProjectRepository,
 	taskService TaskService,
 	userService UserService,
+	taskRepository repository.TaskRepository,
 ) ProjectService {
-	return &projectServiceImpl{projectRepository, taskService, userService}
+	return &projectServiceImpl{
+		projectRepository,
+		taskService,
+		userService,
+		taskRepository,
+	}
 }
 
 func (ps *projectServiceImpl) Create(ctx context.Context, name string) (*model.Project, error) {
@@ -128,6 +135,20 @@ func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *model.F
 	}
 
 	return projects[0], nil
+}
+
+func (ps *projectServiceImpl) GetInProgressTasks(ctx context.Context, id uuid.UUID) ([]*model.Task, error) {
+	_, err := ps.getProject(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	tasks, err := ps.taskRepository.GetInProgress(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
 }
 
 func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {

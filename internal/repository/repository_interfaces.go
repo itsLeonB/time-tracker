@@ -34,4 +34,5 @@ type TaskRepository interface {
 	GetLatestLog(ctx context.Context, task *model.Task) (*model.TaskLog, error)
 	GetLogs(ctx context.Context, task *model.Task) ([]*model.TaskLog, error)
 	Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error)
+	GetInProgress(ctx context.Context, projectID uuid.UUID) ([]*model.Task, error)
 }

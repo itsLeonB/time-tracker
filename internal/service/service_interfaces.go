@@ -20,6 +20,7 @@ type ProjectService interface {
 	Update(ctx context.Context, id uuid.UUID, name string) (*model.Project, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	FirstByQuery(ctx context.Context, options *model.FindProjectOptions) (*model.Project, error)
+	GetInProgressTasks(ctx context.Context, id uuid.UUID) ([]*model.Task, error)
 }
 
 type TaskService interface {

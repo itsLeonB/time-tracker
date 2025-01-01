@@ -166,3 +166,23 @@ func (tr *taskRepositoryGorm) Find(ctx context.Context, options *model.QueryOpti
 
 	return tasks, nil
 }
+
+func (tr *taskRepositoryGorm) GetInProgress(ctx context.Context, projectID uuid.UUID) ([]*model.Task, error) {
+	var tasks []*model.Task
+	subQuery := tr.db.WithContext(ctx).
+		Model(&model.TaskLog{}).
+		Select("task_id, MAX(created_at) as last_log").
+		Group("task_id")
+
+	err := tr.db.WithContext(ctx).
+		Model(&model.Task{}).
+		Joins("JOIN (?) as last_logs ON tasks.id = last_logs.task_id", subQuery).
+		Joins("JOIN task_logs ON task_logs.task_id = tasks.id AND task_logs.created_at = last_logs.last_log").
+		Where("tasks.project_id = ? AND task_logs.action = ?", projectID, "START").
+		Find(&tasks).Error
+	if err != nil {
+		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
+	}
+
+	return tasks, nil
+}
