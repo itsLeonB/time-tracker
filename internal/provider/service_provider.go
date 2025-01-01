@@ -24,7 +24,7 @@ func ProvideServices(configs *config.Config, repositories *Repositories) *Servic
 	jwt := auth.NewJWTHS256(configs.Auth)
 	authService := auth.NewAuthService(hasher, jwt, userService)
 	taskService := service.NewTaskService(repositories.Task, pointStrategy, userService)
-	projectService := service.NewProjectService(repositories.Project, taskService, userService)
+	projectService := service.NewProjectService(repositories.Project, taskService, userService, repositories.Task)
 
 	return &Services{
 		User:    userService,

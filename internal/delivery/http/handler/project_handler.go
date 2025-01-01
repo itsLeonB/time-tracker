@@ -109,3 +109,24 @@ func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 		ctx.JSON(http.StatusOK, model.NewSuccessJSON(project))
 	}
 }
+
+func (ph *ProjectHandler) HandleGetInProgressTasks() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		parsedId, err := uuid.Parse(id)
+		if err != nil {
+			_ = ctx.Error(apperror.BadRequestError(
+				eris.Wrap(err, "error parsing UUID"),
+			))
+			return
+		}
+
+		tasks, err := ph.projectService.GetInProgressTasks(ctx, parsedId)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+	}
+}
