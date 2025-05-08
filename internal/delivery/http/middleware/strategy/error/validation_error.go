@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 )
 
 type validationErrorStrategy struct{}

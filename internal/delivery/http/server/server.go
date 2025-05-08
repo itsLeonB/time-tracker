@@ -10,11 +10,11 @@ import (
 	"syscall"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/config"
-	"github.com/itsLeonB/time-tracker/internal/delivery/http/middleware"
-	strategy "github.com/itsLeonB/time-tracker/internal/delivery/http/middleware/strategy/error"
-	"github.com/itsLeonB/time-tracker/internal/delivery/http/route"
-	"github.com/itsLeonB/time-tracker/internal/provider"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/middleware"
+	strategy "github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/middleware/strategy/error"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/route"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/provider"
 )
 
 type Server struct {

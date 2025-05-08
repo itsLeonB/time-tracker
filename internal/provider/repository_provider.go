@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/itsLeonB/time-tracker/internal/repository"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
 	"gorm.io/gorm"
 )
 

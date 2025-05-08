@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/auth"
-	"github.com/itsLeonB/time-tracker/internal/constant"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/auth"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/rotisserie/eris"
 )
 

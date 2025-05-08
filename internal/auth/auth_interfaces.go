@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 )
 
 type AuthService interface {

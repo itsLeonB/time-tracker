@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/auth"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/auth"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/rotisserie/eris"
 )
 

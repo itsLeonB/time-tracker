@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/constant"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 )
 
 type Task struct {

@@ -1,10 +1,10 @@
 package provider
 
 import (
-	"github.com/itsLeonB/time-tracker/internal/auth"
-	"github.com/itsLeonB/time-tracker/internal/config"
-	"github.com/itsLeonB/time-tracker/internal/service"
-	strategy "github.com/itsLeonB/time-tracker/internal/service/strategy/point"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/auth"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
+	strategy "github.com/itsLeonB/catfeinated-time-tracker/internal/service/strategy/point"
 )
 
 type Services struct {

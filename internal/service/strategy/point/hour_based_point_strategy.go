@@ -1,8 +1,8 @@
 package strategy
 
 import (
-	"github.com/itsLeonB/time-tracker/internal/model"
-	"github.com/itsLeonB/time-tracker/internal/util"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 )
 
 type hourBasedPointStrategy struct{}

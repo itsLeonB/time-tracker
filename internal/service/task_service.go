@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/constant"
-	"github.com/itsLeonB/time-tracker/internal/model"
-	"github.com/itsLeonB/time-tracker/internal/repository"
-	strategy "github.com/itsLeonB/time-tracker/internal/service/strategy/point"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
+	strategy "github.com/itsLeonB/catfeinated-time-tracker/internal/service/strategy/point"
 	"github.com/rotisserie/eris"
 )
 

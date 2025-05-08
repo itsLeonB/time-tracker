@@ -1,6 +1,6 @@
 package provider
 
-import "github.com/itsLeonB/time-tracker/internal/delivery/http/handler"
+import "github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/handler"
 
 type Handlers struct {
 	Root    *handler.RootHandler

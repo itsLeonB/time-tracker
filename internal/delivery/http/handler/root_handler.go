@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 )
 
 type RootHandler struct{}

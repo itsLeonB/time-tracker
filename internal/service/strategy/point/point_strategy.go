@@ -1,6 +1,6 @@
 package strategy
 
-import "github.com/itsLeonB/time-tracker/internal/model"
+import "github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 
 type PointStrategy interface {
 	CalculatePoints(task *model.Task) float64
