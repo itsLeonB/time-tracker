@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
@@ -31,7 +30,7 @@ func (pr *projectRepositoryGorm) Insert(ctx context.Context, project *model.Proj
 func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]*model.Project, error) {
 	var projects []*model.Project
 
-	err := pr.db.WithContext(ctx).Find(&projects, "user_id = ?", ctx.Value(constant.ContextUserID)).Error
+	err := pr.db.WithContext(ctx).Find(&projects).Error
 	if err != nil {
 		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
@@ -42,7 +41,7 @@ func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]*model.Project, 
 func (pr *projectRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model.Project, error) {
 	var project model.Project
 
-	err := pr.db.WithContext(ctx).First(&project, "id = ? AND user_id = ?", id, ctx.Value(constant.ContextUserID)).Error
+	err := pr.db.WithContext(ctx).First(&project, "id = ?", id).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -75,7 +74,7 @@ func (pr *projectRepositoryGorm) Delete(ctx context.Context, project *model.Proj
 func (pr *projectRepositoryGorm) Find(ctx context.Context, options *model.FindProjectOptions) ([]*model.Project, error) {
 	var projects []*model.Project
 
-	query := pr.db.WithContext(ctx).Where("user_id = ?", ctx.Value(constant.ContextUserID))
+	query := pr.db.WithContext(ctx)
 	if options != nil {
 		if options.Name != "" {
 			query = query.Where("name ILIKE %?%", options.Name)
@@ -93,7 +92,7 @@ func (pr *projectRepositoryGorm) Find(ctx context.Context, options *model.FindPr
 func (pr *projectRepositoryGorm) GetByName(ctx context.Context, name string) (*model.Project, error) {
 	var project model.Project
 
-	err := pr.db.WithContext(ctx).First(&project, "name = ? and user_id = ?", name, ctx.Value(constant.ContextUserID)).Error
+	err := pr.db.WithContext(ctx).First(&project, "name = ?", name).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil

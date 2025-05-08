@@ -9,7 +9,6 @@ import (
 
 type Task struct {
 	ID         uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	UserID     uuid.UUID  `json:"userId"`
 	ProjectID  uuid.UUID  `json:"projectId"`
 	Number     string     `json:"number"`
 	Name       string     `json:"name"`
@@ -65,6 +64,7 @@ type NewTaskRequest struct {
 
 type TaskLog struct {
 	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID    uuid.UUID `json:"userId"`
 	TaskID    uuid.UUID `json:"taskId"`
 	Action    string    `json:"action"`
 	CreatedAt time.Time `json:"createdAt"`

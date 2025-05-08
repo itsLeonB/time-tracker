@@ -7,7 +7,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
@@ -34,7 +33,7 @@ func (tr *taskRepositoryGorm) Insert(ctx context.Context, task *model.Task) (*mo
 func (tr *taskRepositoryGorm) GetAll(ctx context.Context) ([]*model.Task, error) {
 	var tasks []*model.Task
 
-	err := tr.db.WithContext(ctx).Find(&tasks, "user_id = ?", ctx.Value(constant.ContextUserID)).Error
+	err := tr.db.WithContext(ctx).Find(&tasks).Error
 	if err != nil {
 		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
@@ -45,7 +44,7 @@ func (tr *taskRepositoryGorm) GetAll(ctx context.Context) ([]*model.Task, error)
 func (tr *taskRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error) {
 	var task model.Task
 
-	err := tr.db.WithContext(ctx).First(&task, "id = ? AND user_id = ?", id, ctx.Value(constant.ContextUserID)).Error
+	err := tr.db.WithContext(ctx).First(&task, "id = ?", id).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -60,10 +59,7 @@ func (tr *taskRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model
 func (tr *taskRepositoryGorm) GetByNumber(ctx context.Context, number string) (*model.Task, error) {
 	var task model.Task
 
-	err := tr.db.WithContext(ctx).Preload("Logs").First(&task,
-		"number = ? AND user_id = ?",
-		number, ctx.Value(constant.ContextUserID),
-	).Error
+	err := tr.db.WithContext(ctx).Preload("Logs").First(&task, "number = ?", number).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -94,12 +90,18 @@ func (tr *taskRepositoryGorm) Delete(ctx context.Context, task *model.Task) erro
 }
 
 func (tr *taskRepositoryGorm) Log(ctx context.Context, task *model.Task, action string) (*model.TaskLog, error) {
+	userId, err := util.GetUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	newLog := &model.TaskLog{
+		UserID: userId,
 		TaskID: task.ID,
 		Action: action,
 	}
 
-	err := tr.db.WithContext(ctx).Create(newLog).Error
+	err = tr.db.WithContext(ctx).Create(newLog).Error
 	if err != nil {
 		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgInsertError))
 	}
@@ -138,7 +140,7 @@ func (tr *taskRepositoryGorm) Find(ctx context.Context, options *model.QueryOpti
 
 	query := tr.db.WithContext(ctx).Preload("Logs", func(db *gorm.DB) *gorm.DB {
 		return db.Order("task_logs.created_at ASC")
-	}).Where("user_id = ?", ctx.Value(constant.ContextUserID))
+	})
 
 	if options != nil {
 		if options.Params != nil {

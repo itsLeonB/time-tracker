@@ -27,7 +27,7 @@ func NewTaskService(
 }
 
 func (ts *taskServiceImpl) Create(ctx context.Context, request *model.NewTaskRequest) (*model.Task, error) {
-	user, err := ts.userService.ValidateUser(ctx)
+	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,6 @@ func (ts *taskServiceImpl) Create(ctx context.Context, request *model.NewTaskReq
 	}
 
 	newTask := &model.Task{
-		UserID:    user.ID,
 		ProjectID: request.ProjectID,
 		Number:    request.Number,
 		Name:      request.Name,

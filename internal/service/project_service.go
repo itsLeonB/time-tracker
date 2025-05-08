@@ -32,7 +32,7 @@ func NewProjectService(
 }
 
 func (ps *projectServiceImpl) Create(ctx context.Context, name string) (*model.Project, error) {
-	user, err := ps.userService.ValidateUser(ctx)
+	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +46,7 @@ func (ps *projectServiceImpl) Create(ctx context.Context, name string) (*model.P
 	}
 
 	newProject := &model.Project{
-		UserID: user.ID,
-		Name:   name,
+		Name: name,
 	}
 
 	return ps.projectRepository.Insert(ctx, newProject)
