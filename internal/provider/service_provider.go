@@ -8,12 +8,13 @@ import (
 )
 
 type Services struct {
-	User    service.UserService
-	Hasher  auth.Hasher
-	JWT     auth.JWT
-	Auth    auth.AuthService
-	Project service.ProjectService
-	Task    service.TaskService
+	User            service.UserService
+	Hasher          auth.Hasher
+	JWT             auth.JWT
+	Auth            auth.AuthService
+	Project         service.ProjectService
+	Task            service.TaskService
+	ExternalTracker service.ExternalTrackerService
 }
 
 func ProvideServices(configs *config.Config, repositories *Repositories) *Services {
@@ -25,13 +26,15 @@ func ProvideServices(configs *config.Config, repositories *Repositories) *Servic
 	authService := auth.NewAuthService(hasher, jwt, userService)
 	taskService := service.NewTaskService(repositories.Task, pointStrategy, userService)
 	projectService := service.NewProjectService(repositories.Project, taskService, userService, repositories.Task)
+	externalTrackerService := service.NewYoutrackService(repositories.Youtrack)
 
 	return &Services{
-		User:    userService,
-		Hasher:  hasher,
-		JWT:     jwt,
-		Auth:    authService,
-		Project: projectService,
-		Task:    taskService,
+		User:            userService,
+		Hasher:          hasher,
+		JWT:             jwt,
+		Auth:            authService,
+		Project:         projectService,
+		Task:            taskService,
+		ExternalTracker: externalTrackerService,
 	}
 }

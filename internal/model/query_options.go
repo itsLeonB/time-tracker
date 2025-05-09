@@ -16,3 +16,11 @@ type QueryParams struct {
 	ProjectID uuid.UUID
 	Date      time.Time
 }
+
+type ExternalQueryOptions struct {
+	Number string
+}
+
+type YoutrackQueryOptions struct {
+	IdReadable string
+}

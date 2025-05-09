@@ -34,3 +34,7 @@ type TaskService interface {
 	LogByNumber(ctx context.Context, number string, action string) (*model.TaskLog, error)
 	Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error)
 }
+
+type ExternalTrackerService interface {
+	FindTask(ctx context.Context, queryOptions model.ExternalQueryOptions) ([]model.ExternalTask, error)
+}

@@ -32,4 +32,8 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *prov
 	taskRoutes.GET("", handlers.Task.Find())
 	taskRoutes.POST("/:id/logs", handlers.Task.Log())
 	taskRoutes.POST("/log-by-number", handlers.Task.LogByNumber())
+
+	externalTrackerRoutes := authenticatedRoutes.Group("/external")
+	externalTaskRoutes := externalTrackerRoutes.Group("/tasks")
+	externalTaskRoutes.GET("", handlers.Task.FindExternal())
 }

@@ -12,11 +12,18 @@ import (
 )
 
 type TaskHandler struct {
-	taskService service.TaskService
+	taskService         service.TaskService
+	externalTaskService service.ExternalTrackerService
 }
 
-func NewTaskHandler(taskService service.TaskService) *TaskHandler {
-	return &TaskHandler{taskService}
+func NewTaskHandler(
+	taskService service.TaskService,
+	externalTrackerService service.ExternalTrackerService,
+) *TaskHandler {
+	return &TaskHandler{
+		taskService,
+		externalTrackerService,
+	}
 }
 
 func (th *TaskHandler) Create() gin.HandlerFunc {
@@ -113,7 +120,22 @@ func (th *TaskHandler) Find() gin.HandlerFunc {
 
 		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
 	}
+}
 
+func (th *TaskHandler) FindExternal() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		number := ctx.Query("number")
+
+		queryOptions := model.ExternalQueryOptions{Number: number}
+
+		tasks, err := th.externalTaskService.FindTask(ctx, queryOptions)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+	}
 }
 
 func constructQueryOptions(ctx *gin.Context) *model.QueryOptions {

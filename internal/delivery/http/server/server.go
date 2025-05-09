@@ -26,7 +26,7 @@ func SetupServer() *Server {
 	configs := config.LoadConfig()
 
 	db := config.NewGormDB(configs.DB)
-	repositories := provider.ProvideRepositories(db)
+	repositories := provider.ProvideRepositories(db, configs)
 	services := provider.ProvideServices(configs, repositories)
 	handlers := provider.ProvideHandlers(services)
 
