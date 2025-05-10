@@ -8,22 +8,26 @@ type ExternalTask struct {
 }
 
 type YoutrackTask struct {
-	Id           string                `json:"id"`
 	IdReadable   string                `json:"idReadable"`
 	Summary      string                `json:"summary"`
 	CustomFields []YoutrackCustomField `json:"customFields"`
-	Type         string                `json:"$type"`
 }
 
 type YoutrackCustomField struct {
 	Value *YoutrackGenericField `json:"value"`
 	Name  string                `json:"name"`
-	Type  string                `json:"$type"`
 }
 
 type YoutrackGenericField struct {
 	Name string `json:"name"`
-	Type string `json:"$type"`
+}
+
+type YoutrackError struct {
+	Error                 string          `json:"error"`
+	ErrorDescription      string          `json:"error_description"`
+	ErrorDeveloperMessage string          `json:"error_developer_message"`
+	ErrorField            string          `json:"error_field"`
+	ErrorChildren         []YoutrackError `json:"error_children"`
 }
 
 func (yt *YoutrackTask) GetEpicName() string {

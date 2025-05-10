@@ -78,7 +78,7 @@ func (pr *projectRepositoryGorm) Find(ctx context.Context, options *dto.FindProj
 	query := pr.db.WithContext(ctx)
 	if options != nil {
 		if options.Name != "" {
-			query = query.Where("name ILIKE %?%", options.Name)
+			query = query.Where("name = ?", options.Name)
 		}
 	}
 

@@ -15,15 +15,24 @@ import (
 )
 
 type taskServiceImpl struct {
-	taskRepository repository.TaskRepository
-	userService    UserService
+	taskRepository         repository.TaskRepository
+	userService            UserService
+	externalTrackerService ExternalTrackerService
+	projectService         ProjectService
 }
 
 func NewTaskService(
 	taskRepository repository.TaskRepository,
 	userService UserService,
+	externalTrackerService ExternalTrackerService,
+	projectService ProjectService,
 ) TaskService {
-	return &taskServiceImpl{taskRepository, userService}
+	return &taskServiceImpl{
+		taskRepository,
+		userService,
+		externalTrackerService,
+		projectService,
+	}
 }
 
 func (ts *taskServiceImpl) Create(ctx context.Context, request *dto.NewTaskRequest) (dto.TaskResponse, error) {
@@ -103,7 +112,58 @@ func (ts *taskServiceImpl) Find(ctx context.Context, queryParams dto.TaskQueryPa
 		return nil, err
 	}
 
-	return util.MapSlice(tasks, mapper.TaskToResponse), nil
+	if len(tasks) > 0 {
+		return util.MapSlice(tasks, mapper.TaskToResponse), nil
+	}
+
+	// If no tasks are found, check the external tracker
+	return ts.findAndInsertFromExternal(ctx, queryParams.Number)
+}
+
+func (ts *taskServiceImpl) findAndInsertFromExternal(ctx context.Context, number string) ([]dto.TaskResponse, error) {
+	externalQueryOptions := dto.ExternalQueryOptions{
+		Number: number,
+	}
+
+	externalTasks, err := ts.externalTrackerService.FindTask(ctx, externalQueryOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	insertedTasks := make([]dto.TaskResponse, 0, len(externalTasks))
+
+	for _, externalTask := range externalTasks {
+		insertedTask, err := ts.insertFromExternal(ctx, externalTask)
+		if err != nil {
+			return nil, err
+		}
+
+		insertedTasks = append(insertedTasks, mapper.TaskToResponse(insertedTask))
+	}
+
+	return insertedTasks, nil
+}
+
+func (ts *taskServiceImpl) insertFromExternal(ctx context.Context, externalTask model.ExternalTask) (model.Task, error) {
+	var task model.Task
+
+	project, err := ts.projectService.GetOrCreate(ctx, externalTask.Project)
+	if err != nil {
+		return task, err
+	}
+
+	newTask := model.Task{
+		ProjectID: project.ID,
+		Number:    externalTask.Number,
+		Name:      externalTask.Name,
+	}
+
+	insertedTask, err := ts.taskRepository.Insert(ctx, &newTask)
+	if err != nil {
+		return task, err
+	}
+
+	return *insertedTask, nil
 }
 
 func (ts *taskServiceImpl) GetByNumber(ctx context.Context, number string) (dto.TaskResponse, error) {

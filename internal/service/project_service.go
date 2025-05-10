@@ -15,22 +15,16 @@ import (
 
 type projectServiceImpl struct {
 	projectRepository repository.ProjectRepository
-	taskService       TaskService
 	userService       UserService
-	taskRepository    repository.TaskRepository
 }
 
 func NewProjectService(
 	projectRepository repository.ProjectRepository,
-	taskService TaskService,
 	userService UserService,
-	taskRepository repository.TaskRepository,
 ) ProjectService {
 	return &projectServiceImpl{
 		projectRepository,
-		taskService,
 		userService,
-		taskRepository,
 	}
 }
 
@@ -147,6 +141,31 @@ func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *dto.Fin
 	}
 
 	return mapper.ProjectToResponse(*projects[0]), nil
+}
+
+func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto.ProjectResponse, error) {
+	var projectResponse dto.ProjectResponse
+
+	project, err := ps.projectRepository.GetByName(ctx, name)
+	if err != nil {
+		return projectResponse, err
+	}
+	if project != nil {
+		// Found project, return
+		return mapper.ProjectToResponse(*project), nil
+	}
+
+	// Not found, insert new
+	newProject := model.Project{
+		Name: name,
+	}
+
+	project, err = ps.projectRepository.Insert(ctx, &newProject)
+	if err != nil {
+		return projectResponse, err
+	}
+
+	return mapper.ProjectToResponse(*project), nil
 }
 
 func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {

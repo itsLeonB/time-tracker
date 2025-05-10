@@ -2,14 +2,14 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
-	"github.com/rotisserie/eris"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 )
 
 type YoutrackRepository struct {
@@ -27,51 +27,40 @@ func NewYoutrackRepository(conf *config.Youtrack) *YoutrackRepository {
 }
 
 func (yr *YoutrackRepository) FindTask(ctx context.Context, queryOptions dto.YoutrackQueryOptions) ([]model.YoutrackTask, error) {
-	queryParams := make(map[string]string)
-
-	queryParams["fields"] = "id,summary,Epic,customFields(name,value(name)),idReadable"
-	queryParams["customFields"] = "Epic"
+	queryParams := map[string]string{
+		"fields":       "idReadable,summary,customFields(name,value(name))",
+		"customFields": "Epic",
+	}
 
 	if queryOptions.IdReadable != "" {
 		queryParams["query"] = fmt.Sprintf("issue ID: %s", queryOptions.IdReadable)
 	}
 
-	url := yr.constructUrl("issues", queryParams)
-
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, eris.Wrap(err, "failed to create request")
+	requestHeaders := map[string]string{
+		"Authorization": fmt.Sprintf("Bearer %s", yr.apiToken),
+		"Accept":        "application/json",
+		"Content-Type":  "application/json",
 	}
 
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", yr.apiToken))
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Content-Type", "application/json")
-
-	response, err := yr.client.Do(request)
-	if err != nil {
-		return nil, eris.Wrap(err, "failed to execute request")
-	}
-	defer response.Body.Close()
-
-	var tasks []model.YoutrackTask
-	err = json.NewDecoder(response.Body).Decode(&tasks)
-	if err != nil {
-		return nil, eris.Wrap(err, "failed to decode response")
+	requestObj := &util.RequestObject{
+		Client:    yr.client,
+		Ctx:       ctx,
+		Method:    http.MethodGet,
+		TargetUrl: util.ConstructUrl(yr.baseUrl, "issues", queryParams),
+		Body:      nil,
+		Headers:   requestHeaders,
 	}
 
-	return tasks, nil
-}
-
-func (yr *YoutrackRepository) constructUrl(target string, queryParams map[string]string) string {
-	url := fmt.Sprintf("%s/%s", yr.baseUrl, target)
-
-	if len(queryParams) > 0 {
-		url += "?"
-		for key, value := range queryParams {
-			url += fmt.Sprintf("%s=%s&", key, value)
+	response, errorResponse, err := util.MakeRequest[[]model.YoutrackTask, model.YoutrackError](requestObj)
+	if err != nil {
+		return nil, err
+	}
+	if len(errorResponse.ErrorChildren) > 0 {
+		if errorResponse.ErrorChildren[0].Error != fmt.Sprintf("The value \"%s\" isn't used for the issue id field.", queryOptions.IdReadable) {
+			log.Println("Error response:", errorResponse)
 		}
-		url = url[:len(url)-1] // Remove the trailing '&'
+		return nil, nil
 	}
 
-	return url
+	return response, nil
 }
