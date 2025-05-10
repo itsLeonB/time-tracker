@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 )
 
@@ -19,7 +20,7 @@ type ProjectRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Project, error)
 	Update(ctx context.Context, project *model.Project) (*model.Project, error)
 	Delete(ctx context.Context, project *model.Project) error
-	Find(ctx context.Context, options *model.FindProjectOptions) ([]*model.Project, error)
+	Find(ctx context.Context, options *dto.FindProjectOptions) ([]*model.Project, error)
 	GetByName(ctx context.Context, name string) (*model.Project, error)
 }
 
@@ -33,6 +34,6 @@ type TaskRepository interface {
 	Log(ctx context.Context, task *model.Task, action string) (*model.TaskLog, error)
 	GetLatestLog(ctx context.Context, task *model.Task) (*model.TaskLog, error)
 	GetLogs(ctx context.Context, task *model.Task) ([]*model.TaskLog, error)
-	Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error)
+	Find(ctx context.Context, options *dto.QueryOptions) ([]*model.Task, error)
 	GetInProgress(ctx context.Context, projectID uuid.UUID) ([]*model.Task, error)
 }

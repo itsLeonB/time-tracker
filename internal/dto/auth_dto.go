@@ -1,4 +1,4 @@
-package model
+package dto
 
 type RegisterRequest struct {
 	Email                string `json:"email" binding:"required,email"`

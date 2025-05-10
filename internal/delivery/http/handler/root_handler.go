@@ -8,26 +8,26 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 )
 
 type RootHandler struct{}
 
 func (h *RootHandler) Root() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON("time-tracker"))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON("time-tracker"))
 	}
 }
 
 func (h *RootHandler) HealthCheck() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON("app is healthy"))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON("app is healthy"))
 	}
 }
 
 func (h *RootHandler) NotFound() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusNotFound, model.NewErrorJSON(&model.ErrorResponse{
+		ctx.JSON(http.StatusNotFound, dto.NewErrorJSON(&dto.ErrorResponse{
 			Type:    "RouteNotFoundError",
 			Message: "Route is not found",
 		}))

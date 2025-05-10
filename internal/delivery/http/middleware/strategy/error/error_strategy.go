@@ -5,11 +5,11 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 )
 
 type ErrorStrategy interface {
-	HandleError(err error) *model.ErrorResponse
+	HandleError(err error) *dto.ErrorResponse
 }
 
 type ErrorStrategyMap struct {

@@ -56,12 +56,6 @@ func (t *Task) TableName() string {
 	return "tasks"
 }
 
-type NewTaskRequest struct {
-	ProjectID uuid.UUID `json:"projectId" binding:"required"`
-	Number    string    `json:"number" binding:"required"`
-	Name      string    `json:"name" binding:"required"`
-}
-
 type TaskLog struct {
 	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	UserID    uuid.UUID `json:"userId"`

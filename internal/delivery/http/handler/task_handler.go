@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
 	"github.com/rotisserie/eris"
@@ -28,7 +29,7 @@ func NewTaskHandler(
 
 func (th *TaskHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(model.NewTaskRequest)
+		request := new(dto.NewTaskRequest)
 		err := ctx.ShouldBindJSON(request)
 		if err != nil {
 			_ = ctx.Error(apperror.BadRequestError(
@@ -43,7 +44,7 @@ func (th *TaskHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(task))
+		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(task))
 	}
 }
 
@@ -55,7 +56,7 @@ func (th *TaskHandler) GetAll() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
 	}
 }
 
@@ -84,7 +85,7 @@ func (th *TaskHandler) Log() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(log))
+		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(log))
 	}
 }
 
@@ -105,7 +106,7 @@ func (th *TaskHandler) LogByNumber() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(log))
+		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(log))
 	}
 }
 
@@ -118,7 +119,7 @@ func (th *TaskHandler) Find() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
 	}
 }
 
@@ -126,7 +127,7 @@ func (th *TaskHandler) FindExternal() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		number := ctx.Query("number")
 
-		queryOptions := model.ExternalQueryOptions{Number: number}
+		queryOptions := dto.ExternalQueryOptions{Number: number}
 
 		tasks, err := th.externalTaskService.FindTask(ctx, queryOptions)
 		if err != nil {
@@ -134,12 +135,12 @@ func (th *TaskHandler) FindExternal() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
 	}
 }
 
-func constructQueryOptions(ctx *gin.Context) *model.QueryOptions {
-	options := new(model.QueryOptions)
+func constructQueryOptions(ctx *gin.Context) *dto.QueryOptions {
+	options := new(dto.QueryOptions)
 
 	withLogs := ctx.Query("withLogs")
 	if withLogs == "true" {
@@ -154,11 +155,11 @@ func constructQueryOptions(ctx *gin.Context) *model.QueryOptions {
 	return options
 }
 
-func constructQueryParams(ctx *gin.Context) *model.QueryParams {
+func constructQueryParams(ctx *gin.Context) *dto.QueryParams {
 	number := ctx.Query("number")
 	if number == "" {
 		return nil
 	}
 
-	return &model.QueryParams{Number: number}
+	return &dto.QueryParams{Number: number}
 }

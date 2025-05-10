@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 )
 
 type validationErrorStrategy struct{}
 
-func (es *validationErrorStrategy) HandleError(err error) *model.ErrorResponse {
+func (es *validationErrorStrategy) HandleError(err error) *dto.ErrorResponse {
 	validationErrors := err.(validator.ValidationErrors)
 	var errMap = make(map[string]string, len(validationErrors))
 
@@ -17,7 +17,7 @@ func (es *validationErrorStrategy) HandleError(err error) *model.ErrorResponse {
 		errMap[validationError.Field()] = validationError.Error()
 	}
 
-	return &model.ErrorResponse{
+	return &dto.ErrorResponse{
 		Code:    http.StatusBadRequest,
 		Type:    "BadRequestError",
 		Message: "Error validating request body",

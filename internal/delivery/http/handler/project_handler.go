@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
 	"github.com/rotisserie/eris"
 )
@@ -22,7 +22,7 @@ func NewProjectHandler(projectService service.ProjectService) *ProjectHandler {
 
 func (ph *ProjectHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(model.NewProjectRequest)
+		request := new(dto.NewProjectRequest)
 		err := ctx.ShouldBindJSON(request)
 		if err != nil {
 			_ = ctx.Error(apperror.BadRequestError(
@@ -37,7 +37,7 @@ func (ph *ProjectHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(project))
+		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(project))
 	}
 }
 
@@ -49,7 +49,7 @@ func (ph *ProjectHandler) GetAll() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(projects))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(projects))
 	}
 }
 
@@ -64,8 +64,8 @@ func (ph *ProjectHandler) GetByID() gin.HandlerFunc {
 			return
 		}
 
-		options := model.QueryOptions{
-			Params: &model.QueryParams{
+		options := dto.QueryOptions{
+			Params: &dto.QueryParams{
 				ProjectID: parsedId,
 			},
 		}
@@ -91,14 +91,14 @@ func (ph *ProjectHandler) GetByID() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(project))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(project))
 	}
 }
 
 func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		name := ctx.Query("name")
-		options := &model.FindProjectOptions{Name: name}
+		options := &dto.FindProjectOptions{Name: name}
 
 		project, err := ph.projectService.FirstByQuery(ctx, options)
 		if err != nil {
@@ -106,7 +106,7 @@ func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(project))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(project))
 	}
 }
 
@@ -127,6 +127,6 @@ func (ph *ProjectHandler) HandleGetInProgressTasks() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
 	}
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
@@ -135,7 +136,7 @@ func (tr *taskRepositoryGorm) GetLogs(ctx context.Context, task *model.Task) ([]
 	return logs, nil
 }
 
-func (tr *taskRepositoryGorm) Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error) {
+func (tr *taskRepositoryGorm) Find(ctx context.Context, options *dto.QueryOptions) ([]*model.Task, error) {
 	var tasks []*model.Task
 
 	query := tr.db.WithContext(ctx).Preload("Logs", func(db *gorm.DB) *gorm.DB {

@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
 	strategy "github.com/itsLeonB/catfeinated-time-tracker/internal/service/strategy/point"
@@ -26,7 +27,7 @@ func NewTaskService(
 	return &taskServiceImpl{taskRepository, pointStrategy, userService}
 }
 
-func (ts *taskServiceImpl) Create(ctx context.Context, request *model.NewTaskRequest) (*model.Task, error) {
+func (ts *taskServiceImpl) Create(ctx context.Context, request *dto.NewTaskRequest) (*model.Task, error) {
 	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (ts *taskServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (*model.Ta
 	return ts.taskRepository.GetByID(ctx, id)
 }
 
-func (ts *taskServiceImpl) Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error) {
+func (ts *taskServiceImpl) Find(ctx context.Context, options *dto.QueryOptions) ([]*model.Task, error) {
 	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
@@ -105,7 +106,7 @@ func (ts *taskServiceImpl) GetByNumber(ctx context.Context, number string) (*mod
 
 func (ts *taskServiceImpl) populateAdditionalTaskFields(
 	task *model.Task,
-	options *model.QueryOptions,
+	options *dto.QueryOptions,
 ) {
 	task.DetermineProgress()
 	task.CalculateTotalTime()

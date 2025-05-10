@@ -4,20 +4,20 @@ import (
 	"log"
 
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/rotisserie/eris"
 )
 
 type appErrorStrategy struct{}
 
-func (es *appErrorStrategy) HandleError(err error) *model.ErrorResponse {
+func (es *appErrorStrategy) HandleError(err error) *dto.ErrorResponse {
 	appError := err.(*apperror.AppError)
 
 	if appError.HttpStatusCode == 500 {
 		log.Println(eris.ToString(appError.Err, true))
 	}
 
-	return &model.ErrorResponse{
+	return &dto.ErrorResponse{
 		Code:    appError.HttpStatusCode,
 		Type:    appError.Type,
 		Message: appError.Message,

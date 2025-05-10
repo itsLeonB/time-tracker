@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/mapper"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
@@ -21,8 +22,8 @@ func NewYoutrackService(
 	}
 }
 
-func (ys *youtrackService) FindTask(ctx context.Context, queryOptions model.ExternalQueryOptions) ([]model.ExternalTask, error) {
-	youtrackQueryOpts := model.YoutrackQueryOptions{
+func (ys *youtrackService) FindTask(ctx context.Context, queryOptions dto.ExternalQueryOptions) ([]model.ExternalTask, error) {
+	youtrackQueryOpts := dto.YoutrackQueryOptions{
 		IdReadable: queryOptions.Number,
 	}
 

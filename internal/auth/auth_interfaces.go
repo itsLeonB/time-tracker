@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 )
 
 type AuthService interface {
-	Register(ctx context.Context, request *model.RegisterRequest) (*model.RegisterResponse, error)
-	Login(ctx context.Context, request *model.LoginRequest) (*model.LoginResponse, error)
+	Register(ctx context.Context, request *dto.RegisterRequest) (*dto.RegisterResponse, error)
+	Login(ctx context.Context, request *dto.LoginRequest) (*dto.LoginResponse, error)
 }
 
 type Hasher interface {

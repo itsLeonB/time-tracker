@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 )
 
@@ -16,15 +17,15 @@ type UserService interface {
 type ProjectService interface {
 	Create(ctx context.Context, name string) (*model.Project, error)
 	GetAll(ctx context.Context) ([]*model.Project, error)
-	GetByID(ctx context.Context, options *model.QueryOptions) (*model.Project, error)
+	GetByID(ctx context.Context, options *dto.QueryOptions) (*model.Project, error)
 	Update(ctx context.Context, id uuid.UUID, name string) (*model.Project, error)
 	Delete(ctx context.Context, id uuid.UUID) error
-	FirstByQuery(ctx context.Context, options *model.FindProjectOptions) (*model.Project, error)
+	FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (*model.Project, error)
 	GetInProgressTasks(ctx context.Context, id uuid.UUID) ([]*model.Task, error)
 }
 
 type TaskService interface {
-	Create(ctx context.Context, request *model.NewTaskRequest) (*model.Task, error)
+	Create(ctx context.Context, request *dto.NewTaskRequest) (*model.Task, error)
 	GetAll(ctx context.Context) ([]*model.Task, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error)
 	GetByNumber(ctx context.Context, number string) (*model.Task, error)
@@ -32,9 +33,9 @@ type TaskService interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	Log(ctx context.Context, id uuid.UUID, action string) (*model.TaskLog, error)
 	LogByNumber(ctx context.Context, number string, action string) (*model.TaskLog, error)
-	Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error)
+	Find(ctx context.Context, options *dto.QueryOptions) ([]*model.Task, error)
 }
 
 type ExternalTrackerService interface {
-	FindTask(ctx context.Context, queryOptions model.ExternalQueryOptions) ([]model.ExternalTask, error)
+	FindTask(ctx context.Context, queryOptions dto.ExternalQueryOptions) ([]model.ExternalTask, error)
 }

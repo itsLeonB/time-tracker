@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
 	"github.com/rotisserie/eris"
@@ -21,7 +22,7 @@ func NewAuthService(hasher Hasher, jwt JWT, userService service.UserService) Aut
 	return &authServiceImpl{hasher, jwt, userService}
 }
 
-func (as *authServiceImpl) Register(ctx context.Context, request *model.RegisterRequest) (*model.RegisterResponse, error) {
+func (as *authServiceImpl) Register(ctx context.Context, request *dto.RegisterRequest) (*dto.RegisterResponse, error) {
 	existingUser, err := as.userService.FindByEmail(ctx, request.Email)
 	if err != nil {
 		return nil, err
@@ -45,12 +46,12 @@ func (as *authServiceImpl) Register(ctx context.Context, request *model.Register
 		return nil, err
 	}
 
-	return &model.RegisterResponse{
+	return &dto.RegisterResponse{
 		Message: "register success, please login",
 	}, nil
 }
 
-func (as *authServiceImpl) Login(ctx context.Context, request *model.LoginRequest) (*model.LoginResponse, error) {
+func (as *authServiceImpl) Login(ctx context.Context, request *dto.LoginRequest) (*dto.LoginResponse, error) {
 	user, err := as.userService.FindByEmail(ctx, request.Email)
 	if err != nil {
 		return nil, err
@@ -72,7 +73,7 @@ func (as *authServiceImpl) Login(ctx context.Context, request *model.LoginReques
 		return nil, err
 	}
 
-	return &model.LoginResponse{
+	return &dto.LoginResponse{
 		Type:  "Bearer",
 		Token: token,
 	}, nil

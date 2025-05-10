@@ -18,11 +18,3 @@ type Project struct {
 func (p *Project) TableName() string {
 	return "projects"
 }
-
-type NewProjectRequest struct {
-	Name string `json:"name" binding:"required"`
-}
-
-type FindProjectOptions struct {
-	Name string
-}

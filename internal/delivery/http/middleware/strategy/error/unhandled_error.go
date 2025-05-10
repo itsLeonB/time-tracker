@@ -4,15 +4,15 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 )
 
 type unhandledErrorStrategy struct{}
 
-func (es *unhandledErrorStrategy) HandleError(err error) *model.ErrorResponse {
+func (es *unhandledErrorStrategy) HandleError(err error) *dto.ErrorResponse {
 	log.Printf("unexpected error type: %T\n", err)
 
-	return &model.ErrorResponse{
+	return &dto.ErrorResponse{
 		Code:    http.StatusInternalServerError,
 		Type:    "InternalServerError",
 		Message: "An unexpected error occurred",

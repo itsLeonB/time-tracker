@@ -3,8 +3,6 @@
 3. Insert UserTask
 4. When log, insert UserTaskLog
 
-store external_id in projects
-store external_id in tasks
 
 GET /projects
 Get list of projects
@@ -25,3 +23,5 @@ Upsert Project
 Upsert Task
 
 POST /user-tasks/:id/logs
+
+Setup service client auth

@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
 	"github.com/rotisserie/eris"
@@ -61,7 +62,7 @@ func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]*model.Project, err
 	return ps.projectRepository.GetAll(ctx)
 }
 
-func (ps *projectServiceImpl) GetByID(ctx context.Context, options *model.QueryOptions) (*model.Project, error) {
+func (ps *projectServiceImpl) GetByID(ctx context.Context, options *dto.QueryOptions) (*model.Project, error) {
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
@@ -118,7 +119,7 @@ func (ps *projectServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
 	return ps.projectRepository.Delete(ctx, project)
 }
 
-func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *model.FindProjectOptions) (*model.Project, error) {
+func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (*model.Project, error) {
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err

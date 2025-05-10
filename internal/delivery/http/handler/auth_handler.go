@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/auth"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/rotisserie/eris"
 )
 
@@ -20,7 +20,7 @@ func NewAuthHandler(authService auth.AuthService) *AuthHandler {
 
 func (ah *AuthHandler) HandleRegister() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var request model.RegisterRequest
+		var request dto.RegisterRequest
 		err := ctx.ShouldBindJSON(&request)
 		if err != nil {
 			_ = ctx.Error(eris.Wrap(err, apperror.MsgBindJsonError))
@@ -33,13 +33,13 @@ func (ah *AuthHandler) HandleRegister() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(response))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(response))
 	}
 }
 
 func (ah *AuthHandler) HandleLogin() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var request model.LoginRequest
+		var request dto.LoginRequest
 		err := ctx.ShouldBindJSON(&request)
 		if err != nil {
 			_ = ctx.Error(eris.Wrap(err, apperror.MsgBindJsonError))
@@ -52,6 +52,6 @@ func (ah *AuthHandler) HandleLogin() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(response))
+		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(response))
 	}
 }

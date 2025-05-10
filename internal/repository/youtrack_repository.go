@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/rotisserie/eris"
 )
@@ -25,7 +26,7 @@ func NewYoutrackRepository(conf *config.Youtrack) *YoutrackRepository {
 	}
 }
 
-func (yr *YoutrackRepository) FindTask(ctx context.Context, queryOptions model.YoutrackQueryOptions) ([]model.YoutrackTask, error) {
+func (yr *YoutrackRepository) FindTask(ctx context.Context, queryOptions dto.YoutrackQueryOptions) ([]model.YoutrackTask, error) {
 	queryParams := make(map[string]string)
 
 	queryParams["fields"] = "id,summary,Epic,customFields(name,value(name)),idReadable"

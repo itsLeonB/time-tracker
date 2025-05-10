@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
@@ -71,7 +72,7 @@ func (pr *projectRepositoryGorm) Delete(ctx context.Context, project *model.Proj
 	return nil
 }
 
-func (pr *projectRepositoryGorm) Find(ctx context.Context, options *model.FindProjectOptions) ([]*model.Project, error) {
+func (pr *projectRepositoryGorm) Find(ctx context.Context, options *dto.FindProjectOptions) ([]*model.Project, error) {
 	var projects []*model.Project
 
 	query := pr.db.WithContext(ctx)

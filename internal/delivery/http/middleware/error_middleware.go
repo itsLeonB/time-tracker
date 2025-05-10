@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	strategy "github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/middleware/strategy/error"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/rotisserie/eris"
 )
 
@@ -23,7 +23,7 @@ func HandleError(errorStrategyMap *strategy.ErrorStrategyMap) gin.HandlerFunc {
 
 			errorStrategy := errorStrategyMap.DetermineStrategy(handledError)
 			errorResponse := errorStrategy.HandleError(handledError)
-			ctx.AbortWithStatusJSON(errorResponse.Code, model.NewErrorJSON(errorResponse))
+			ctx.AbortWithStatusJSON(errorResponse.Code, dto.NewErrorJSON(errorResponse))
 			return
 		}
 	}
