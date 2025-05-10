@@ -31,8 +31,8 @@ func (tr *taskRepositoryGorm) Insert(ctx context.Context, task *model.Task) (*mo
 	return task, nil
 }
 
-func (tr *taskRepositoryGorm) GetAll(ctx context.Context) ([]*model.Task, error) {
-	var tasks []*model.Task
+func (tr *taskRepositoryGorm) GetAll(ctx context.Context) ([]model.Task, error) {
+	var tasks []model.Task
 
 	err := tr.db.WithContext(ctx).Find(&tasks).Error
 	if err != nil {
@@ -136,8 +136,8 @@ func (tr *taskRepositoryGorm) GetLogs(ctx context.Context, task *model.Task) ([]
 	return logs, nil
 }
 
-func (tr *taskRepositoryGorm) Find(ctx context.Context, options *dto.QueryOptions) ([]*model.Task, error) {
-	var tasks []*model.Task
+func (tr *taskRepositoryGorm) Find(ctx context.Context, options *dto.QueryOptions) ([]model.Task, error) {
+	var tasks []model.Task
 
 	query := tr.db.WithContext(ctx).Preload("Logs", func(db *gorm.DB) *gorm.DB {
 		return db.Order("task_logs.created_at ASC")

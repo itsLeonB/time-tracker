@@ -7,8 +7,10 @@ import (
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/mapper"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
 )
 
@@ -24,20 +26,20 @@ func NewTaskService(
 	return &taskServiceImpl{taskRepository, userService}
 }
 
-func (ts *taskServiceImpl) Create(ctx context.Context, request *dto.NewTaskRequest) (*model.Task, error) {
+func (ts *taskServiceImpl) Create(ctx context.Context, request *dto.NewTaskRequest) (dto.TaskResponse, error) {
+	var taskResponse dto.TaskResponse
+
 	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
-		return nil, err
+		return taskResponse, err
 	}
 
 	task, err := ts.taskRepository.GetByNumber(ctx, request.Number)
 	if err != nil {
-		return nil, err
+		return taskResponse, err
 	}
 	if task != nil {
-		return nil, apperror.ConflictError(
-			eris.Errorf("task number: %s already exists", request.Number),
-		)
+		return taskResponse, apperror.ConflictError(eris.Errorf("task number: %s already exists", request.Number))
 	}
 
 	newTask := &model.Task{
@@ -46,28 +48,45 @@ func (ts *taskServiceImpl) Create(ctx context.Context, request *dto.NewTaskReque
 		Name:      request.Name,
 	}
 
-	return ts.taskRepository.Insert(ctx, newTask)
+	insertedTask, err := ts.taskRepository.Insert(ctx, newTask)
+	if err != nil {
+		return taskResponse, err
+	}
+
+	return mapper.TaskToResponse(*insertedTask), nil
 }
 
-func (ts *taskServiceImpl) GetAll(ctx context.Context) ([]*model.Task, error) {
+func (ts *taskServiceImpl) GetAll(ctx context.Context) ([]dto.TaskResponse, error) {
 	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return ts.taskRepository.GetAll(ctx)
-}
-
-func (ts *taskServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error) {
-	_, err := ts.userService.ValidateUser(ctx)
+	tasks, err := ts.taskRepository.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return ts.taskRepository.GetByID(ctx, id)
+	return util.MapSlice(tasks, mapper.TaskToResponse), nil
 }
 
-func (ts *taskServiceImpl) Find(ctx context.Context, options *dto.QueryOptions) ([]*model.Task, error) {
+func (ts *taskServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.TaskResponse, error) {
+	var taskResponse dto.TaskResponse
+
+	_, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return taskResponse, err
+	}
+
+	task, err := ts.taskRepository.GetByID(ctx, id)
+	if err != nil {
+		return taskResponse, err
+	}
+
+	return mapper.TaskToResponse(*task), nil
+}
+
+func (ts *taskServiceImpl) Find(ctx context.Context, options *dto.QueryOptions) ([]dto.TaskResponse, error) {
 	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
@@ -78,55 +97,46 @@ func (ts *taskServiceImpl) Find(ctx context.Context, options *dto.QueryOptions) 
 		return nil, err
 	}
 
-	for _, task := range tasks {
-		ts.populateAdditionalTaskFields(task, options)
-	}
-
-	return tasks, nil
+	return util.MapSlice(tasks, mapper.TaskToResponse), nil
 }
 
-func (ts *taskServiceImpl) GetByNumber(ctx context.Context, number string) (*model.Task, error) {
+func (ts *taskServiceImpl) GetByNumber(ctx context.Context, number string) (dto.TaskResponse, error) {
+	var taskResponse dto.TaskResponse
+
 	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
-		return nil, err
+		return taskResponse, err
 	}
 
 	task, err := ts.getTaskByNumber(ctx, number)
 	if err != nil {
-		return nil, err
+		return taskResponse, err
 	}
 
-	ts.populateAdditionalTaskFields(task, nil)
-
-	return task, nil
+	return mapper.TaskToResponse(*task), nil
 }
 
-func (ts *taskServiceImpl) populateAdditionalTaskFields(
-	task *model.Task,
-	options *dto.QueryOptions,
-) {
-	task.DetermineProgress()
-	task.CalculateTotalTime()
+func (ts *taskServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (dto.TaskResponse, error) {
+	var taskResponse dto.TaskResponse
 
-	if options != nil && !options.WithLogs {
-		task.Logs = nil
-	}
-}
-
-func (ts *taskServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (*model.Task, error) {
 	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
-		return nil, err
+		return taskResponse, err
 	}
 
 	task, err := ts.getTask(ctx, id)
 	if err != nil {
-		return nil, err
+		return taskResponse, err
 	}
 
 	task.Name = name
 
-	return ts.taskRepository.Update(ctx, task)
+	updatedTask, err := ts.taskRepository.Update(ctx, task)
+	if err != nil {
+		return taskResponse, err
+	}
+
+	return mapper.TaskToResponse(*updatedTask), nil
 }
 
 func (ts *taskServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {

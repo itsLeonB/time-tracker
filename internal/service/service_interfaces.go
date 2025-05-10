@@ -24,15 +24,15 @@ type ProjectService interface {
 }
 
 type TaskService interface {
-	Create(ctx context.Context, request *dto.NewTaskRequest) (*model.Task, error)
-	GetAll(ctx context.Context) ([]*model.Task, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error)
-	GetByNumber(ctx context.Context, number string) (*model.Task, error)
-	Update(ctx context.Context, id uuid.UUID, name string) (*model.Task, error)
+	Create(ctx context.Context, request *dto.NewTaskRequest) (dto.TaskResponse, error)
+	GetAll(ctx context.Context) ([]dto.TaskResponse, error)
+	GetByID(ctx context.Context, id uuid.UUID) (dto.TaskResponse, error)
+	GetByNumber(ctx context.Context, number string) (dto.TaskResponse, error)
+	Update(ctx context.Context, id uuid.UUID, name string) (dto.TaskResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	Log(ctx context.Context, id uuid.UUID, action string) (*model.TaskLog, error)
 	LogByNumber(ctx context.Context, number string, action string) (*model.TaskLog, error)
-	Find(ctx context.Context, options *dto.QueryOptions) ([]*model.Task, error)
+	Find(ctx context.Context, options *dto.QueryOptions) ([]dto.TaskResponse, error)
 }
 
 type ExternalTrackerService interface {
