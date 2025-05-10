@@ -14,6 +14,8 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *prov
 	router.GET("", handlers.Root.Root())
 	router.GET("/health", handlers.Root.HealthCheck())
 
+	router.POST("/test", handlers.Root.TestReadData())
+
 	authRoutes := router.Group("/auth")
 	authRoutes.POST("/register", handlers.Auth.HandleRegister())
 	authRoutes.POST("/login", handlers.Auth.HandleLogin())
