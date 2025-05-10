@@ -9,22 +9,19 @@ import (
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
-	strategy "github.com/itsLeonB/catfeinated-time-tracker/internal/service/strategy/point"
 	"github.com/rotisserie/eris"
 )
 
 type taskServiceImpl struct {
 	taskRepository repository.TaskRepository
-	pointStrategy  strategy.PointStrategy
 	userService    UserService
 }
 
 func NewTaskService(
 	taskRepository repository.TaskRepository,
-	pointStrategy strategy.PointStrategy,
 	userService UserService,
 ) TaskService {
-	return &taskServiceImpl{taskRepository, pointStrategy, userService}
+	return &taskServiceImpl{taskRepository, userService}
 }
 
 func (ts *taskServiceImpl) Create(ctx context.Context, request *dto.NewTaskRequest) (*model.Task, error) {
@@ -110,7 +107,6 @@ func (ts *taskServiceImpl) populateAdditionalTaskFields(
 ) {
 	task.DetermineProgress()
 	task.CalculateTotalTime()
-	task.Points = ts.pointStrategy.CalculatePoints(task)
 
 	if options != nil && !options.WithLogs {
 		task.Logs = nil

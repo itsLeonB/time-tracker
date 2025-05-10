@@ -16,7 +16,7 @@ type UserRepository interface {
 
 type ProjectRepository interface {
 	Insert(ctx context.Context, project *model.Project) (*model.Project, error)
-	GetAll(ctx context.Context) ([]*model.Project, error)
+	GetAll(ctx context.Context) ([]model.Project, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Project, error)
 	Update(ctx context.Context, project *model.Project) (*model.Project, error)
 	Delete(ctx context.Context, project *model.Project) error

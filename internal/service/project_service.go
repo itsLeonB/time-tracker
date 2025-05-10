@@ -6,8 +6,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/mapper"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
 )
 
@@ -32,77 +34,85 @@ func NewProjectService(
 	}
 }
 
-func (ps *projectServiceImpl) Create(ctx context.Context, name string) (*model.Project, error) {
+func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.ProjectResponse, error) {
+	var projectResponse dto.ProjectResponse
+
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
-		return nil, err
+		return projectResponse, err
 	}
 
 	existingProject, err := ps.projectRepository.GetByName(ctx, name)
 	if err != nil {
-		return nil, err
+		return projectResponse, err
 	}
 	if existingProject != nil {
-		return nil, apperror.ConflictError(eris.Errorf("project with name: %s already exists", name))
+		return projectResponse, apperror.ConflictError(eris.Errorf("project with name: %s already exists", name))
 	}
 
 	newProject := &model.Project{
 		Name: name,
 	}
 
-	return ps.projectRepository.Insert(ctx, newProject)
+	insertedProject, err := ps.projectRepository.Insert(ctx, newProject)
+	if err != nil {
+		return projectResponse, err
+	}
+
+	return mapper.ProjectToResponse(*insertedProject), nil
 }
 
-func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]*model.Project, error) {
+func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]dto.ProjectResponse, error) {
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return ps.projectRepository.GetAll(ctx)
-}
-
-func (ps *projectServiceImpl) GetByID(ctx context.Context, options *dto.QueryOptions) (*model.Project, error) {
-	_, err := ps.userService.ValidateUser(ctx)
+	projects, err := ps.projectRepository.GetAll(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	return util.MapSlice(projects, mapper.ProjectToResponse), nil
+}
+
+func (ps *projectServiceImpl) GetByID(ctx context.Context, options *dto.QueryOptions) (dto.ProjectResponse, error) {
+	var projectResponse dto.ProjectResponse
+
+	_, err := ps.userService.ValidateUser(ctx)
+	if err != nil {
+		return projectResponse, err
 	}
 
 	project, err := ps.getProject(ctx, options.Params.ProjectID)
 	if err != nil {
-		return nil, err
+		return projectResponse, err
 	}
 
-	tasks, err := ps.taskService.Find(ctx, options)
-	if err != nil {
-		return nil, err
-	}
-
-	timeSpent := new(model.TimeSpent)
-	for _, task := range tasks {
-		project.TotalPoints += task.Points
-		timeSpent.Add(task.TimeSpent)
-	}
-
-	project.TimeSpent = timeSpent
-
-	return project, nil
+	return mapper.ProjectToResponse(*project), nil
 }
 
-func (ps *projectServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (*model.Project, error) {
+func (ps *projectServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (dto.ProjectResponse, error) {
+	var projectResponse dto.ProjectResponse
+
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
-		return nil, err
+		return projectResponse, err
 	}
 
 	project, err := ps.getProject(ctx, id)
 	if err != nil {
-		return nil, err
+		return projectResponse, err
 	}
 
 	project.Name = name
 
-	return ps.projectRepository.Update(ctx, project)
+	updatedProject, err := ps.projectRepository.Update(ctx, project)
+	if err != nil {
+		return projectResponse, err
+	}
+
+	return mapper.ProjectToResponse(*updatedProject), nil
 }
 
 func (ps *projectServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
@@ -119,36 +129,24 @@ func (ps *projectServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
 	return ps.projectRepository.Delete(ctx, project)
 }
 
-func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (*model.Project, error) {
+func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (dto.ProjectResponse, error) {
+	var projectResponse dto.ProjectResponse
+
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
-		return nil, err
+		return projectResponse, err
 	}
 
 	projects, err := ps.projectRepository.Find(ctx, options)
 	if err != nil {
-		return nil, err
+		return projectResponse, err
 	}
 
 	if len(projects) == 0 {
-		return nil, nil
+		return projectResponse, nil
 	}
 
-	return projects[0], nil
-}
-
-func (ps *projectServiceImpl) GetInProgressTasks(ctx context.Context, id uuid.UUID) ([]*model.Task, error) {
-	_, err := ps.getProject(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	tasks, err := ps.taskRepository.GetInProgress(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return tasks, nil
+	return mapper.ProjectToResponse(*projects[0]), nil
 }
 
 func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {

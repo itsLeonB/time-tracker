@@ -28,8 +28,8 @@ func (pr *projectRepositoryGorm) Insert(ctx context.Context, project *model.Proj
 	return project, nil
 }
 
-func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]*model.Project, error) {
-	var projects []*model.Project
+func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]model.Project, error) {
+	var projects []model.Project
 
 	err := pr.db.WithContext(ctx).Find(&projects).Error
 	if err != nil {

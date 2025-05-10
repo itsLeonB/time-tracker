@@ -15,13 +15,12 @@ type UserService interface {
 }
 
 type ProjectService interface {
-	Create(ctx context.Context, name string) (*model.Project, error)
-	GetAll(ctx context.Context) ([]*model.Project, error)
-	GetByID(ctx context.Context, options *dto.QueryOptions) (*model.Project, error)
-	Update(ctx context.Context, id uuid.UUID, name string) (*model.Project, error)
+	Create(ctx context.Context, name string) (dto.ProjectResponse, error)
+	GetAll(ctx context.Context) ([]dto.ProjectResponse, error)
+	GetByID(ctx context.Context, options *dto.QueryOptions) (dto.ProjectResponse, error)
+	Update(ctx context.Context, id uuid.UUID, name string) (dto.ProjectResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
-	FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (*model.Project, error)
-	GetInProgressTasks(ctx context.Context, id uuid.UUID) ([]*model.Task, error)
+	FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (dto.ProjectResponse, error)
 }
 
 type TaskService interface {

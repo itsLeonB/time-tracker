@@ -8,16 +8,15 @@ import (
 )
 
 type Task struct {
-	ID         uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	ProjectID  uuid.UUID  `json:"projectId"`
-	Number     string     `json:"number"`
-	Name       string     `json:"name"`
-	CreatedAt  time.Time  `json:"createdAt"`
-	UpdatedAt  time.Time  `json:"updatedAt"`
-	InProgress bool       `json:"inProgress" gorm:"-"`
-	Points     float64    `json:"points" gorm:"-"`
-	TimeSpent  *TimeSpent `json:"timeSpent" gorm:"-"`
-	Logs       []TaskLog  `json:"logs,omitempty" gorm:"foreignKey:TaskID"`
+	ID         uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	ProjectID  uuid.UUID `json:"projectId"`
+	Number     string    `json:"number"`
+	Name       string    `json:"name"`
+	CreatedAt  time.Time `json:"createdAt"`
+	UpdatedAt  time.Time `json:"updatedAt"`
+	InProgress bool      `json:"inProgress" gorm:"-"`
+	Points     float64   `json:"points" gorm:"-"`
+	Logs       []TaskLog `json:"logs,omitempty" gorm:"foreignKey:TaskID"`
 }
 
 func (task *Task) DetermineProgress() {
@@ -42,13 +41,6 @@ func (task *Task) CalculateTotalTime() {
 				totalTime += duration
 			}
 		}
-	}
-
-	task.TimeSpent = &TimeSpent{
-		Duration: totalTime,
-		Minutes:  totalTime.Minutes(),
-		Hours:    totalTime.Hours(),
-		String:   totalTime.String(),
 	}
 }
 

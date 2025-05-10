@@ -27,7 +27,6 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *prov
 	projectRoutes.GET("", handlers.Project.GetAll())
 	projectRoutes.GET("/:id", handlers.Project.GetByID())
 	projectRoutes.GET("/first", handlers.Project.FirstByQuery())
-	projectRoutes.GET("/:id/tasks/in-progress", handlers.Project.HandleGetInProgressTasks())
 
 	taskRoutes := authenticatedRoutes.Group("/tasks")
 	taskRoutes.POST("", handlers.Task.Create())
