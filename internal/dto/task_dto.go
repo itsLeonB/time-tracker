@@ -20,3 +20,9 @@ type TaskResponse struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
+type TaskQueryParams struct {
+	Number    string
+	ProjectID uuid.UUID
+	Date      time.Time
+}

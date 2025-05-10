@@ -2,12 +2,10 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
@@ -136,30 +134,24 @@ func (tr *taskRepositoryGorm) GetLogs(ctx context.Context, task *model.Task) ([]
 	return logs, nil
 }
 
-func (tr *taskRepositoryGorm) Find(ctx context.Context, options *dto.QueryOptions) ([]model.Task, error) {
+func (tr *taskRepositoryGorm) Find(ctx context.Context, options model.TaskQueryOptions) ([]model.Task, error) {
 	var tasks []model.Task
 
-	query := tr.db.WithContext(ctx).Preload("Logs", func(db *gorm.DB) *gorm.DB {
-		return db.Order("task_logs.created_at ASC")
-	})
+	query := tr.db.WithContext(ctx)
 
-	if options != nil {
-		if options.Params != nil {
-			if options.Params.Number != "" {
-				query = query.Where("number ILIKE ?", fmt.Sprintf("%%%s%%", options.Params.Number))
-			}
+	if options.Number != "" {
+		query = query.Where("number = ?", options.Number)
+	}
 
-			if options.Params.ProjectID != uuid.Nil {
-				query = query.Where("project_id = ?", options.Params.ProjectID)
-			}
+	if options.ProjectID != uuid.Nil {
+		query = query.Where("project_id = ?", options.ProjectID)
+	}
 
-			if options.Params.Date != (time.Time{}) {
-				query = query.Where("created_at >= ? AND created_at <= ?",
-					util.StartOfDay(options.Params.Date),
-					util.EndOfDay(options.Params.Date),
-				)
-			}
-		}
+	if options.Date != (time.Time{}) {
+		query = query.Where("created_at >= ? AND created_at <= ?",
+			util.StartOfDay(options.Date),
+			util.EndOfDay(options.Date),
+		)
 	}
 
 	err := query.Find(&tasks).Error

@@ -18,3 +18,9 @@ type Task struct {
 func (t *Task) TableName() string {
 	return "tasks"
 }
+
+type TaskQueryOptions struct {
+	Number    string
+	ProjectID uuid.UUID
+	Date      time.Time
+}

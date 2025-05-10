@@ -110,10 +110,11 @@ func (th *TaskHandler) LogByNumber() gin.HandlerFunc {
 	}
 }
 
-func (th *TaskHandler) Find() gin.HandlerFunc {
+func (th *TaskHandler) HandleFind() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		queryOptions := constructQueryOptions(ctx)
-		tasks, err := th.taskService.Find(ctx, queryOptions)
+		queryParams := constructQueryParams(ctx)
+
+		tasks, err := th.taskService.Find(ctx, queryParams)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -139,27 +140,13 @@ func (th *TaskHandler) FindExternal() gin.HandlerFunc {
 	}
 }
 
-func constructQueryOptions(ctx *gin.Context) *dto.QueryOptions {
-	options := new(dto.QueryOptions)
+func constructQueryParams(ctx *gin.Context) dto.TaskQueryParams {
+	var queryParams dto.TaskQueryParams
 
-	withLogs := ctx.Query("withLogs")
-	if withLogs == "true" {
-		options.WithLogs = true
-	}
-
-	params := constructQueryParams(ctx)
-	if params != nil {
-		options.Params = params
-	}
-
-	return options
-}
-
-func constructQueryParams(ctx *gin.Context) *dto.QueryParams {
 	number := ctx.Query("number")
-	if number == "" {
-		return nil
+	if number != "" {
+		queryParams.Number = number
 	}
 
-	return &dto.QueryParams{Number: number}
+	return queryParams
 }

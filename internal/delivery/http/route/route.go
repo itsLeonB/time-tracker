@@ -30,7 +30,7 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *prov
 
 	taskRoutes := authenticatedRoutes.Group("/tasks")
 	taskRoutes.POST("", handlers.Task.Create())
-	taskRoutes.GET("", handlers.Task.Find())
+	taskRoutes.GET("", handlers.Task.HandleFind())
 	taskRoutes.POST("/:id/logs", handlers.Task.Log())
 	taskRoutes.POST("/log-by-number", handlers.Task.LogByNumber())
 

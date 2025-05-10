@@ -32,7 +32,7 @@ type TaskService interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	Log(ctx context.Context, id uuid.UUID, action string) (*model.TaskLog, error)
 	LogByNumber(ctx context.Context, number string, action string) (*model.TaskLog, error)
-	Find(ctx context.Context, options *dto.QueryOptions) ([]dto.TaskResponse, error)
+	Find(ctx context.Context, queryParams dto.TaskQueryParams) ([]dto.TaskResponse, error)
 }
 
 type ExternalTrackerService interface {

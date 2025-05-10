@@ -86,13 +86,19 @@ func (ts *taskServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.TaskR
 	return mapper.TaskToResponse(*task), nil
 }
 
-func (ts *taskServiceImpl) Find(ctx context.Context, options *dto.QueryOptions) ([]dto.TaskResponse, error) {
+func (ts *taskServiceImpl) Find(ctx context.Context, queryParams dto.TaskQueryParams) ([]dto.TaskResponse, error) {
 	_, err := ts.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	tasks, err := ts.taskRepository.Find(ctx, options)
+	queryOptions := model.TaskQueryOptions{
+		Number:    queryParams.Number,
+		ProjectID: queryParams.ProjectID,
+		Date:      queryParams.Date,
+	}
+
+	tasks, err := ts.taskRepository.Find(ctx, queryOptions)
 	if err != nil {
 		return nil, err
 	}
