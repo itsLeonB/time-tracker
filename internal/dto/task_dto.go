@@ -13,12 +13,14 @@ type NewTaskRequest struct {
 }
 
 type TaskResponse struct {
-	ID        uuid.UUID `json:"id"`
-	ProjectID uuid.UUID `json:"projectId"`
-	Number    string    `json:"number"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID        uuid.UUID          `json:"id"`
+	ProjectID uuid.UUID          `json:"projectId"`
+	Number    string             `json:"number"`
+	Name      string             `json:"name"`
+	CreatedAt time.Time          `json:"createdAt"`
+	UpdatedAt time.Time          `json:"updatedAt"`
+	TimeSpent TimeSpent          `json:"timeSpent"`
+	UserTasks []UserTaskResponse `json:"userTasks"`
 }
 
 type TaskQueryParams struct {

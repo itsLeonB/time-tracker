@@ -9,6 +9,7 @@ import (
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/mapper"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
 )
 
@@ -59,4 +60,30 @@ func (utls *userTaskLogServiceImpl) Create(ctx context.Context, request dto.NewU
 	}
 
 	return mapper.UserTaskLogToResponse(insertedLog), nil
+}
+
+func (utls *userTaskLogServiceImpl) FindAll(ctx context.Context, params dto.UserTaskLogParams) ([]dto.UserTaskLogResponse, error) {
+	queryOptions := model.UserTaskLogQueryOptions{}
+
+	queryOptions.Filterables = []model.Filter{
+		{
+			Column: "user_task_logs.user_task_id",
+			Type:   model.FilterTypeIn,
+			Value:  params.UserTaskIds,
+		},
+	}
+
+	queryOptions.DatetimeRanges = map[string]model.DatetimeRange{
+		"user_task_logs.created_at": {
+			Start: params.StartDatetime,
+			End:   params.EndDatetime,
+		},
+	}
+
+	logs, err := utls.userTaskLogRepository.FindAll(ctx, queryOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	return util.MapSlice(logs, mapper.UserTaskLogToResponse), nil
 }

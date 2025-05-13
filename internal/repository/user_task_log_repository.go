@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
@@ -20,7 +21,7 @@ func NewUserTaskLogRepository(db *gorm.DB) UserTaskLogRepository {
 func (r *gormUserTaskLogRepository) Insert(ctx context.Context, userTaskLog model.UserTaskLog) (model.UserTaskLog, error) {
 	err := r.db.WithContext(ctx).Create(&userTaskLog).Error
 	if err != nil {
-		return userTaskLog, eris.Wrap(err, "failed to insert user task log")
+		return userTaskLog, eris.Wrap(err, apperror.MsgInsertError)
 	}
 
 	return userTaskLog, nil
@@ -40,7 +41,24 @@ func (utlr *gormUserTaskLogRepository) FindLatest(ctx context.Context, options m
 			return userTaskLog, nil
 		}
 
-		return userTaskLog, eris.Wrap(err, "failed to find latest user task log")
+		return userTaskLog, eris.Wrap(err, apperror.MsgQueryError)
+	}
+
+	return userTaskLog, nil
+}
+
+func (utlr *gormUserTaskLogRepository) FindAll(ctx context.Context, options model.UserTaskLogQueryOptions) ([]model.UserTaskLog, error) {
+	var userTaskLog []model.UserTaskLog
+
+	query := utlr.db.WithContext(ctx).Scopes(
+		util.PreloadRelations(options.PreloadRelations),
+		util.FilterByColumns(options.Filters),
+		util.WithinTimeRanges(options.DatetimeRanges),
+	)
+
+	err := query.Order("created_at DESC").Find(&userTaskLog).Error
+	if err != nil {
+		return nil, eris.Wrap(err, apperror.MsgQueryError)
 	}
 
 	return userTaskLog, nil

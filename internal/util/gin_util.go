@@ -2,10 +2,12 @@ package util
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/rotisserie/eris"
 )
 
@@ -46,4 +48,41 @@ func GetUuidParam(ctx *gin.Context, key string) (uuid.UUID, error) {
 	}
 
 	return ParseUuid(val)
+}
+
+func GetDatetimeParams(ctx *gin.Context, startKey string, endKey string) (dto.QueryParams, error) {
+	var params dto.QueryParams
+
+	startDate, err := parseDatetimeFromQuery(ctx, startKey, time.DateOnly)
+	if err != nil {
+		return params, err
+	}
+
+	endDate, err := parseDatetimeFromQuery(ctx, endKey, time.DateOnly)
+	if err != nil {
+		return params, err
+	}
+
+	if !endDate.IsZero() {
+		endDate = endDate.AddDate(0, 0, 1).Add(-1 * time.Nanosecond)
+	}
+
+	params.StartDatetime = startDate
+	params.EndDatetime = endDate
+
+	return params, nil
+}
+
+func parseDatetimeFromQuery(ctx *gin.Context, key string, layout string) (time.Time, error) {
+	val := ctx.Query(key)
+	if val == "" {
+		return time.Time{}, nil
+	}
+
+	result, err := time.Parse(layout, val)
+	if err != nil {
+		return time.Time{}, eris.Wrap(err, fmt.Sprintf("Invalid datetime format for %s", key))
+	}
+
+	return result, nil
 }

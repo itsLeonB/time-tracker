@@ -18,3 +18,8 @@ type UserTaskLogResponse struct {
 	CreatedAt  time.Time `json:"createdAt"`
 	UpdatedAt  time.Time `json:"updatedAt"`
 }
+
+type UserTaskLogParams struct {
+	QueryParams
+	UserTaskIds []uuid.UUID
+}

@@ -4,9 +4,6 @@
 4. When log, insert UserTaskLog
 
 
-GET /projects
-Get list of projects
-
 GET /projects/:id
 Get project detail
 Queries: 

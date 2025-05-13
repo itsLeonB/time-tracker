@@ -13,6 +13,7 @@ type Task struct {
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	UserTasks []UserTask `gorm:"foreignKey:TaskId"`
 }
 
 func (t *Task) TableName() string {

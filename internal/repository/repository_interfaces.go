@@ -20,8 +20,9 @@ type ProjectRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Project, error)
 	Update(ctx context.Context, project *model.Project) (*model.Project, error)
 	Delete(ctx context.Context, project *model.Project) error
-	Find(ctx context.Context, options *dto.FindProjectOptions) ([]model.Project, error)
+	Find(ctx context.Context, options dto.ProjectQueryParams) ([]model.Project, error)
 	GetByName(ctx context.Context, name string) (*model.Project, error)
+	First(ctx context.Context, options model.ProjectQueryOptions) (model.Project, error)
 }
 
 type TaskRepository interface {
@@ -43,4 +44,5 @@ type UserTaskRepository interface {
 type UserTaskLogRepository interface {
 	Insert(ctx context.Context, userTaskLog model.UserTaskLog) (model.UserTaskLog, error)
 	FindLatest(ctx context.Context, options model.UserTaskLogQueryOptions) (model.UserTaskLog, error)
+	FindAll(ctx context.Context, options model.UserTaskLogQueryOptions) ([]model.UserTaskLog, error)
 }

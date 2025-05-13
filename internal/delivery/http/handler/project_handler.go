@@ -2,10 +2,8 @@ package handler
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
@@ -61,39 +59,32 @@ func (ph *ProjectHandler) HandleGetAll() gin.HandlerFunc {
 	}
 }
 
-func (ph *ProjectHandler) GetByID() gin.HandlerFunc {
+func (ph *ProjectHandler) HandleGetById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id := ctx.Param("id")
-		parsedId, err := uuid.Parse(id)
+		id, err := util.GetUuidParam(ctx, "id")
 		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, "error parsing UUID"),
-			))
+			_ = ctx.Error(err)
 			return
 		}
 
-		options := dto.QueryOptions{
-			Params: &dto.QueryParams{
-				ProjectID: parsedId,
-			},
+		userId, err := util.GetUuidFromCtx(ctx, constant.ContextUserID)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
 		}
 
-		date := ctx.Query("date")
-		if date == "today" {
-			options.Params.Date = time.Now()
-		} else if date != "" {
-			timestamp, err := time.Parse(time.DateOnly, date)
-			if err != nil {
-				_ = ctx.Error(apperror.BadRequestError(
-					eris.Wrap(err, "error parsing date"),
-				))
-				return
-			}
-
-			options.Params.Date = timestamp
+		params, err := util.GetDatetimeParams(ctx, "start", "end")
+		if err != nil {
+			_ = ctx.Error(err)
+			return
 		}
 
-		project, err := ph.projectService.GetByID(ctx, &options)
+		params.ProjectID = id
+		params.UserId = userId
+
+		projectParams := dto.ProjectQueryParams{QueryParams: params}
+
+		project, err := ph.projectService.FirstByQuery(ctx, projectParams)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -106,7 +97,7 @@ func (ph *ProjectHandler) GetByID() gin.HandlerFunc {
 func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		name := ctx.Query("name")
-		options := &dto.FindProjectOptions{Name: name}
+		options := dto.ProjectQueryParams{Name: name}
 
 		project, err := ph.projectService.FirstByQuery(ctx, options)
 		if err != nil {

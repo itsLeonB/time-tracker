@@ -20,7 +20,7 @@ type ProjectService interface {
 	GetByID(ctx context.Context, options *dto.QueryOptions) (dto.ProjectResponse, error)
 	Update(ctx context.Context, id uuid.UUID, name string) (dto.ProjectResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
-	FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (dto.ProjectResponse, error)
+	FirstByQuery(ctx context.Context, options dto.ProjectQueryParams) (dto.ProjectResponse, error)
 	GetOrCreate(ctx context.Context, name string) (dto.ProjectResponse, error)
 	FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.ProjectResponse, error)
 }
@@ -47,4 +47,5 @@ type UserTaskService interface {
 
 type UserTaskLogService interface {
 	Create(ctx context.Context, request dto.NewUserTaskLogRequest) (dto.UserTaskLogResponse, error)
+	FindAll(ctx context.Context, params dto.UserTaskLogParams) ([]dto.UserTaskLogResponse, error)
 }

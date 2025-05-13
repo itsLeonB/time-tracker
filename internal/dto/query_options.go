@@ -12,9 +12,13 @@ type QueryOptions struct {
 }
 
 type QueryParams struct {
-	Number    string
-	ProjectID uuid.UUID
-	Date      time.Time
+	Number        string
+	ProjectID     uuid.UUID
+	Date          time.Time
+	StartDatetime time.Time
+	EndDatetime   time.Time
+	Ids           []uuid.UUID
+	UserId        uuid.UUID
 }
 
 type ExternalQueryOptions struct {

@@ -9,7 +9,7 @@ type TimeSpent struct {
 	String   string        `json:"string"`
 }
 
-func (ts *TimeSpent) Add(timeSpent *TimeSpent) {
+func (ts *TimeSpent) Add(timeSpent TimeSpent) {
 	ts.Duration += timeSpent.Duration
 	ts.Minutes = ts.Duration.Minutes()
 	ts.Hours = ts.Duration.Hours()

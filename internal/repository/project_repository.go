@@ -7,6 +7,7 @@ import (
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
@@ -72,18 +73,17 @@ func (pr *projectRepositoryGorm) Delete(ctx context.Context, project *model.Proj
 	return nil
 }
 
-func (pr *projectRepositoryGorm) Find(ctx context.Context, options *dto.FindProjectOptions) ([]model.Project, error) {
+func (pr *projectRepositoryGorm) Find(ctx context.Context, options dto.ProjectQueryParams) ([]model.Project, error) {
 	var projects []model.Project
 
 	query := pr.db.WithContext(ctx)
-	if options != nil {
-		if options.Name != "" {
-			query = query.Where("name = ?", options.Name)
-		}
 
-		if options.Ids != nil {
-			query = query.Where("id IN ?", options.Ids)
-		}
+	if options.Name != "" {
+		query = query.Where("name = ?", options.Name)
+	}
+
+	if options.Ids != nil {
+		query = query.Where("id IN ?", options.Ids)
 	}
 
 	err := query.Find(&projects).Error
@@ -107,4 +107,25 @@ func (pr *projectRepositoryGorm) GetByName(ctx context.Context, name string) (*m
 	}
 
 	return &project, nil
+}
+
+func (pr *projectRepositoryGorm) First(ctx context.Context, options model.ProjectQueryOptions) (model.Project, error) {
+	var project model.Project
+
+	query := pr.db.WithContext(ctx).Scopes(
+		util.FilterByColumns(options.Filters),
+		util.PreloadRelations(options.PreloadRelations),
+		util.Join(options.Joins),
+	)
+
+	err := query.First(&project).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return project, nil
+		}
+
+		return project, eris.Wrap(err, apperror.MsgQueryError)
+	}
+
+	return project, nil
 }

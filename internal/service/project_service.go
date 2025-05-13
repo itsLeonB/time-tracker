@@ -14,20 +14,23 @@ import (
 )
 
 type projectServiceImpl struct {
-	projectRepository repository.ProjectRepository
-	userService       UserService
-	userTaskService   UserTaskService
+	projectRepository  repository.ProjectRepository
+	userService        UserService
+	userTaskService    UserTaskService
+	userTaskLogService UserTaskLogService
 }
 
 func NewProjectService(
 	projectRepository repository.ProjectRepository,
 	userService UserService,
 	userTaskService UserTaskService,
+	userTaskLogService UserTaskLogService,
 ) ProjectService {
 	return &projectServiceImpl{
 		projectRepository,
 		userService,
 		userTaskService,
+		userTaskLogService,
 	}
 }
 
@@ -126,7 +129,7 @@ func (ps *projectServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
 	return ps.projectRepository.Delete(ctx, project)
 }
 
-func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (dto.ProjectResponse, error) {
+func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, params dto.ProjectQueryParams) (dto.ProjectResponse, error) {
 	var projectResponse dto.ProjectResponse
 
 	_, err := ps.userService.ValidateUser(ctx)
@@ -134,16 +137,62 @@ func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *dto.Fin
 		return projectResponse, err
 	}
 
-	projects, err := ps.projectRepository.Find(ctx, options)
+	options := model.ProjectQueryOptions{}
+
+	options.Filters = map[string]any{
+		"projects.id":        params.ProjectID,
+		"user_tasks.user_id": params.UserId,
+	}
+
+	options.Joins = []model.Join{
+		{
+			Table: "tasks",
+			On:    "tasks.project_id = projects.id",
+		},
+		{
+			Table: "user_tasks",
+			On:    "user_tasks.task_id = tasks.id",
+		},
+	}
+
+	options.PreloadRelations = []string{
+		"Tasks",
+		"Tasks.UserTasks",
+	}
+
+	project, err := ps.projectRepository.First(ctx, options)
+	if err != nil {
+		return projectResponse, err
+	}
+	if project.IsZero() {
+		return projectResponse, apperror.NotFoundError(eris.Errorf("project not found"))
+	}
+
+	userTaskIds := make([]uuid.UUID, 0)
+	for _, tasks := range project.Tasks {
+		for _, userTask := range tasks.UserTasks {
+			userTaskIds = append(userTaskIds, userTask.ID)
+		}
+	}
+
+	userTaskLogParams := dto.UserTaskLogParams{
+		UserTaskIds: userTaskIds,
+	}
+
+	userTaskLogParams.StartDatetime = params.StartDatetime
+	userTaskLogParams.EndDatetime = params.EndDatetime
+
+	userTaskLogs, err := ps.userTaskLogService.FindAll(ctx, userTaskLogParams)
 	if err != nil {
 		return projectResponse, err
 	}
 
-	if len(projects) == 0 {
-		return projectResponse, nil
+	projectResponse, err = mapper.PopulateProjectWithLogs(project, userTaskLogs)
+	if err != nil {
+		return projectResponse, err
 	}
 
-	return mapper.ProjectToResponse(projects[0]), nil
+	return projectResponse, nil
 }
 
 func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto.ProjectResponse, error) {
@@ -195,11 +244,10 @@ func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID
 		projectIds = append(projectIds, userTask.ProjectId)
 	}
 
-	projectOptions := &dto.FindProjectOptions{
-		Ids: projectIds,
-	}
+	projectOptions := &dto.ProjectQueryParams{}
+	projectOptions.Ids = projectIds
 
-	projects, err := ps.projectRepository.Find(ctx, projectOptions)
+	projects, err := ps.projectRepository.Find(ctx, *projectOptions)
 	if err != nil {
 		return nil, err
 	}
