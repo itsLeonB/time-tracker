@@ -13,7 +13,8 @@ type UserTask struct {
 	TaskId    uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Logs      []TaskLog `gorm:"foreignKey:TaskId"`
+	Logs      []TaskLog `gorm:"foreignKey:TaskID"`
+	Task      Task      `gorm:"foreignKey:TaskId;references:ID"`
 }
 
 func (userTask *UserTask) IsInProgress() bool {
@@ -44,4 +45,9 @@ func (userTask *UserTask) GetTotalTime() time.Duration {
 
 func (ut *UserTask) TableName() string {
 	return "user_tasks"
+}
+
+type UserTaskQueryOptions struct {
+	Filters          map[string]any
+	PreloadRelations []string
 }

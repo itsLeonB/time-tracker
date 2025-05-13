@@ -37,4 +37,8 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *prov
 	externalTrackerRoutes := authenticatedRoutes.Group("/external")
 	externalTaskRoutes := externalTrackerRoutes.Group("/tasks")
 	externalTaskRoutes.GET("", handlers.Task.FindExternal())
+
+	userTaskRoutes := authenticatedRoutes.Group("/user-tasks")
+	userTaskRoutes.POST("", handlers.UserTask.HandleCreate())
+	userTaskRoutes.GET("", handlers.UserTask.HandleFindAll())
 }

@@ -37,3 +37,9 @@ type TaskRepository interface {
 	Find(ctx context.Context, options model.TaskQueryOptions) ([]model.Task, error)
 	GetInProgress(ctx context.Context, projectID uuid.UUID) ([]*model.Task, error)
 }
+
+type UserTaskRepository interface {
+	Insert(ctx context.Context, userTask model.UserTask) (model.UserTask, error)
+	FindAll(ctx context.Context, options model.UserTaskQueryOptions) ([]model.UserTask, error)
+	FindById(ctx context.Context, id uuid.UUID) (model.UserTask, error)
+}

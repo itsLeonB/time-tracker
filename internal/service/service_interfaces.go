@@ -39,3 +39,9 @@ type TaskService interface {
 type ExternalTrackerService interface {
 	FindTask(ctx context.Context, queryOptions dto.ExternalQueryOptions) ([]model.ExternalTask, error)
 }
+
+type UserTaskService interface {
+	Create(ctx context.Context, request dto.NewUserTaskRequest) (dto.UserTaskResponse, error)
+	FindAll(ctx context.Context, options dto.UserTaskQueryParams) ([]dto.UserTaskResponse, error)
+	GetById(ctx context.Context, id uuid.UUID) (dto.UserTaskResponse, error)
+}

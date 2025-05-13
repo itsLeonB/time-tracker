@@ -11,6 +11,7 @@ type Repositories struct {
 	Project  repository.ProjectRepository
 	Task     repository.TaskRepository
 	Youtrack *repository.YoutrackRepository
+	UserTask repository.UserTaskRepository
 }
 
 func ProvideRepositories(
@@ -22,5 +23,6 @@ func ProvideRepositories(
 		Project:  repository.NewProjectRepository(db),
 		Task:     repository.NewTaskRepository(db),
 		Youtrack: repository.NewYoutrackRepository(configs.Youtrack),
+		UserTask: repository.NewUserTaskRepository(db),
 	}
 }
