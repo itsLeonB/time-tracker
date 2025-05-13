@@ -31,8 +31,6 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *prov
 	taskRoutes := authenticatedRoutes.Group("/tasks")
 	taskRoutes.POST("", handlers.Task.Create())
 	taskRoutes.GET("", handlers.Task.HandleFind())
-	taskRoutes.POST("/:id/logs", handlers.Task.Log())
-	taskRoutes.POST("/log-by-number", handlers.Task.LogByNumber())
 
 	externalTrackerRoutes := authenticatedRoutes.Group("/external")
 	externalTaskRoutes := externalTrackerRoutes.Group("/tasks")
@@ -41,4 +39,6 @@ func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *prov
 	userTaskRoutes := authenticatedRoutes.Group("/user-tasks")
 	userTaskRoutes.POST("", handlers.UserTask.HandleCreate())
 	userTaskRoutes.GET("", handlers.UserTask.HandleFindAll())
+	userTaskRoutes.GET("/:id", handlers.UserTask.HandleGetById())
+	userTaskRoutes.POST("/:id/logs", handlers.UserTask.HandleLog())
 }

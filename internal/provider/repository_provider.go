@@ -7,11 +7,12 @@ import (
 )
 
 type Repositories struct {
-	User     repository.UserRepository
-	Project  repository.ProjectRepository
-	Task     repository.TaskRepository
-	Youtrack *repository.YoutrackRepository
-	UserTask repository.UserTaskRepository
+	User        repository.UserRepository
+	Project     repository.ProjectRepository
+	Task        repository.TaskRepository
+	Youtrack    *repository.YoutrackRepository
+	UserTask    repository.UserTaskRepository
+	UserTaskLog repository.UserTaskLogRepository
 }
 
 func ProvideRepositories(
@@ -19,10 +20,11 @@ func ProvideRepositories(
 	configs *config.Config,
 ) *Repositories {
 	return &Repositories{
-		User:     repository.NewUserRepository(db),
-		Project:  repository.NewProjectRepository(db),
-		Task:     repository.NewTaskRepository(db),
-		Youtrack: repository.NewYoutrackRepository(configs.Youtrack),
-		UserTask: repository.NewUserTaskRepository(db),
+		User:        repository.NewUserRepository(db),
+		Project:     repository.NewProjectRepository(db),
+		Task:        repository.NewTaskRepository(db),
+		Youtrack:    repository.NewYoutrackRepository(configs.Youtrack),
+		UserTask:    repository.NewUserTaskRepository(db),
+		UserTaskLog: repository.NewUserTaskLogRepository(db),
 	}
 }

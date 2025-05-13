@@ -15,6 +15,7 @@ type Services struct {
 	Task            service.TaskService
 	ExternalTracker service.ExternalTrackerService
 	UserTask        service.UserTaskService
+	UserTaskLog     service.UserTaskLogService
 }
 
 func ProvideServices(configs *config.Config, repositories *Repositories) *Services {
@@ -26,6 +27,7 @@ func ProvideServices(configs *config.Config, repositories *Repositories) *Servic
 	projectService := service.NewProjectService(repositories.Project, userService)
 	taskService := service.NewTaskService(repositories.Task, userService, externalTrackerService, projectService)
 	userTaskService := service.NewUserTaskService(repositories.UserTask)
+	userTaskLogService := service.NewUserTaskLogService(repositories.UserTaskLog)
 
 	return &Services{
 		User:            userService,
@@ -36,5 +38,6 @@ func ProvideServices(configs *config.Config, repositories *Repositories) *Servic
 		Task:            taskService,
 		ExternalTracker: externalTrackerService,
 		UserTask:        userTaskService,
+		UserTaskLog:     userTaskLogService,
 	}
 }

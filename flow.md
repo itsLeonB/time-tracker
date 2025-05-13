@@ -12,9 +12,5 @@ Get project detail
 Queries: 
 include=tasks,logs
 
-GET /user-tasks
-Get list of user tasks
-
-POST /user-tasks/:id/logs
 
 Setup service client auth

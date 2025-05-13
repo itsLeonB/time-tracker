@@ -13,8 +13,8 @@ type UserTask struct {
 	TaskId    uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Logs      []TaskLog `gorm:"foreignKey:TaskID"`
-	Task      Task      `gorm:"foreignKey:TaskId;references:ID"`
+	Logs      []UserTaskLog `gorm:"foreignKey:UserTaskId"`
+	Task      Task          `gorm:"foreignKey:TaskId;references:ID"`
 }
 
 func (userTask *UserTask) IsInProgress() bool {

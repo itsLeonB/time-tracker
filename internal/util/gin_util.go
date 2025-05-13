@@ -1,6 +1,8 @@
 package util
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
@@ -29,10 +31,19 @@ func GetUuidFromCtx(ctx *gin.Context, key string) (uuid.UUID, error) {
 		return uuid.Nil, eris.Errorf("Invalid user id type")
 	}
 
-	userUuid, err := uuid.Parse(userId)
+	userUuid, err := ParseUuid(userId)
 	if err != nil {
-		return uuid.Nil, eris.Wrap(err, "Failed to parse user id")
+		return uuid.Nil, err
 	}
 
 	return userUuid, nil
+}
+
+func GetUuidParam(ctx *gin.Context, key string) (uuid.UUID, error) {
+	val := ctx.Param(key)
+	if val == "" || val == fmt.Sprintf(":%s", key) {
+		return uuid.Nil, apperror.BadRequestError(eris.Errorf("missing path parameter"))
+	}
+
+	return ParseUuid(val)
 }

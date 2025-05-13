@@ -31,8 +31,6 @@ type TaskService interface {
 	GetByNumber(ctx context.Context, number string) (dto.TaskResponse, error)
 	Update(ctx context.Context, id uuid.UUID, name string) (dto.TaskResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
-	Log(ctx context.Context, id uuid.UUID, action string) (*model.TaskLog, error)
-	LogByNumber(ctx context.Context, number string, action string) (*model.TaskLog, error)
 	Find(ctx context.Context, queryParams dto.TaskQueryParams) ([]dto.TaskResponse, error)
 }
 
@@ -44,4 +42,8 @@ type UserTaskService interface {
 	Create(ctx context.Context, request dto.NewUserTaskRequest) (dto.UserTaskResponse, error)
 	FindAll(ctx context.Context, options dto.UserTaskQueryParams) ([]dto.UserTaskResponse, error)
 	GetById(ctx context.Context, id uuid.UUID) (dto.UserTaskResponse, error)
+}
+
+type UserTaskLogService interface {
+	Create(ctx context.Context, request dto.NewUserTaskLogRequest) (dto.UserTaskLogResponse, error)
 }

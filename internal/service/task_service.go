@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/mapper"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
@@ -219,20 +218,6 @@ func (ts *taskServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
 	return ts.taskRepository.Delete(ctx, task)
 }
 
-func (ts *taskServiceImpl) Log(ctx context.Context, id uuid.UUID, action string) (*model.TaskLog, error) {
-	_, err := ts.userService.ValidateUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	task, err := ts.getTask(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return ts.createLog(ctx, task, action)
-}
-
 func (ts *taskServiceImpl) getTask(ctx context.Context, id uuid.UUID) (*model.Task, error) {
 	task, err := ts.taskRepository.GetByID(ctx, id)
 	if err != nil {
@@ -255,46 +240,4 @@ func (ts *taskServiceImpl) getTaskByNumber(ctx context.Context, number string) (
 	}
 
 	return task, nil
-}
-
-func (ts *taskServiceImpl) LogByNumber(ctx context.Context, number string, action string) (*model.TaskLog, error) {
-	_, err := ts.userService.ValidateUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	task, err := ts.getTaskByNumber(ctx, number)
-	if err != nil {
-		return nil, err
-	}
-
-	return ts.createLog(ctx, task, action)
-}
-
-func (ts *taskServiceImpl) createLog(ctx context.Context, task *model.Task, action string) (*model.TaskLog, error) {
-	latestLog, err := ts.taskRepository.GetLatestLog(ctx, task)
-	if err != nil {
-		return nil, err
-	}
-
-	// should always start with START action
-	if latestLog == nil && action == constant.LogAction.Stop {
-		return nil, apperror.BadRequestError(
-			eris.Errorf("task ID: %s is not yet started", task.ID),
-		)
-	}
-
-	// should alternate actions
-	if latestLog != nil && latestLog.Action == action {
-		return nil, apperror.BadRequestError(
-			eris.Errorf("task ID: %s is already %s", task.ID, action),
-		)
-	}
-
-	log, err := ts.taskRepository.Log(ctx, task, action)
-	if err != nil {
-		return nil, err
-	}
-
-	return log, nil
 }

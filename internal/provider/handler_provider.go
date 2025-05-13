@@ -16,6 +16,6 @@ func ProvideHandlers(services *Services) *Handlers {
 		Auth:     handler.NewAuthHandler(services.Auth),
 		Project:  handler.NewProjectHandler(services.Project),
 		Task:     handler.NewTaskHandler(services.Task, services.ExternalTracker),
-		UserTask: handler.NewUserTaskHandler(services.UserTask),
+		UserTask: handler.NewUserTaskHandler(services.UserTask, services.UserTaskLog),
 	}
 }

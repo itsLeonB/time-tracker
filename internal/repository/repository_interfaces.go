@@ -31,15 +31,16 @@ type TaskRepository interface {
 	GetByNumber(ctx context.Context, number string) (*model.Task, error)
 	Update(ctx context.Context, task *model.Task) (*model.Task, error)
 	Delete(ctx context.Context, task *model.Task) error
-	Log(ctx context.Context, task *model.Task, action string) (*model.TaskLog, error)
-	GetLatestLog(ctx context.Context, task *model.Task) (*model.TaskLog, error)
-	GetLogs(ctx context.Context, task *model.Task) ([]*model.TaskLog, error)
 	Find(ctx context.Context, options model.TaskQueryOptions) ([]model.Task, error)
-	GetInProgress(ctx context.Context, projectID uuid.UUID) ([]*model.Task, error)
 }
 
 type UserTaskRepository interface {
 	Insert(ctx context.Context, userTask model.UserTask) (model.UserTask, error)
 	FindAll(ctx context.Context, options model.UserTaskQueryOptions) ([]model.UserTask, error)
 	FindById(ctx context.Context, id uuid.UUID) (model.UserTask, error)
+}
+
+type UserTaskLogRepository interface {
+	Insert(ctx context.Context, userTaskLog model.UserTaskLog) (model.UserTaskLog, error)
+	FindLatest(ctx context.Context, options model.UserTaskLogQueryOptions) (model.UserTaskLog, error)
 }

@@ -4,10 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
 	"github.com/rotisserie/eris"
 )
@@ -57,56 +55,6 @@ func (th *TaskHandler) GetAll() gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
-	}
-}
-
-func (th *TaskHandler) Log() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		request := new(model.NewLogRequest)
-		err := ctx.ShouldBindJSON(request)
-		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, apperror.MsgBindJsonError),
-			))
-			return
-		}
-
-		parsedId, err := uuid.Parse(ctx.Param("id"))
-		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, "error parsing UUID"),
-			))
-			return
-		}
-
-		log, err := th.taskService.Log(ctx, parsedId, request.Action)
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
-		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(log))
-	}
-}
-
-func (th *TaskHandler) LogByNumber() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		request := new(model.LogByNumberRequest)
-		err := ctx.ShouldBindJSON(request)
-		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, apperror.MsgBindJsonError),
-			))
-			return
-		}
-
-		log, err := th.taskService.LogByNumber(ctx, request.Number, request.Action)
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
-		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(log))
 	}
 }
 
