@@ -72,13 +72,17 @@ func (pr *projectRepositoryGorm) Delete(ctx context.Context, project *model.Proj
 	return nil
 }
 
-func (pr *projectRepositoryGorm) Find(ctx context.Context, options *dto.FindProjectOptions) ([]*model.Project, error) {
-	var projects []*model.Project
+func (pr *projectRepositoryGorm) Find(ctx context.Context, options *dto.FindProjectOptions) ([]model.Project, error) {
+	var projects []model.Project
 
 	query := pr.db.WithContext(ctx)
 	if options != nil {
 		if options.Name != "" {
 			query = query.Where("name = ?", options.Name)
+		}
+
+		if options.Ids != nil {
+			query = query.Where("id IN ?", options.Ids)
 		}
 	}
 

@@ -16,15 +16,18 @@ import (
 type projectServiceImpl struct {
 	projectRepository repository.ProjectRepository
 	userService       UserService
+	userTaskService   UserTaskService
 }
 
 func NewProjectService(
 	projectRepository repository.ProjectRepository,
 	userService UserService,
+	userTaskService UserTaskService,
 ) ProjectService {
 	return &projectServiceImpl{
 		projectRepository,
 		userService,
+		userTaskService,
 	}
 }
 
@@ -140,7 +143,7 @@ func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *dto.Fin
 		return projectResponse, nil
 	}
 
-	return mapper.ProjectToResponse(*projects[0]), nil
+	return mapper.ProjectToResponse(projects[0]), nil
 }
 
 func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto.ProjectResponse, error) {
@@ -166,6 +169,42 @@ func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto
 	}
 
 	return mapper.ProjectToResponse(*project), nil
+}
+
+func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.ProjectResponse, error) {
+	_, err := ps.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	userTaskOptions := dto.UserTaskQueryParams{
+		UserId: userId,
+	}
+
+	userTasks, err := ps.userTaskService.FindAll(ctx, userTaskOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(userTasks) == 0 {
+		return []dto.ProjectResponse{}, nil
+	}
+
+	projectIds := make([]uuid.UUID, 0, len(userTasks))
+	for _, userTask := range userTasks {
+		projectIds = append(projectIds, userTask.ProjectId)
+	}
+
+	projectOptions := &dto.FindProjectOptions{
+		Ids: projectIds,
+	}
+
+	projects, err := ps.projectRepository.Find(ctx, projectOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	return util.MapSlice(projects, mapper.ProjectToResponse), nil
 }
 
 func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {

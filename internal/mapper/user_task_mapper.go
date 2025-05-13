@@ -12,6 +12,7 @@ func UserTaskToResponse(userTask model.UserTask) dto.UserTaskResponse {
 		TaskId:     userTask.TaskId,
 		TaskNumber: userTask.Task.Number,
 		TaskName:   userTask.Task.Name,
+		ProjectId:  userTask.Task.ProjectID,
 		CreatedAt:  userTask.CreatedAt,
 		UpdatedAt:  userTask.UpdatedAt,
 	}

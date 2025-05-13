@@ -7,8 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
 )
 
@@ -41,9 +43,15 @@ func (ph *ProjectHandler) Create() gin.HandlerFunc {
 	}
 }
 
-func (ph *ProjectHandler) GetAll() gin.HandlerFunc {
+func (ph *ProjectHandler) HandleGetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		projects, err := ph.projectService.GetAll(ctx)
+		userId, err := util.GetUuidFromCtx(ctx, constant.ContextUserID)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		projects, err := ph.projectService.FindByUserId(ctx, userId)
 		if err != nil {
 			_ = ctx.Error(err)
 			return

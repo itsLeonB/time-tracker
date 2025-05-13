@@ -12,6 +12,7 @@ type NewProjectRequest struct {
 
 type FindProjectOptions struct {
 	Name string
+	Ids  []uuid.UUID
 }
 
 type ProjectResponse struct {

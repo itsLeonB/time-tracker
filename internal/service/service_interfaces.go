@@ -22,6 +22,7 @@ type ProjectService interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	FirstByQuery(ctx context.Context, options *dto.FindProjectOptions) (dto.ProjectResponse, error)
 	GetOrCreate(ctx context.Context, name string) (dto.ProjectResponse, error)
+	FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.ProjectResponse, error)
 }
 
 type TaskService interface {

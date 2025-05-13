@@ -17,6 +17,7 @@ type UserTaskResponse struct {
 	TaskId     uuid.UUID `json:"taskId"`
 	TaskNumber string    `json:"taskNumber"`
 	TaskName   string    `json:"taskName"`
+	ProjectId  uuid.UUID `json:"projectId"`
 	CreatedAt  time.Time `json:"createdAt"`
 	UpdatedAt  time.Time `json:"updatedAt"`
 }

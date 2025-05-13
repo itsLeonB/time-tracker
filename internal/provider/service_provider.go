@@ -24,9 +24,9 @@ func ProvideServices(configs *config.Config, repositories *Repositories) *Servic
 	jwt := auth.NewJWTHS256(configs.Auth)
 	authService := auth.NewAuthService(hasher, jwt, userService)
 	externalTrackerService := service.NewYoutrackService(repositories.Youtrack)
-	projectService := service.NewProjectService(repositories.Project, userService)
-	taskService := service.NewTaskService(repositories.Task, userService, externalTrackerService, projectService)
 	userTaskService := service.NewUserTaskService(repositories.UserTask)
+	projectService := service.NewProjectService(repositories.Project, userService, userTaskService)
+	taskService := service.NewTaskService(repositories.Task, userService, externalTrackerService, projectService)
 	userTaskLogService := service.NewUserTaskLogService(repositories.UserTaskLog)
 
 	return &Services{
