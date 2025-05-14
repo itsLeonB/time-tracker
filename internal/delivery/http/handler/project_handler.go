@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -76,7 +77,7 @@ func (ph *ProjectHandler) HandleGetById() gin.HandlerFunc {
 			return
 		}
 
-		project, err := ph.getUserProjectById(ctx, userId)
+		project, _, err := ph.getUserProjectById(ctx, userId)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -109,30 +110,32 @@ func (ph *ProjectHandler) HandleProjectDetailPage() gin.HandlerFunc {
 			return
 		}
 
-		project, err := ph.getUserProjectById(ctx, user.ID)
+		project, params, err := ph.getUserProjectById(ctx, user.ID)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
 		viewDto := dto.ProjectDetailViewDto{
-			User:    *user,
-			Project: project,
+			User:      *user,
+			Project:   project,
+			StartDate: util.FormatTime(params.StartDatetime, time.DateOnly),
+			EndDate:   util.FormatTime(params.EndDatetime, time.DateOnly),
 		}
 
 		ctx.HTML(http.StatusOK, "", pages.ProjectDetail(viewDto))
 	}
 }
 
-func (ph *ProjectHandler) getUserProjectById(ctx *gin.Context, userId uuid.UUID) (dto.ProjectResponse, error) {
+func (ph *ProjectHandler) getUserProjectById(ctx *gin.Context, userId uuid.UUID) (dto.ProjectResponse, dto.QueryParams, error) {
 	id, err := util.GetUuidParam(ctx, "id")
 	if err != nil {
-		return dto.ProjectResponse{}, err
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
 	}
 
 	params, err := util.GetDatetimeParams(ctx, "start", "end")
 	if err != nil {
-		return dto.ProjectResponse{}, err
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
 	}
 
 	params.ProjectID = id
@@ -142,8 +145,8 @@ func (ph *ProjectHandler) getUserProjectById(ctx *gin.Context, userId uuid.UUID)
 
 	project, err := ph.projectService.FirstByQuery(ctx, projectParams)
 	if err != nil {
-		return dto.ProjectResponse{}, err
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
 	}
 
-	return project, nil
+	return project, params, nil
 }

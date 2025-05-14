@@ -5,6 +5,8 @@ import (
 )
 
 type ProjectDetailViewDto struct {
-	User    model.User
-	Project ProjectResponse
+	User      model.User
+	Project   ProjectResponse
+	StartDate string
+	EndDate   string
 }

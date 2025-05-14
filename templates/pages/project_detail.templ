@@ -2,32 +2,62 @@ package pages
 
 import (
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
 )
 
 templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 	@layouts.Base("Home", &projectDetailViewDto.User) {
 		<div class="bg-white shadow rounded-lg p-6">
-			<h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome to your Dashboard, { projectDetailViewDto.User.Email }!</h1>
-			<div class="bg-indigo-50 p-4 rounded-lg">
-				<h2 class="text-lg font-medium text-indigo-800 mb-2">Your Account Information</h2>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<div class="bg-white p-4 rounded shadow">
-						<p class="text-sm text-gray-500">Email</p>
-						<p class="font-medium">{ projectDetailViewDto.User.Email }</p>
+			<h1 class="text-2xl font-bold text-gray-800 mb-4">Project Detail</h1>
+			<div class="mb-6 p-4 bg-gray-50 rounded-lg">
+				<form
+					hx-get={ util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID) }
+					hx-target="body"
+					hx-push-url="true"
+					class="flex items-end gap-4"
+				>
+					<div>
+						<label for="start" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+						<input
+							type="date"
+							id="start"
+							name="start"
+							value={ projectDetailViewDto.StartDate }
+							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+						/>
 					</div>
-					<div class="bg-white p-4 rounded shadow">
-						<p class="text-sm text-gray-500">Member Since</p>
-						<p class="font-medium">{ projectDetailViewDto.User.CreatedAt.Format("January 2, 2006") }</p>
+					<div>
+						<label for="end" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+						<input
+							type="date"
+							id="end"
+							name="end"
+							value={ projectDetailViewDto.EndDate }
+							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+						/>
 					</div>
-				</div>
+					<button
+						type="submit"
+						class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+					>
+						Apply Filter
+					</button>
+					if projectDetailViewDto.StartDate != "" || projectDetailViewDto.EndDate != "" {
+						<a
+							href={ util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID) }
+							class="rounded-md bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
+						>
+							Clear
+						</a>
+					}
+				</form>
 			</div>
 			<div class="flex flex-col gap-4 mt-6">
 				<div>
 					<h2 class="text-lg font-medium text-gray-800 mb-4">{ projectDetailViewDto.Project.Name }</h2>
 					<div class="bg-white p-4 rounded shadow">
 						<p class="text-sm text-gray-500">Total time spent</p>
-						<p class="font-medium">{ projectDetailViewDto.Project.TimeSpent.Minutes } minutes</p>
 						<p class="font-medium">{ projectDetailViewDto.Project.TimeSpent.Hours } hours</p>
 					</div>
 				</div>
