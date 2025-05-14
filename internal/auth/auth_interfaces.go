@@ -10,6 +10,7 @@ import (
 type AuthService interface {
 	Register(ctx context.Context, request *dto.RegisterRequest) (*dto.RegisterResponse, error)
 	Login(ctx context.Context, request *dto.LoginRequest) (*dto.LoginResponse, error)
+	CheckToken(ctx context.Context, token string) (bool, error)
 }
 
 type Hasher interface {

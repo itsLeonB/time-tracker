@@ -78,3 +78,12 @@ func (as *authServiceImpl) Login(ctx context.Context, request *dto.LoginRequest)
 		Token: token,
 	}, nil
 }
+
+func (as *authServiceImpl) CheckToken(ctx context.Context, token string) (bool, error) {
+	claims, err := as.jwt.VerifyToken(token)
+	if err != nil {
+		return false, err
+	}
+
+	return claims != nil, nil
+}

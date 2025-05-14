@@ -11,8 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/middleware"
-	strategy "github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/middleware/strategy/error"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/route"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/provider"
 )
@@ -30,11 +28,9 @@ func SetupServer() *Server {
 	services := provider.ProvideServices(configs, repositories)
 	handlers := provider.ProvideHandlers(services)
 
-	errorStrategyMap := strategy.NewErrorStrategyMap()
-
 	gin.SetMode(configs.App.Env)
 	r := gin.Default()
-	r.Use(middleware.HandleError(errorStrategyMap))
+
 	route.SetupRoutes(r, handlers, services)
 
 	return &Server{

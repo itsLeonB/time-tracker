@@ -1,0 +1,34 @@
+package pages
+
+import (
+    "github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+    "github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
+)
+
+templ Home(user *model.User) {
+    @layouts.Base("Home", user) {
+        <div class="bg-white shadow rounded-lg p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome to your Dashboard, {user.Email}!</h1>
+            <div class="bg-indigo-50 p-4 rounded-lg">
+                <h2 class="text-lg font-medium text-indigo-800 mb-2">Your Account Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded shadow">
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="font-medium">{user.Email}</p>
+                    </div>
+                    <div class="bg-white p-4 rounded shadow">
+                        <p class="text-sm text-gray-500">Member Since</p>
+                        <p class="font-medium">{user.CreatedAt.Format("January 2, 2006")}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6">
+                <h2 class="text-lg font-medium text-gray-800 mb-4">Your Protected Content</h2>
+                <p class="text-gray-600">
+                    This is your private dashboard. This content is only visible to authenticated users.
+                    You can customize this page to display any information relevant to your users.
+                </p>
+            </div>
+        </div>
+    }
+}

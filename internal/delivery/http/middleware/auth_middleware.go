@@ -2,12 +2,14 @@ package middleware
 
 import (
 	"crypto/subtle"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/auth"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
+	"github.com/itsLeonB/catfeinated-time-tracker/templates/auth_pages"
 	"github.com/rotisserie/eris"
 )
 
@@ -31,6 +33,27 @@ func Authorize(jwt auth.JWT) gin.HandlerFunc {
 		if err != nil {
 			_ = ctx.Error(err)
 			ctx.Abort()
+			return
+		}
+
+		ctx.Set(constant.ContextUserID, claims.Data[constant.ContextUserID])
+		ctx.Next()
+	}
+}
+
+func AuthorizeViaCookie(jwt auth.JWT) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		cookie, err := ctx.Request.Cookie("session_token")
+		if err != nil {
+			ctx.Abort()
+			ctx.HTML(http.StatusForbidden, "", auth_pages.Login("Not logged in", ""))
+			return
+		}
+
+		claims, err := jwt.VerifyToken(cookie.Value)
+		if err != nil {
+			ctx.Abort()
+			ctx.HTML(http.StatusForbidden, "", auth_pages.Login(err.Error(), ""))
 			return
 		}
 

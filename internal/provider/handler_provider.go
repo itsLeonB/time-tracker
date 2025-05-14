@@ -8,6 +8,7 @@ type Handlers struct {
 	Project  *handler.ProjectHandler
 	Task     *handler.TaskHandler
 	UserTask *handler.UserTaskHandler
+	Home     *handler.HomeHandler
 }
 
 func ProvideHandlers(services *Services) *Handlers {
@@ -17,5 +18,6 @@ func ProvideHandlers(services *Services) *Handlers {
 		Project:  handler.NewProjectHandler(services.Project),
 		Task:     handler.NewTaskHandler(services.Task, services.ExternalTracker),
 		UserTask: handler.NewUserTaskHandler(services.UserTask, services.UserTaskLog),
+		Home:     handler.NewHomeHandler(services.User),
 	}
 }

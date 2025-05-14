@@ -11,10 +11,21 @@ import (
 	"github.com/rotisserie/eris"
 )
 
-func BindRequest[T any](ctx *gin.Context) (T, error) {
+func BindJsonRequest[T any](ctx *gin.Context) (T, error) {
 	var request T
 
 	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		return request, eris.Wrap(err, apperror.MsgBindJsonError)
+	}
+
+	return request, nil
+}
+
+func BindFormRequest[T any](ctx *gin.Context) (T, error) {
+	var request T
+
+	err := ctx.ShouldBind(&request)
 	if err != nil {
 		return request, eris.Wrap(err, apperror.MsgBindJsonError)
 	}

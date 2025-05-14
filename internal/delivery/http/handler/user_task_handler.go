@@ -27,7 +27,7 @@ func NewUserTaskHandler(
 
 func (uth *UserTaskHandler) HandleCreate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request, err := util.BindRequest[dto.NewUserTaskRequest](ctx)
+		request, err := util.BindJsonRequest[dto.NewUserTaskRequest](ctx)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -103,7 +103,7 @@ func (uth *UserTaskHandler) HandleGetById() gin.HandlerFunc {
 
 func (uth *UserTaskHandler) HandleLog() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request, err := util.BindRequest[dto.NewUserTaskLogRequest](ctx)
+		request, err := util.BindJsonRequest[dto.NewUserTaskLogRequest](ctx)
 		if err != nil {
 			_ = ctx.Error(err)
 			return

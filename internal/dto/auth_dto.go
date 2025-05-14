@@ -1,9 +1,9 @@
 package dto
 
 type RegisterRequest struct {
-	Email                string `json:"email" binding:"required,email"`
-	Password             string `json:"password" binding:"required"`
-	PasswordConfirmation string `json:"passwordConfirmation" binding:"required,eqfield=Password"`
+	Email                string `json:"email" form:"email" binding:"required,email"`
+	Password             string `json:"password" form:"password" binding:"required"`
+	PasswordConfirmation string `json:"passwordConfirmation" form:"passwordConfirmation" binding:"required,eqfield=Password"`
 }
 
 type RegisterResponse struct {
@@ -11,8 +11,8 @@ type RegisterResponse struct {
 }
 
 type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	Email    string `json:"email" form:"email" binding:"required,email"`
+	Password string `json:"password" form:"password" binding:"required"`
 }
 
 type LoginResponse struct {
