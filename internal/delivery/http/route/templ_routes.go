@@ -23,4 +23,6 @@ func setupTemplRoutes(router *gin.Engine, handlers *provider.Handlers, services 
 
 	router.GET("/", authMiddleware, handlers.Home.HandleHomePage())
 	router.GET("/logout", authMiddleware, handlers.Auth.HandleLogout())
+
+	router.GET("/projects/:id", authMiddleware, handlers.Project.HandleProjectDetailPage())
 }

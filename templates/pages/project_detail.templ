@@ -1,0 +1,50 @@
+package pages
+
+import (
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
+	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
+)
+
+templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
+	@layouts.Base("Home", &projectDetailViewDto.User) {
+		<div class="bg-white shadow rounded-lg p-6">
+			<h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome to your Dashboard, { projectDetailViewDto.User.Email }!</h1>
+			<div class="bg-indigo-50 p-4 rounded-lg">
+				<h2 class="text-lg font-medium text-indigo-800 mb-2">Your Account Information</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="bg-white p-4 rounded shadow">
+						<p class="text-sm text-gray-500">Email</p>
+						<p class="font-medium">{ projectDetailViewDto.User.Email }</p>
+					</div>
+					<div class="bg-white p-4 rounded shadow">
+						<p class="text-sm text-gray-500">Member Since</p>
+						<p class="font-medium">{ projectDetailViewDto.User.CreatedAt.Format("January 2, 2006") }</p>
+					</div>
+				</div>
+			</div>
+			<div class="flex flex-col gap-4 mt-6">
+				<div>
+					<h2 class="text-lg font-medium text-gray-800 mb-4">{ projectDetailViewDto.Project.Name }</h2>
+					<div class="bg-white p-4 rounded shadow">
+						<p class="text-sm text-gray-500">Total time spent</p>
+						<p class="font-medium">{ projectDetailViewDto.Project.TimeSpent.Minutes } minutes</p>
+						<p class="font-medium">{ projectDetailViewDto.Project.TimeSpent.Hours } hours</p>
+					</div>
+				</div>
+				<div class="bg-indigo-50 p-4 rounded-lg">
+					<h2 class="text-lg font-medium text-indigo-800 mb-2">Tasks</h2>
+					<div class="flex flex-col gap-2">
+						for _, task := range projectDetailViewDto.Project.Tasks {
+							<div class="bg-white p-4 rounded shadow">
+								<p class="text-sm text-gray-500">{ task.Number }</p>
+								<p class="font-medium">{ task.Name }</p>
+								<p class="text-sm text-gray-500">Time spent</p>
+								<p class="font-medium">{ task.TimeSpent.Hours } hours</p>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}

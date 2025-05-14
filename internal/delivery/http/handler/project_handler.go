@@ -4,20 +4,29 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
+	"github.com/itsLeonB/catfeinated-time-tracker/templates/pages"
 	"github.com/rotisserie/eris"
 )
 
 type ProjectHandler struct {
 	projectService service.ProjectService
+	userService    service.UserService
 }
 
-func NewProjectHandler(projectService service.ProjectService) *ProjectHandler {
-	return &ProjectHandler{projectService}
+func NewProjectHandler(
+	projectService service.ProjectService,
+	userService service.UserService,
+) *ProjectHandler {
+	return &ProjectHandler{
+		projectService,
+		userService,
+	}
 }
 
 func (ph *ProjectHandler) Create() gin.HandlerFunc {
@@ -61,30 +70,13 @@ func (ph *ProjectHandler) HandleGetAll() gin.HandlerFunc {
 
 func (ph *ProjectHandler) HandleGetById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id, err := util.GetUuidParam(ctx, "id")
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
 		userId, err := util.GetUuidFromCtx(ctx, constant.ContextUserID)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		params, err := util.GetDatetimeParams(ctx, "start", "end")
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
-		params.ProjectID = id
-		params.UserId = userId
-
-		projectParams := dto.ProjectQueryParams{QueryParams: params}
-
-		project, err := ph.projectService.FirstByQuery(ctx, projectParams)
+		project, err := ph.getUserProjectById(ctx, userId)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -107,4 +99,51 @@ func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 
 		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(project))
 	}
+}
+
+func (ph *ProjectHandler) HandleProjectDetailPage() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		user, err := ph.userService.ValidateUser(ctx)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		project, err := ph.getUserProjectById(ctx, user.ID)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		viewDto := dto.ProjectDetailViewDto{
+			User:    *user,
+			Project: project,
+		}
+
+		ctx.HTML(http.StatusOK, "", pages.ProjectDetail(viewDto))
+	}
+}
+
+func (ph *ProjectHandler) getUserProjectById(ctx *gin.Context, userId uuid.UUID) (dto.ProjectResponse, error) {
+	id, err := util.GetUuidParam(ctx, "id")
+	if err != nil {
+		return dto.ProjectResponse{}, err
+	}
+
+	params, err := util.GetDatetimeParams(ctx, "start", "end")
+	if err != nil {
+		return dto.ProjectResponse{}, err
+	}
+
+	params.ProjectID = id
+	params.UserId = userId
+
+	projectParams := dto.ProjectQueryParams{QueryParams: params}
+
+	project, err := ph.projectService.FirstByQuery(ctx, projectParams)
+	if err != nil {
+		return dto.ProjectResponse{}, err
+	}
+
+	return project, nil
 }

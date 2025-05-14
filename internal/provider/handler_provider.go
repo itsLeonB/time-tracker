@@ -15,9 +15,9 @@ func ProvideHandlers(services *Services) *Handlers {
 	return &Handlers{
 		Root:     &handler.RootHandler{},
 		Auth:     handler.NewAuthHandler(services.Auth),
-		Project:  handler.NewProjectHandler(services.Project),
+		Project:  handler.NewProjectHandler(services.Project, services.User),
 		Task:     handler.NewTaskHandler(services.Task, services.ExternalTracker),
 		UserTask: handler.NewUserTaskHandler(services.UserTask, services.UserTaskLog),
-		Home:     handler.NewHomeHandler(services.User),
+		Home:     handler.NewHomeHandler(services.User, services.Project),
 	}
 }
