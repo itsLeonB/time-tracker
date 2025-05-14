@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"fmt"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
@@ -96,10 +97,44 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 					<div class="flex flex-col gap-2">
 						for _, task := range projectDetailViewDto.Project.Tasks {
 							<div class="bg-white p-4 rounded shadow">
-								<p class="text-sm text-gray-500">{ task.Number }</p>
-								<p class="font-medium">{ task.Name }</p>
-								<p class="text-sm text-gray-500">Time spent</p>
-								<p class="font-medium">{ task.TimeSpent.Hours } hours</p>
+								<div class="flex justify-between items-start">
+									<div>
+										<p class="text-sm text-gray-500">{ task.Number }</p>
+										<p class="font-medium">{ task.Name }</p>
+										<p class="text-sm text-gray-500">Time spent</p>
+										<p class="font-medium">{ task.TimeSpent.Hours } hours</p>
+									</div>
+									<div class="flex flex-col items-end gap-2">
+										<div
+											class="text-xl font-mono"
+											id={ fmt.Sprintf("timer-%s", task.ID) }
+											data-start-time={ task.StartTime() }
+										></div>
+										if len(task.UserTasks) > 0 && len(task.UserTasks[0].Logs) > 0 && task.UserTasks[0].Logs[0].Action == "START" {
+											<button
+												hx-post={ util.ConstructTemplUrl("/projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, task.UserTasks[0].ID) }
+												hx-boost="true"
+												hx-push-url="true"
+												hx-history="false"
+												hx-target="body"
+												class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+											>
+												STOP
+											</button>
+										} else {
+											<button
+												hx-post={ util.ConstructTemplUrl("/projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, task.UserTasks[0].ID) }
+												hx-boost="true"
+												hx-push-url="true"
+												hx-history="false"
+												hx-target="body"
+												class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+											>
+												START
+											</button>
+										}
+									</div>
+								</div>
 							</div>
 						}
 					</div>

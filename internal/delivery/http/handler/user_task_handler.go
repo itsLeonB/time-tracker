@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
+	"github.com/rotisserie/eris"
 )
 
 type UserTaskHandler struct {
@@ -124,5 +126,40 @@ func (uth *UserTaskHandler) HandleLog() gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(response))
+	}
+}
+
+func (uth *UserTaskHandler) HandleLogPost() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		projectId, err := util.GetUuidParam(ctx, "id")
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		userTaskId, err := util.GetUuidParam(ctx, "userTaskId")
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		action := ctx.Param("action")
+		if action != constant.LogAction.Start && action != constant.LogAction.Stop {
+			_ = ctx.Error(eris.Errorf("%s is not a valid action", action))
+			return
+		}
+
+		newLogRequest := dto.NewUserTaskLogRequest{
+			UserTaskId: userTaskId,
+			Action:     action,
+		}
+
+		_, err = uth.userTaskLogService.Create(ctx, newLogRequest)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/projects/%s", projectId))
 	}
 }

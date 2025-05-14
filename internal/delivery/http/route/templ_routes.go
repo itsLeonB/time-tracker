@@ -15,6 +15,8 @@ func setupTemplRoutes(router *gin.Engine, handlers *provider.Handlers, services 
 
 	router.SetTrustedProxies(nil)
 
+	router.Static("/static", "./static")
+
 	router.GET("/register", handlers.Auth.HandleRegisterPage())
 	router.POST("/auth/register", handlers.Auth.HandleRegisterForm())
 
@@ -28,4 +30,5 @@ func setupTemplRoutes(router *gin.Engine, handlers *provider.Handlers, services 
 
 	protectedRoutes.GET("/projects/:id", handlers.Project.HandleProjectDetailPage())
 	protectedRoutes.POST("/projects/:id/tasks", handlers.Task.HandleAddToUserProject())
+	protectedRoutes.POST("/projects/:id/user-tasks/:userTaskId/:action", handlers.UserTask.HandleLogPost())
 }

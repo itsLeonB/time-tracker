@@ -80,7 +80,7 @@ func Base(title string, user *model.User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</main><footer class=\"max-w-6xl mx-auto px-4 py-6 text-center text-gray-500\"><p>&copy; 2025 YourApp. All rights reserved.</p></footer></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</main><footer class=\"max-w-6xl mx-auto px-4 py-6 text-center text-gray-500\"><p>&copy; 2025 YourApp. All rights reserved.</p></footer><script src=\"/static/js/timer.js\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

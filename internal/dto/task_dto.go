@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 )
 
 type NewTaskRequest struct {
@@ -26,6 +27,18 @@ type TaskResponse struct {
 	UpdatedAt time.Time          `json:"updatedAt"`
 	TimeSpent TimeSpent          `json:"timeSpent"`
 	UserTasks []UserTaskResponse `json:"userTasks"`
+}
+
+func (tr *TaskResponse) StartTime() string {
+	if len(tr.UserTasks) > 0 {
+		if len(tr.UserTasks[0].Logs) > 0 {
+			if tr.UserTasks[0].Logs[0].Action == constant.LogAction.Start {
+				return tr.UserTasks[0].Logs[0].CreatedAtIso
+			}
+		}
+	}
+
+	return ""
 }
 
 type TaskQueryParams struct {
