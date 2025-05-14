@@ -27,7 +27,7 @@ func ProvideServices(configs *config.Config, repositories *Repositories) *Servic
 	userTaskService := service.NewUserTaskService(repositories.UserTask)
 	userTaskLogService := service.NewUserTaskLogService(repositories.UserTaskLog)
 	projectService := service.NewProjectService(repositories.Project, userService, userTaskService, userTaskLogService)
-	taskService := service.NewTaskService(repositories.Task, userService, externalTrackerService, projectService)
+	taskService := service.NewTaskService(repositories.Task, userService, externalTrackerService, projectService, userTaskService)
 
 	return &Services{
 		User:            userService,

@@ -20,6 +20,10 @@ func (t *Task) TableName() string {
 	return "tasks"
 }
 
+func (t *Task) IsZero() bool {
+	return t.ID == uuid.Nil
+}
+
 type TaskQueryOptions struct {
 	Number    string
 	ProjectID uuid.UUID

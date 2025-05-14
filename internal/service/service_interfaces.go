@@ -33,6 +33,7 @@ type TaskService interface {
 	Update(ctx context.Context, id uuid.UUID, name string) (dto.TaskResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	Find(ctx context.Context, queryParams dto.TaskQueryParams) ([]dto.TaskResponse, error)
+	AddToUserProject(ctx context.Context, request dto.AddToProjectRequest) (dto.TaskResponse, error)
 }
 
 type ExternalTrackerService interface {

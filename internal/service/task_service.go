@@ -18,6 +18,7 @@ type taskServiceImpl struct {
 	userService            UserService
 	externalTrackerService ExternalTrackerService
 	projectService         ProjectService
+	userTaskService        UserTaskService
 }
 
 func NewTaskService(
@@ -25,12 +26,14 @@ func NewTaskService(
 	userService UserService,
 	externalTrackerService ExternalTrackerService,
 	projectService ProjectService,
+	userTaskService UserTaskService,
 ) TaskService {
 	return &taskServiceImpl{
 		taskRepository,
 		userService,
 		externalTrackerService,
 		projectService,
+		userTaskService,
 	}
 }
 
@@ -95,18 +98,7 @@ func (ts *taskServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.TaskR
 }
 
 func (ts *taskServiceImpl) Find(ctx context.Context, queryParams dto.TaskQueryParams) ([]dto.TaskResponse, error) {
-	_, err := ts.userService.ValidateUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	queryOptions := model.TaskQueryOptions{
-		Number:    queryParams.Number,
-		ProjectID: queryParams.ProjectID,
-		Date:      queryParams.Date,
-	}
-
-	tasks, err := ts.taskRepository.Find(ctx, queryOptions)
+	tasks, _, err := ts.findTask(ctx, queryParams)
 	if err != nil {
 		return nil, err
 	}
@@ -116,10 +108,10 @@ func (ts *taskServiceImpl) Find(ctx context.Context, queryParams dto.TaskQueryPa
 	}
 
 	// If no tasks are found, check the external tracker
-	return ts.findAndInsertFromExternal(ctx, queryParams.Number)
+	return ts.findAndInsertFromExternal(ctx, queryParams.Number, uuid.Nil)
 }
 
-func (ts *taskServiceImpl) findAndInsertFromExternal(ctx context.Context, number string) ([]dto.TaskResponse, error) {
+func (ts *taskServiceImpl) findAndInsertFromExternal(ctx context.Context, number string, projectId uuid.UUID) ([]dto.TaskResponse, error) {
 	externalQueryOptions := dto.ExternalQueryOptions{
 		Number: number,
 	}
@@ -132,7 +124,7 @@ func (ts *taskServiceImpl) findAndInsertFromExternal(ctx context.Context, number
 	insertedTasks := make([]dto.TaskResponse, 0, len(externalTasks))
 
 	for _, externalTask := range externalTasks {
-		insertedTask, err := ts.insertFromExternal(ctx, externalTask)
+		insertedTask, err := ts.insertFromExternal(ctx, externalTask, projectId)
 		if err != nil {
 			return nil, err
 		}
@@ -143,16 +135,20 @@ func (ts *taskServiceImpl) findAndInsertFromExternal(ctx context.Context, number
 	return insertedTasks, nil
 }
 
-func (ts *taskServiceImpl) insertFromExternal(ctx context.Context, externalTask model.ExternalTask) (model.Task, error) {
+func (ts *taskServiceImpl) insertFromExternal(ctx context.Context, externalTask model.ExternalTask, projectId uuid.UUID) (model.Task, error) {
 	var task model.Task
 
-	project, err := ts.projectService.GetOrCreate(ctx, externalTask.Project)
-	if err != nil {
-		return task, err
+	if projectId == uuid.Nil {
+		project, err := ts.projectService.GetOrCreate(ctx, externalTask.Project)
+		if err != nil {
+			return task, err
+		}
+
+		projectId = project.ID
 	}
 
 	newTask := model.Task{
-		ProjectID: project.ID,
+		ProjectID: projectId,
 		Number:    externalTask.Number,
 		Name:      externalTask.Name,
 	}
@@ -240,4 +236,73 @@ func (ts *taskServiceImpl) getTaskByNumber(ctx context.Context, number string) (
 	}
 
 	return task, nil
+}
+
+func (ts *taskServiceImpl) AddToUserProject(ctx context.Context, request dto.AddToProjectRequest) (dto.TaskResponse, error) {
+	params := dto.TaskQueryParams{
+		Number:    request.Number,
+		ProjectID: request.ProjectID,
+	}
+
+	tasks, user, err := ts.findTask(ctx, params)
+	if err != nil {
+		return dto.TaskResponse{}, err
+	}
+
+	if len(tasks) > 0 {
+		for _, task := range tasks {
+			userTaskParams := dto.UserTaskQueryParams{
+				UserId: user.ID,
+				TaskId: task.ID,
+			}
+			userTasks, err := ts.userTaskService.FindAll(ctx, userTaskParams)
+			if err != nil {
+				return dto.TaskResponse{}, err
+			}
+
+			if len(userTasks) > 0 {
+				return userTasks[0].Task, nil
+			}
+		}
+	}
+
+	taskResponse, err := ts.findAndInsertFromExternal(ctx, request.Number, request.ProjectID)
+	if err != nil {
+		return dto.TaskResponse{}, err
+	}
+	if len(taskResponse) == 0 {
+		return dto.TaskResponse{}, eris.Errorf("Task not found: %s", request.Number)
+	}
+
+	newUserTask := dto.NewUserTaskRequest{
+		TaskId: taskResponse[0].ID,
+		UserId: user.ID,
+	}
+
+	_, err = ts.userTaskService.Create(ctx, newUserTask)
+	if err != nil {
+		return dto.TaskResponse{}, err
+	}
+
+	return taskResponse[0], nil
+}
+
+func (ts *taskServiceImpl) findTask(ctx context.Context, params dto.TaskQueryParams) ([]model.Task, model.User, error) {
+	user, err := ts.userService.ValidateUser(ctx)
+	if err != nil {
+		return nil, model.User{}, err
+	}
+
+	queryOptions := model.TaskQueryOptions{
+		Number:    params.Number,
+		ProjectID: params.ProjectID,
+		Date:      params.Date,
+	}
+
+	tasks, err := ts.taskRepository.Find(ctx, queryOptions)
+	if err != nil {
+		return nil, model.User{}, err
+	}
+
+	return tasks, *user, nil
 }

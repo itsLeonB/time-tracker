@@ -14,7 +14,7 @@ func UserTaskToResponse(userTask model.UserTask) dto.UserTaskResponse {
 		logs[i] = UserTaskLogToResponse(log)
 	}
 
-	return dto.UserTaskResponse{
+	userTaskResponse := dto.UserTaskResponse{
 		ID:         userTask.ID,
 		UserId:     userTask.UserId,
 		TaskId:     userTask.TaskId,
@@ -26,6 +26,12 @@ func UserTaskToResponse(userTask model.UserTask) dto.UserTaskResponse {
 		TimeSpent:  dto.TimeSpentFromDuration(userTask.GetTotalTime()),
 		Logs:       logs,
 	}
+
+	if !userTask.Task.IsZero() {
+		userTaskResponse.Task = TaskToResponse(userTask.Task)
+	}
+
+	return userTaskResponse
 }
 
 func PopulateUserTaskWithLogs(userTask model.UserTask, userTaskLogs []dto.UserTaskLogResponse) dto.UserTaskResponse {
@@ -67,6 +73,7 @@ func QueryParamsToOptions(queryParams dto.UserTaskQueryParams) model.UserTaskQue
 	return model.UserTaskQueryOptions{
 		Filters: map[string]any{
 			"user_id": queryParams.UserId,
+			"task_id": queryParams.TaskId,
 		},
 		PreloadRelations: []string{"Task"},
 	}

@@ -12,6 +12,11 @@ type NewTaskRequest struct {
 	Name      string    `json:"name" binding:"required"`
 }
 
+type AddToProjectRequest struct {
+	ProjectID uuid.UUID
+	Number    string `form:"number" binding:"required,min=3"`
+}
+
 type TaskResponse struct {
 	ID        uuid.UUID          `json:"id"`
 	ProjectID uuid.UUID          `json:"projectId"`

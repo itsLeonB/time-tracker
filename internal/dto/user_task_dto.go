@@ -22,8 +22,10 @@ type UserTaskResponse struct {
 	UpdatedAt  time.Time             `json:"updatedAt"`
 	TimeSpent  TimeSpent             `json:"timeSpent"`
 	Logs       []UserTaskLogResponse `json:"logs"`
+	Task       TaskResponse          `json:"task"`
 }
 
 type UserTaskQueryParams struct {
 	UserId uuid.UUID
+	TaskId uuid.UUID
 }
