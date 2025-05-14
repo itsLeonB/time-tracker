@@ -1,6 +1,9 @@
 package layouts
 
-import "github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+import (
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+)
 
 templ Base(title string, user *model.User) {
 	<!DOCTYPE html>
@@ -8,36 +11,90 @@ templ Base(title string, user *model.User) {
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>{ title }</title>
+			<title>{ title } | { config.LoadedGlobalConfig.AppName }</title>
 			<script src="https://cdn.tailwindcss.com"></script>
 			<script src="https://unpkg.com/htmx.org@1.9.6"></script>
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+			<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+			<style>
+				body {
+					font-family: 'Inter', sans-serif;
+				}
+				.transition-all {
+					transition: all 0.3s ease;
+				}
+			</style>
 		</head>
-		<body class="bg-gray-100 min-h-screen">
-			<header class="bg-white shadow">
-				<div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-					<a href="/" class="text-xl font-bold text-indigo-600">YourApp</a>
-					<nav>
-						if user != nil {
-							<div class="flex items-center space-x-4">
-								<span class="text-gray-700">Welcome, { user.Email }</span>
-								<a href="/logout" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Logout</a>
-							</div>
-						} else {
-							<div class="space-x-2">
-								<a href="/login" class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded hover:bg-indigo-50">Login</a>
-								<a href="/register" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Register</a>
-							</div>
-						}
-					</nav>
+		<body class="bg-gray-50 min-h-screen flex flex-col">
+			<header class="bg-white shadow-sm sticky top-0 z-10">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="flex justify-between items-center h-16">
+						<!-- Logo and Brand -->
+						<div class="flex items-center">
+							<a href="/" class="flex items-center">
+								<div class="w-8 h-8 bg-indigo-600 rounded-md flex items-center justify-center mr-2">
+									<i class="fas fa-clock text-white"></i>
+								</div>
+								<span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+									{ config.LoadedGlobalConfig.AppName }
+								</span>
+							</a>
+						</div>
+						<!-- Desktop Navigation -->
+						<nav class="hidden md:flex items-center space-x-4">
+							if user != nil {
+								<div class="relative ml-3 group">
+									<button class="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 focus:outline-none">
+										<span class="mr-1">{ getUserDisplayName(user) }</span>
+										<i class="fas fa-chevron-down text-xs"></i>
+									</button>
+									<div class="hidden group-hover:block absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg z-50">
+										<div class="border-t border-gray-100 my-1"></div>
+										<a href="/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+											<i class="fas fa-sign-out-alt mr-2"></i> Logout
+										</a>
+									</div>
+								</div>
+							} else {
+								<a href="/login" class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 text-sm font-medium transition-all">Login</a>
+								<a href="/register" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium transition-all">
+									Get Started
+								</a>
+							}
+						</nav>
+					</div>
 				</div>
 			</header>
-			<main class="max-w-6xl mx-auto px-4 py-8">
-				{ children... }
+			<main class="flex-grow">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+					{ children... }
+				</div>
 			</main>
-			<footer class="max-w-6xl mx-auto px-4 py-6 text-center text-gray-500">
-				<p>&copy; 2025 YourApp. All rights reserved.</p>
+			<footer class="bg-white border-t border-gray-200 mt-12">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+					<p class="mt-8 md:mt-0 md:order-1 text-sm text-gray-500">
+						&copy; { getCurrentYear() } { config.LoadedGlobalConfig.AppName }.
+					</p>
+				</div>
 			</footer>
+			<!-- Scripts -->
 			<script src="/static/js/timer.js"></script>
 		</body>
 	</html>
+}
+
+// Helper functions
+func getUserDisplayName(user *model.User) string {
+	if user == nil {
+		return ""
+	}
+	// Use email as display name if no name is set
+	// You can modify this logic if you add name fields to user model
+	return user.Email
+}
+
+func getCurrentYear() string {
+	return "2025"
 }

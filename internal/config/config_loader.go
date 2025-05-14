@@ -13,6 +13,8 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
+	loadGlobalConfig()
+
 	return &Config{
 		App:      loadAppConfig(),
 		Auth:     loadAuthConfig(),

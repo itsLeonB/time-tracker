@@ -13,6 +13,7 @@ import (
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
+	"time"
 )
 
 func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Component {
@@ -48,231 +49,328 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"bg-white shadow rounded-lg p-6\"><h1 class=\"text-2xl font-bold text-gray-800 mb-4\">Project Detail</h1><div class=\"mb-6 p-4 bg-gray-50 rounded-lg\"><form hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"space-y-6\"><!-- Project Header --><div class=\"bg-white shadow-sm rounded-lg p-6\"><div class=\"flex flex-col md:flex-row md:items-center md:justify-between gap-4\"><div><div class=\"flex items-center\"><a href=\"/\" class=\"text-indigo-600 hover:text-indigo-800 mr-2\"><i class=\"fas fa-arrow-left text-sm\"></i></a><h1 class=\"text-2xl font-bold text-gray-800\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID))
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.Project.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 16, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 22, Col: 87}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"body\" hx-push-url=\"true\" class=\"flex items-end gap-4\"><div><label for=\"start\" class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date</label> <input type=\"date\" id=\"start\" name=\"start\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h1></div></div><div class=\"flex items-center\"><div class=\"bg-indigo-100 px-4 py-2 rounded-lg flex items-center\"><i class=\"fas fa-clock text-indigo-600 mr-2\"></i><div><span class=\"text-sm text-indigo-600 font-medium\">Total Time</span><p class=\"text-lg font-bold text-indigo-800\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.StartDate)
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.Project.TimeSpent.Hours)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 27, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 30, Col: 99}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2\"></div><div><label for=\"end\" class=\"block text-sm font-medium text-gray-700 mb-1\">End Date</label> <input type=\"date\" id=\"end\" name=\"end\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " hours</p></div></div></div></div></div><!-- Date Range Filter --><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-lg font-medium text-gray-800 mb-4 flex items-center\"><i class=\"fas fa-filter text-indigo-600 mr-2\"></i> Filter Tasks by Date</h2><form hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.EndDate)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 37, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 43, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2\"></div><button type=\"submit\" class=\"rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600\">Apply Filter</button> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" hx-target=\"body\" hx-push-url=\"true\" class=\"flex flex-col md:flex-row items-end gap-4\"><div class=\"w-full md:w-auto\"><label for=\"start\" class=\"block text-sm font-medium text-gray-700 mb-1\">Start Date</label> <input type=\"date\" id=\"start\" name=\"start\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if projectDetailViewDto.StartDate != "" || projectDetailViewDto.EndDate != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<a href=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var6 templ.SafeURL = util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID)
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var6)))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"rounded-md bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500\">Clear</a>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.StartDate)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 54, Col: 45}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</form></div><div class=\"flex flex-col gap-4 mt-6\"><div><h2 class=\"text-lg font-medium text-gray-800 mb-4\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2\"></div><div class=\"w-full md:w-auto\"><label for=\"end\" class=\"block text-sm font-medium text-gray-700 mb-1\">End Date</label> <input type=\"date\" id=\"end\" name=\"end\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.Project.Name)
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.EndDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 59, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 64, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</h2><div class=\"bg-white p-4 rounded shadow\"><p class=\"text-sm text-gray-500\">Total time spent</p><p class=\"font-medium\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2\"></div><div class=\"flex space-x-2\"><button type=\"submit\" class=\"rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 flex items-center\"><i class=\"fas fa-search mr-2\"></i> Apply Filter</button> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.Project.TimeSpent.Hours)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 62, Col: 75}
+			if projectDetailViewDto.StartDate != "" || projectDetailViewDto.EndDate != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<a href=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var8 templ.SafeURL = util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var8)))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 flex items-center\"><i class=\"fas fa-times mr-2\"></i> Clear</a>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, " hours</p></div></div><div class=\"p-4 bg-gray-50 rounded-lg\"><form hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></form></div><!-- Task Management Section --><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\"><!-- Add Task Section --><div class=\"md:col-span-1\"><div class=\"bg-white shadow-sm rounded-lg p-6 h-full\"><h2 class=\"text-lg font-medium text-gray-800 mb-4 flex items-center\"><i class=\"fas fa-plus-circle text-indigo-600 mr-2\"></i> Add New Task</h2><form hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/tasks", projectDetailViewDto.Project.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 67, Col: 93}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 98, Col: 94}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-boost=\"true\" hx-push-url=\"true\" hx-history=\"false\" hx-target=\"body\" class=\"flex items-end gap-4\"><div class=\"flex-1\"><label for=\"number\" class=\"block text-sm font-medium text-gray-700 mb-1\">Add Task by Number</label> <input type=\"text\" id=\"number\" name=\"number\" minlength=\"3\" required title=\"Task number must be at least 3 characters\" class=\"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2\" placeholder=\"Enter task number (min 3 characters)\"></div><button type=\"submit\" class=\"rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600\">Add Task</button></form></div><div class=\"bg-indigo-50 p-4 rounded-lg\"><h2 class=\"text-lg font-medium text-indigo-800 mb-2\">Tasks</h2><div class=\"flex flex-col gap-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-boost=\"true\" hx-push-url=\"true\" hx-history=\"false\" hx-target=\"body\" class=\"space-y-4\"><div><label for=\"number\" class=\"block text-sm font-medium text-gray-700 mb-1\">Task Number</label> <input type=\"text\" id=\"number\" name=\"number\" minlength=\"3\" required title=\"Task number must be at least 3 characters\" class=\"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2\" placeholder=\"Enter task number (min 3 characters)\"><p class=\"mt-1 text-xs text-gray-500\">Example: ABC-123, TASK-456</p></div><button type=\"submit\" class=\"w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 flex items-center justify-center\"><i class=\"fas fa-plus mr-2\"></i> Add Task</button></form><!-- Quick Stats --><div class=\"mt-8 pt-6 border-t border-gray-200\"><h3 class=\"text-sm font-semibold text-gray-600 mb-4\">Quick Stats</h3><div class=\"space-y-3\"><div class=\"flex justify-between items-center\"><span class=\"text-sm text-gray-600\">Total Tasks</span> <span class=\"font-medium\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, task := range projectDetailViewDto.Project.Tasks {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"bg-white p-4 rounded shadow\"><div class=\"flex justify-between items-start\"><div><p class=\"text-sm text-gray-500\">")
+			var templ_7745c5c3_Var10 string
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(len(projectDetailViewDto.Project.Tasks))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 133, Col: 76}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</span></div><div class=\"flex justify-between items-center\"><span class=\"text-sm text-gray-600\">Active Tasks</span> <span class=\"font-medium\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var11 string
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(countActiveTasks(projectDetailViewDto.Project.Tasks))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 137, Col: 89}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</span></div></div></div></div></div><!-- Tasks List Section --><div class=\"md:col-span-2\"><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-lg font-medium text-gray-800 mb-4 flex items-center\"><i class=\"fas fa-tasks text-indigo-600 mr-2\"></i> Project Tasks</h2>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(projectDetailViewDto.Project.Tasks) > 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"space-y-4\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(task.Number)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 102, Col: 56}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</p><p class=\"font-medium\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(task.Name)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 103, Col: 44}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</p><p class=\"text-sm text-gray-500\">Time spent</p><p class=\"font-medium\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(task.TimeSpent.Hours)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 105, Col: 55}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " hours</p></div><div class=\"flex flex-col items-end gap-2\"><div class=\"text-xl font-mono\" id=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("timer-%s", task.ID))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 110, Col: 48}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" data-start-time=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(task.StartTime())
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 111, Col: 45}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\"></div>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				if len(task.UserTasks) > 0 && len(task.UserTasks[0].Logs) > 0 && task.UserTasks[0].Logs[0].Action == "START" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<button hx-post=\"")
+				for _, task := range projectDetailViewDto.Project.Tasks {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"border border-gray-200 rounded-lg hover:shadow-md transition-all overflow-hidden\"><div class=\"p-4\"><div class=\"flex flex-col md:flex-row md:items-center md:justify-between gap-4\"><div><div class=\"flex items-center mb-1\"><span class=\"bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var12 string
+					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(task.Number)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 158, Col: 123}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</span> ")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					if isActiveTask(task) {
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<span class=\"bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full\">Active</span>")
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><h3 class=\"font-medium text-gray-800\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var13 string
+					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(task.Name)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 163, Col: 62}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</h3><div class=\"mt-2 flex items-center text-sm text-gray-500\"><i class=\"fas fa-clock mr-1 text-gray-400\"></i> <span>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var14 string
+					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(task.TimeSpent.Hours)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 166, Col: 42}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " hours logged</span></div></div><div class=\"flex flex-col items-end gap-2\"><div class=\"text-xl font-mono font-bold bg-gray-100 px-3 py-1 rounded-md\" id=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var15 string
-					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, task.UserTasks[0].ID))
+					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("timer-%s", task.ID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 115, Col: 134}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 172, Col: 51}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-boost=\"true\" hx-push-url=\"true\" hx-history=\"false\" hx-target=\"body\" class=\"rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600\">STOP</button>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<button hx-post=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" data-start-time=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var16 string
-					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, task.UserTasks[0].ID))
+					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(task.StartTime())
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 126, Col: 135}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 173, Col: 48}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" hx-boost=\"true\" hx-push-url=\"true\" hx-history=\"false\" hx-target=\"body\" class=\"rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600\">START</button>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\"></div>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					if len(task.UserTasks) > 0 && len(task.UserTasks[0].Logs) > 0 && task.UserTasks[0].Logs[0].Action == "START" {
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<button hx-post=\"")
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+						var templ_7745c5c3_Var17 string
+						templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, task.UserTasks[0].ID))
+						if templ_7745c5c3_Err != nil {
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 177, Col: 137}
+						}
+						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" hx-boost=\"true\" hx-push-url=\"true\" hx-history=\"false\" hx-target=\"body\" class=\"rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 flex items-center\"><i class=\"fas fa-stop-circle mr-2\"></i> Stop Timer</button>")
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+					} else {
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<button hx-post=\"")
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+						var templ_7745c5c3_Var18 string
+						templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, task.UserTasks[0].ID))
+						if templ_7745c5c3_Err != nil {
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 189, Col: 138}
+						}
+						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" hx-boost=\"true\" hx-push-url=\"true\" hx-history=\"false\" hx-target=\"body\" class=\"rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 flex items-center\"><i class=\"fas fa-play-circle mr-2\"></i> Start Timer</button>")
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></div></div><div class=\"bg-gray-50 px-4 py-3 flex justify-between items-center\"><div class=\"text-xs text-gray-500\">Added on ")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var19 string
+					templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(task.CreatedAt))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 205, Col: 49}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div></div></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"text-center py-12 border-2 border-dashed border-gray-300 rounded-lg\"><i class=\"fas fa-clipboard-list text-gray-400 text-4xl mb-3\"></i><h3 class=\"text-base font-medium text-gray-900\">No tasks yet</h3><p class=\"mt-1 text-sm text-gray-500\">Get started by adding your first task.</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layouts.Base("Home", &projectDetailViewDto.User).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layouts.Base(fmt.Sprintf("Project: %s", projectDetailViewDto.Project.Name), &projectDetailViewDto.User).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
+}
+
+// Helper functions
+func countActiveTasks(tasks []dto.TaskResponse) int {
+	count := 0
+	for _, task := range tasks {
+		if isActiveTask(task) {
+			count++
+		}
+	}
+	return count
+}
+
+func isActiveTask(task dto.TaskResponse) bool {
+	return len(task.UserTasks) > 0 && len(task.UserTasks[0].Logs) > 0 && task.UserTasks[0].Logs[0].Action == "START"
+}
+
+func calculateAvgTaskTime(tasks []dto.TaskResponse) string {
+	if len(tasks) == 0 {
+		return "0"
+	}
+
+	totalHours := 0.0
+	for _, task := range tasks {
+		totalHours += task.TimeSpent.Hours
+	}
+
+	avg := totalHours / float64(len(tasks))
+	return fmt.Sprintf("%.1f", avg)
+}
+
+func formatDate(date time.Time) string {
+	return date.Format(time.RFC822)
 }
 
 var _ = templruntime.GeneratedTemplate
