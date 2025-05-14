@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
 	"gorm.io/gorm"
 )
@@ -23,7 +24,10 @@ func FilterByColumns(filters map[string]any) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		for col, val := range filters {
 			if val != nil {
-				db = db.Where(fmt.Sprintf("%s = ?", col), val)
+				uuidVal, ok := val.(uuid.UUID)
+				if !ok || (ok && uuidVal != uuid.Nil) {
+					db = db.Where(fmt.Sprintf("%s = ?", col), val)
+				}
 			}
 		}
 
