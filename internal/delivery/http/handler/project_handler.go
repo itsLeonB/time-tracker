@@ -32,7 +32,7 @@ func NewProjectHandler(
 
 func (ph *ProjectHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(dto.NewProjectRequest)
+		request := new(dto.NewUserProjectRequest)
 		err := ctx.ShouldBindJSON(request)
 		if err != nil {
 			_ = ctx.Error(apperror.BadRequestError(
@@ -90,7 +90,7 @@ func (ph *ProjectHandler) HandleGetById() gin.HandlerFunc {
 func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		name := ctx.Query("name")
-		options := dto.ProjectQueryParams{Name: name}
+		options := dto.UserProjectQueryParams{Name: name}
 
 		project, err := ph.projectService.FirstByQuery(ctx, options)
 		if err != nil {
@@ -127,25 +127,49 @@ func (ph *ProjectHandler) HandleProjectDetailPage() gin.HandlerFunc {
 	}
 }
 
-func (ph *ProjectHandler) getUserProjectById(ctx *gin.Context, userId uuid.UUID) (dto.ProjectResponse, dto.QueryParams, error) {
+func (ph *ProjectHandler) HandleNewProjectForm() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		_, err := ph.userService.ValidateUser(ctx)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		request, err := util.BindFormRequest[dto.NewUserProjectRequest](ctx)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		_, err = ph.projectService.Create(ctx, request.Name)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.Redirect(http.StatusSeeOther, "/")
+	}
+}
+
+func (ph *ProjectHandler) getUserProjectById(ctx *gin.Context, userId uuid.UUID) (dto.UserProjectResponse, dto.QueryParams, error) {
 	id, err := util.GetUuidParam(ctx, "id")
 	if err != nil {
-		return dto.ProjectResponse{}, dto.QueryParams{}, err
+		return dto.UserProjectResponse{}, dto.QueryParams{}, err
 	}
 
 	params, err := util.GetDatetimeParams(ctx, "start", "end")
 	if err != nil {
-		return dto.ProjectResponse{}, dto.QueryParams{}, err
+		return dto.UserProjectResponse{}, dto.QueryParams{}, err
 	}
 
 	params.ProjectID = id
 	params.UserId = userId
 
-	projectParams := dto.ProjectQueryParams{QueryParams: params}
+	projectParams := dto.UserProjectQueryParams{QueryParams: params}
 
 	project, err := ph.projectService.FirstByQuery(ctx, projectParams)
 	if err != nil {
-		return dto.ProjectResponse{}, dto.QueryParams{}, err
+		return dto.UserProjectResponse{}, dto.QueryParams{}, err
 	}
 
 	return project, params, nil

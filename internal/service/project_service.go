@@ -34,8 +34,8 @@ func NewProjectService(
 	}
 }
 
-func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.ProjectResponse, error) {
-	var projectResponse dto.ProjectResponse
+func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.UserProjectResponse, error) {
+	var projectResponse dto.UserProjectResponse
 
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
@@ -50,7 +50,7 @@ func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.Proj
 		return projectResponse, apperror.ConflictError(eris.Errorf("project with name: %s already exists", name))
 	}
 
-	newProject := &model.Project{
+	newProject := &model.UserProject{
 		Name: name,
 	}
 
@@ -62,7 +62,7 @@ func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.Proj
 	return mapper.ProjectToResponse(*insertedProject), nil
 }
 
-func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]dto.ProjectResponse, error) {
+func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]dto.UserProjectResponse, error) {
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
@@ -76,8 +76,8 @@ func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]dto.ProjectResponse
 	return util.MapSlice(projects, mapper.ProjectToResponse), nil
 }
 
-func (ps *projectServiceImpl) GetByID(ctx context.Context, options *dto.QueryOptions) (dto.ProjectResponse, error) {
-	var projectResponse dto.ProjectResponse
+func (ps *projectServiceImpl) GetByID(ctx context.Context, options *dto.QueryOptions) (dto.UserProjectResponse, error) {
+	var projectResponse dto.UserProjectResponse
 
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
@@ -92,8 +92,8 @@ func (ps *projectServiceImpl) GetByID(ctx context.Context, options *dto.QueryOpt
 	return mapper.ProjectToResponse(*project), nil
 }
 
-func (ps *projectServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (dto.ProjectResponse, error) {
-	var projectResponse dto.ProjectResponse
+func (ps *projectServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (dto.UserProjectResponse, error) {
+	var projectResponse dto.UserProjectResponse
 
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
@@ -129,8 +129,8 @@ func (ps *projectServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
 	return ps.projectRepository.Delete(ctx, project)
 }
 
-func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, params dto.ProjectQueryParams) (dto.ProjectResponse, error) {
-	var projectResponse dto.ProjectResponse
+func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, params dto.UserProjectQueryParams) (dto.UserProjectResponse, error) {
+	var projectResponse dto.UserProjectResponse
 
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
@@ -169,10 +169,8 @@ func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, params dto.Proje
 	}
 
 	userTaskIds := make([]uuid.UUID, 0)
-	for _, tasks := range project.Tasks {
-		for _, userTask := range tasks.UserTasks {
-			userTaskIds = append(userTaskIds, userTask.ID)
-		}
+	for _, userTask := range project.UserTasks {
+		userTaskIds = append(userTaskIds, userTask.ID)
 	}
 
 	userTaskLogParams := dto.UserTaskLogParams{
@@ -195,8 +193,8 @@ func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, params dto.Proje
 	return projectResponse, nil
 }
 
-func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto.ProjectResponse, error) {
-	var projectResponse dto.ProjectResponse
+func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto.UserProjectResponse, error) {
+	var projectResponse dto.UserProjectResponse
 
 	project, err := ps.projectRepository.GetByName(ctx, name)
 	if err != nil {
@@ -208,7 +206,7 @@ func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto
 	}
 
 	// Not found, insert new
-	newProject := model.Project{
+	newProject := model.UserProject{
 		Name: name,
 	}
 
@@ -220,32 +218,14 @@ func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto
 	return mapper.ProjectToResponse(*project), nil
 }
 
-func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.ProjectResponse, error) {
+func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.UserProjectResponse, error) {
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	userTaskOptions := dto.UserTaskQueryParams{
-		UserId: userId,
-	}
-
-	userTasks, err := ps.userTaskService.FindAll(ctx, userTaskOptions)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(userTasks) == 0 {
-		return []dto.ProjectResponse{}, nil
-	}
-
-	projectIds := make([]uuid.UUID, 0, len(userTasks))
-	for _, userTask := range userTasks {
-		projectIds = append(projectIds, userTask.ProjectId)
-	}
-
-	projectOptions := &dto.ProjectQueryParams{}
-	projectOptions.Ids = projectIds
+	projectOptions := &dto.UserProjectQueryParams{}
+	projectOptions.UserId = userId
 
 	projects, err := ps.projectRepository.Find(ctx, *projectOptions)
 	if err != nil {
@@ -255,7 +235,7 @@ func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID
 	return util.MapSlice(projects, mapper.ProjectToResponse), nil
 }
 
-func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {
+func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.UserProject, error) {
 	project, err := ps.projectRepository.GetByID(ctx, id)
 	if err != nil {
 		return nil, err

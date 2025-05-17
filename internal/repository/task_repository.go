@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
@@ -58,7 +57,7 @@ func (tr *taskRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model
 func (tr *taskRepositoryGorm) GetByNumber(ctx context.Context, number string) (*model.Task, error) {
 	var task model.Task
 
-	err := tr.db.WithContext(ctx).Preload("Logs").First(&task, "number = ?", number).Error
+	err := tr.db.WithContext(ctx).First(&task, "number = ?", number).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -97,11 +96,7 @@ func (tr *taskRepositoryGorm) Find(ctx context.Context, options model.TaskQueryO
 		query = query.Where("number = ?", options.Number)
 	}
 
-	if options.ProjectID != uuid.Nil {
-		query = query.Where("project_id = ?", options.ProjectID)
-	}
-
-	if options.Date != (time.Time{}) {
+	if !options.Date.IsZero() {
 		query = query.Where("created_at >= ? AND created_at <= ?",
 			util.StartOfDay(options.Date),
 			util.EndOfDay(options.Date),

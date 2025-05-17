@@ -15,20 +15,17 @@ func UserTaskToResponse(userTask model.UserTask) dto.UserTaskResponse {
 	}
 
 	userTaskResponse := dto.UserTaskResponse{
-		ID:         userTask.ID,
-		UserId:     userTask.UserId,
-		TaskId:     userTask.TaskId,
-		TaskNumber: userTask.Task.Number,
-		TaskName:   userTask.Task.Name,
-		ProjectId:  userTask.Task.ProjectID,
-		CreatedAt:  userTask.CreatedAt,
-		UpdatedAt:  userTask.UpdatedAt,
-		TimeSpent:  dto.TimeSpentFromDuration(userTask.GetTotalTime()),
-		Logs:       logs,
-	}
-
-	if !userTask.Task.IsZero() {
-		userTaskResponse.Task = TaskToResponse(userTask.Task)
+		ID:            userTask.ID,
+		UserProjectId: userTask.UserProjectId,
+		TaskId:        userTask.TaskId,
+		CreatedAt:     userTask.CreatedAt,
+		UpdatedAt:     userTask.UpdatedAt,
+		TaskNumber:    userTask.Task.Number,
+		TaskName:      userTask.Task.Name,
+		TimeSpent:     dto.TimeSpentFromDuration(userTask.GetTotalTime()),
+		Logs:          logs,
+		IsActive:      userTask.IsActive(),
+		StartTime:     userTask.GetStartTime(),
 	}
 
 	return userTaskResponse
@@ -38,16 +35,17 @@ func PopulateUserTaskWithLogs(userTask model.UserTask, userTaskLogs []dto.UserTa
 	durationSpent := durationSpentFromLogs(userTaskLogs)
 
 	return dto.UserTaskResponse{
-		ID:         userTask.ID,
-		UserId:     userTask.UserId,
-		TaskId:     userTask.TaskId,
-		TaskNumber: userTask.Task.Number,
-		TaskName:   userTask.Task.Name,
-		ProjectId:  userTask.Task.ProjectID,
-		CreatedAt:  userTask.CreatedAt,
-		UpdatedAt:  userTask.UpdatedAt,
-		TimeSpent:  dto.TimeSpentFromDuration(durationSpent),
-		Logs:       userTaskLogs,
+		ID:            userTask.ID,
+		UserProjectId: userTask.UserProjectId,
+		TaskId:        userTask.TaskId,
+		CreatedAt:     userTask.CreatedAt,
+		UpdatedAt:     userTask.UpdatedAt,
+		TaskNumber:    userTask.Task.Number,
+		TaskName:      userTask.Task.Name,
+		TimeSpent:     dto.TimeSpentFromDuration(durationSpent),
+		Logs:          userTaskLogs,
+		IsActive:      userTask.IsActive(),
+		StartTime:     userTask.GetStartTime(),
 	}
 }
 
@@ -72,8 +70,8 @@ func durationSpentFromLogs(logs []dto.UserTaskLogResponse) time.Duration {
 func QueryParamsToOptions(queryParams dto.UserTaskQueryParams) model.UserTaskQueryOptions {
 	return model.UserTaskQueryOptions{
 		Filters: map[string]any{
-			"user_id": queryParams.UserId,
-			"task_id": queryParams.TaskId,
+			"user_project_id": queryParams.UserProjectId,
+			"task_id":         queryParams.TaskId,
 		},
 		PreloadRelations: []string{"Task"},
 	}

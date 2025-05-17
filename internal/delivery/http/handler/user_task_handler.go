@@ -35,14 +35,6 @@ func (uth *UserTaskHandler) HandleCreate() gin.HandlerFunc {
 			return
 		}
 
-		userId, err := util.GetUuidFromCtx(ctx, constant.ContextUserID)
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
-		request.UserId = userId
-
 		response, err := uth.userTaskService.Create(ctx, request)
 		if err != nil {
 			_ = ctx.Error(err)
@@ -55,17 +47,7 @@ func (uth *UserTaskHandler) HandleCreate() gin.HandlerFunc {
 
 func (uth *UserTaskHandler) HandleFindAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		userId, err := util.GetUuidFromCtx(ctx, constant.ContextUserID)
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
-		queryParams := dto.UserTaskQueryParams{
-			UserId: userId,
-		}
-
-		response, err := uth.userTaskService.FindAll(ctx, queryParams)
+		response, err := uth.userTaskService.FindAll(ctx, dto.UserTaskQueryParams{})
 		if err != nil {
 			_ = ctx.Error(err)
 			return

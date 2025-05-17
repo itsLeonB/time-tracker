@@ -2,6 +2,7 @@ package pages
 
 import (
 	"fmt"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
@@ -130,11 +131,11 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 							<div class="space-y-3">
 								<div class="flex justify-between items-center">
 									<span class="text-sm text-gray-600">Total Tasks</span>
-									<span class="font-medium">{ len(projectDetailViewDto.Project.Tasks) }</span>
+									<span class="font-medium">{ len(projectDetailViewDto.Project.UserTasks) }</span>
 								</div>
 								<div class="flex justify-between items-center">
 									<span class="text-sm text-gray-600">Active Tasks</span>
-									<span class="font-medium">{ countActiveTasks(projectDetailViewDto.Project.Tasks) }</span>
+									<span class="font-medium">{ projectDetailViewDto.Project.ActiveTaskCount }</span>
 								</div>
 							</div>
 						</div>
@@ -147,34 +148,34 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 							<i class="fas fa-tasks text-indigo-600 mr-2"></i>
 							Project Tasks
 						</h2>
-						if len(projectDetailViewDto.Project.Tasks) > 0 {
+						if len(projectDetailViewDto.Project.UserTasks) > 0 {
 							<div class="space-y-4">
-								for _, task := range projectDetailViewDto.Project.Tasks {
+								for _, userTask := range projectDetailViewDto.Project.UserTasks {
 									<div class="border border-gray-200 rounded-lg hover:shadow-md transition-all overflow-hidden">
 										<div class="p-4">
 											<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 												<div>
 													<div class="flex items-center mb-1">
-														<span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">{ task.Number }</span>
-														if isActiveTask(task) {
+														<span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">{ userTask.TaskNumber }</span>
+														if userTask.IsActive {
 															<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Active</span>
 														}
 													</div>
-													<h3 class="font-medium text-gray-800">{ task.Name }</h3>
+													<h3 class="font-medium text-gray-800">{ userTask.TaskName }</h3>
 													<div class="mt-2 flex items-center text-sm text-gray-500">
 														<i class="fas fa-clock mr-1 text-gray-400"></i>
-														<span>{ task.TimeSpent.Hours } hours logged</span>
+														<span>{ userTask.TimeSpent.Hours } hours logged</span>
 													</div>
 												</div>
 												<div class="flex flex-col items-end gap-2">
 													<div
 														class="text-xl font-mono font-bold bg-gray-100 px-3 py-1 rounded-md"
-														id={ fmt.Sprintf("timer-%s", task.ID) }
-														data-start-time={ task.StartTime() }
+														id={ fmt.Sprintf("timer-%s", userTask.ID) }
+														data-start-time={ userTask.StartTime }
 													></div>
-													if len(task.UserTasks) > 0 && len(task.UserTasks[0].Logs) > 0 && task.UserTasks[0].Logs[0].Action == "START" {
+													if len(userTask.Logs) > 0 && userTask.Logs[0].Action == constant.LogAction.Start {
 														<button
-															hx-post={ util.ConstructTemplUrl("/projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, task.UserTasks[0].ID) }
+															hx-post={ util.ConstructTemplUrl("/projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, userTask.ID) }
 															hx-boost="true"
 															hx-push-url="true"
 															hx-history="false"
@@ -186,7 +187,7 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 														</button>
 													} else {
 														<button
-															hx-post={ util.ConstructTemplUrl("/projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, task.UserTasks[0].ID) }
+															hx-post={ util.ConstructTemplUrl("/projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, userTask.ID) }
 															hx-boost="true"
 															hx-push-url="true"
 															hx-history="false"
@@ -202,7 +203,7 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 										</div>
 										<div class="bg-gray-50 px-4 py-3 flex justify-between items-center">
 											<div class="text-xs text-gray-500">
-												Added on { formatDate(task.CreatedAt) }
+												Added on { formatDate(userTask.CreatedAt) }
 											</div>
 										</div>
 									</div>
@@ -220,35 +221,6 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 			</div>
 		</div>
 	}
-}
-
-// Helper functions
-func countActiveTasks(tasks []dto.TaskResponse) int {
-	count := 0
-	for _, task := range tasks {
-		if isActiveTask(task) {
-			count++
-		}
-	}
-	return count
-}
-
-func isActiveTask(task dto.TaskResponse) bool {
-	return len(task.UserTasks) > 0 && len(task.UserTasks[0].Logs) > 0 && task.UserTasks[0].Logs[0].Action == "START"
-}
-
-func calculateAvgTaskTime(tasks []dto.TaskResponse) string {
-	if len(tasks) == 0 {
-		return "0"
-	}
-
-	totalHours := 0.0
-	for _, task := range tasks {
-		totalHours += task.TimeSpent.Hours
-	}
-
-	avg := totalHours / float64(len(tasks))
-	return fmt.Sprintf("%.1f", avg)
 }
 
 func formatDate(date time.Time) string {

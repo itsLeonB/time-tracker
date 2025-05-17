@@ -28,8 +28,8 @@ func (uts *userTaskServiceImpl) Create(ctx context.Context, request dto.NewUserT
 	var userTaskResponse dto.UserTaskResponse
 
 	newUserTask := model.UserTask{
-		TaskId: request.TaskId,
-		UserId: request.UserId,
+		UserProjectId: request.UserProjectId,
+		TaskId:        request.TaskId,
 	}
 
 	insertedUserTask, err := uts.userTaskRepository.Insert(ctx, newUserTask)

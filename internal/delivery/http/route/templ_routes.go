@@ -17,18 +17,18 @@ func setupTemplRoutes(router *gin.Engine, handlers *provider.Handlers, services 
 
 	router.Static("/static", "./static")
 
-	router.GET("/register", handlers.Auth.HandleRegisterPage())
-	router.POST("/auth/register", handlers.Auth.HandleRegisterForm())
-
 	router.GET("/login", handlers.Auth.HandleLoginPage())
+	router.GET("/register", handlers.Auth.HandleRegisterPage())
+
 	router.POST("/auth/login", handlers.Auth.HandleLoginForm())
+	router.POST("/auth/register", handlers.Auth.HandleRegisterForm())
 
 	protectedRoutes := router.Group("/", authMiddleware)
 
 	protectedRoutes.GET("/", handlers.Home.HandleHomePage())
 	protectedRoutes.GET("/logout", handlers.Auth.HandleLogout())
 
+	protectedRoutes.POST("/projects", handlers.Project.HandleNewProjectForm())
 	protectedRoutes.GET("/projects/:id", handlers.Project.HandleProjectDetailPage())
-	protectedRoutes.POST("/projects/:id/tasks", handlers.Task.HandleAddToUserProject())
 	protectedRoutes.POST("/projects/:id/user-tasks/:userTaskId/:action", handlers.UserTask.HandleLogPost())
 }

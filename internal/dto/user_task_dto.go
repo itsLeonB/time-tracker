@@ -7,25 +7,25 @@ import (
 )
 
 type NewUserTaskRequest struct {
-	TaskId uuid.UUID `json:"taskId" binding:"required"`
-	UserId uuid.UUID `json:"userId"`
+	UserProjectId uuid.UUID `json:"userProjectId"`
+	TaskId        uuid.UUID `json:"taskId" binding:"required"`
 }
 
 type UserTaskResponse struct {
-	ID         uuid.UUID             `json:"id"`
-	UserId     uuid.UUID             `json:"userId"`
-	TaskId     uuid.UUID             `json:"taskId"`
-	TaskNumber string                `json:"taskNumber"`
-	TaskName   string                `json:"taskName"`
-	ProjectId  uuid.UUID             `json:"projectId"`
-	CreatedAt  time.Time             `json:"createdAt"`
-	UpdatedAt  time.Time             `json:"updatedAt"`
-	TimeSpent  TimeSpent             `json:"timeSpent"`
-	Logs       []UserTaskLogResponse `json:"logs"`
-	Task       TaskResponse          `json:"task"`
+	ID            uuid.UUID             `json:"id"`
+	UserProjectId uuid.UUID             `json:"userProjectId"`
+	TaskId        uuid.UUID             `json:"taskId"`
+	CreatedAt     time.Time             `json:"createdAt"`
+	UpdatedAt     time.Time             `json:"updatedAt"`
+	TaskNumber    string                `json:"taskNumber"`
+	TaskName      string                `json:"taskName"`
+	TimeSpent     TimeSpent             `json:"timeSpent"`
+	Logs          []UserTaskLogResponse `json:"logs"`
+	IsActive      bool                  `json:"isActive"`
+	StartTime     string                `json:"startTime"`
 }
 
 type UserTaskQueryParams struct {
-	UserId uuid.UUID
-	TaskId uuid.UUID
+	UserProjectId uuid.UUID
+	TaskId        uuid.UUID
 }

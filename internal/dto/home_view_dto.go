@@ -6,5 +6,5 @@ import (
 
 type HomeViewDto struct {
 	User     model.User
-	Projects []ProjectResponse
+	Projects []UserProjectResponse
 }

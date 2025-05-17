@@ -15,14 +15,14 @@ type UserService interface {
 }
 
 type ProjectService interface {
-	Create(ctx context.Context, name string) (dto.ProjectResponse, error)
-	GetAll(ctx context.Context) ([]dto.ProjectResponse, error)
-	GetByID(ctx context.Context, options *dto.QueryOptions) (dto.ProjectResponse, error)
-	Update(ctx context.Context, id uuid.UUID, name string) (dto.ProjectResponse, error)
+	Create(ctx context.Context, name string) (dto.UserProjectResponse, error)
+	GetAll(ctx context.Context) ([]dto.UserProjectResponse, error)
+	GetByID(ctx context.Context, options *dto.QueryOptions) (dto.UserProjectResponse, error)
+	Update(ctx context.Context, id uuid.UUID, name string) (dto.UserProjectResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
-	FirstByQuery(ctx context.Context, options dto.ProjectQueryParams) (dto.ProjectResponse, error)
-	GetOrCreate(ctx context.Context, name string) (dto.ProjectResponse, error)
-	FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.ProjectResponse, error)
+	FirstByQuery(ctx context.Context, options dto.UserProjectQueryParams) (dto.UserProjectResponse, error)
+	GetOrCreate(ctx context.Context, name string) (dto.UserProjectResponse, error)
+	FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.UserProjectResponse, error)
 }
 
 type TaskService interface {
@@ -33,7 +33,6 @@ type TaskService interface {
 	Update(ctx context.Context, id uuid.UUID, name string) (dto.TaskResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	Find(ctx context.Context, queryParams dto.TaskQueryParams) ([]dto.TaskResponse, error)
-	AddToUserProject(ctx context.Context, request dto.AddToProjectRequest) (dto.TaskResponse, error)
 }
 
 type ExternalTrackerService interface {

@@ -47,80 +47,93 @@ func Home(homeViewDto dto.HomeViewDto) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-7xl mx-auto\"><!-- Welcome Section --><div class=\"bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg rounded-lg p-6 mb-6 text-white\"><div class=\"flex items-center justify-between\"><div><h1 class=\"text-3xl font-bold mb-2\">Welcome back!</h1><p class=\"text-indigo-100\">Track your time, boost your productivity</p></div><div class=\"hidden md:block\"><div class=\"p-3 bg-white bg-opacity-20 rounded-full\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-10 w-10 text-white\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div></div></div></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\"><!-- Account Information --><div class=\"md:col-span-1\"><div class=\"bg-white shadow rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-800 mb-4 flex items-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 mr-2 text-indigo-600\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg> Account Information</h2><div class=\"space-y-4\"><div class=\"border-b border-gray-200 pb-3\"><p class=\"text-sm text-gray-500\">Email</p><p class=\"font-medium text-gray-800\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-7xl mx-auto px-4 py-6\"><!-- Welcome Section with Stats --><div class=\"bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg rounded-xl p-8 mb-8 text-white overflow-hidden relative\"><div class=\"absolute top-0 right-0 -mt-8 -mr-8 opacity-10\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-48 w-48\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><div class=\"flex flex-col md:flex-row md:items-center md:justify-between relative z-10\"><div class=\"mb-6 md:mb-0\"><h1 class=\"text-3xl font-bold mb-3\">Welcome back, ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(homeViewDto.User.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 41, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 21, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</p></div><div class=\"border-b border-gray-200 pb-3\"><p class=\"text-sm text-gray-500\">Member Since</p><p class=\"font-medium text-gray-800\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "!</h1><p class=\"text-lg text-indigo-100\">Track your time, boost your productivity</p></div></div></div><div class=\"grid grid-cols-1 lg:grid-cols-3 gap-8 content-start\"><!-- Account Information --><div class=\"lg:col-span-1 order-2 lg:order-1 self-start\"><div class=\"bg-white shadow-md rounded-xl p-6 border border-gray-100\"><h2 class=\"text-xl font-semibold text-gray-800 mb-6 flex items-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mr-3 text-indigo-600\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\"></path></svg> Account Information</h2><div class=\"space-y-5\"><div class=\"border-b border-gray-200 pb-4\"><p class=\"text-sm font-medium text-gray-500 uppercase tracking-wider mb-1\">Email</p><p class=\"font-medium text-gray-800\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(homeViewDto.User.CreatedAt.Format("January 2, 2006"))
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(homeViewDto.User.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 45, Col: 99}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 39, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div></div></div></div><!-- Projects Section --><div class=\"md:col-span-2\"><div class=\"bg-white shadow rounded-lg p-6\"><div class=\"flex justify-between items-center mb-6\"><h2 class=\"text-xl font-semibold text-gray-800 flex items-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 mr-2 text-indigo-600\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2\"></path></svg> Your Projects</h2><div class=\"p-4 bg-gray-50 rounded-lg\"><form hx-post=\"/projects\" hx-boost=\"true\" hx-push-url=\"true\" hx-history=\"false\" hx-target=\"body\" class=\"flex items-end gap-4\"><div class=\"flex-1\"><label for=\"number\" class=\"block text-sm font-medium text-gray-700 mb-1\">New project name</label> <input type=\"text\" id=\"name\" name=\"name\" minlength=\"3\" required title=\"Project name must be at least 3 characters\" class=\"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2\" placeholder=\"Enter project name\"></div><button type=\"submit\" class=\"rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600\">Add Project</button></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><div class=\"border-gray-200\"><p class=\"text-sm font-medium text-gray-500 uppercase tracking-wider mb-1\">Member Since</p><p class=\"font-medium text-gray-800\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(homeViewDto.User.CreatedAt.Format("January 2, 2006"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 43, Col: 99}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p></div></div></div></div><!-- Projects Section --><div class=\"lg:col-span-2 order-1 lg:order-2 self-start\"><div class=\"bg-white shadow-md rounded-xl p-6 border border-gray-100\"><div class=\"flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4\"><h2 class=\"text-xl font-semibold text-gray-800 flex items-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mr-3 text-indigo-600\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2\"></path></svg> Your Projects</h2><div class=\"flex items-center space-x-2\"><button class=\"px-4 py-2 bg-indigo-50 text-indigo-600 font-medium rounded-lg hover:bg-indigo-100 transition-colors flex items-center\" onclick=\"document.getElementById(&#39;newProjectForm&#39;).classList.toggle(&#39;hidden&#39;); document.getElementById(&#39;projectNameInput&#39;).focus();\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> New Project</button></div></div><div id=\"newProjectForm\" class=\"mb-6 bg-gray-50 rounded-lg p-5 border border-gray-200 hidden\"><form hx-post=\"/projects\" hx-boost=\"true\" hx-push-url=\"true\" hx-history=\"false\" hx-target=\"body\" class=\"flex flex-col md:flex-row md:items-end gap-4\"><div class=\"flex-1\"><label for=\"name\" class=\"block text-sm font-medium text-gray-700 mb-1\">Project name</label> <input type=\"text\" id=\"projectNameInput\" name=\"name\" minlength=\"3\" required title=\"Project name must be at least 3 characters\" class=\"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2\" placeholder=\"Enter project name\"></div><div class=\"flex space-x-2\"><button type=\"submit\" class=\"rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600\">Create Project</button> <button type=\"button\" class=\"rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300\" onclick=\"document.getElementById(&#39;newProjectForm&#39;).classList.add(&#39;hidden&#39;)\">Cancel</button></div></form></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(homeViewDto.Projects) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"space-y-4\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"space-y-4\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				for _, project := range homeViewDto.Projects {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"border border-gray-200 rounded-lg hover:shadow-md transition-shadow\"><a href=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"border border-gray-200 rounded-lg hover:shadow-md transition-shadow group\"><a href=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var5 templ.SafeURL = util.ConstructTemplUrl("/projects/%s", project.ID)
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var5)))
+					var templ_7745c5c3_Var6 templ.SafeURL = util.ConstructTemplUrl("/projects/%s", project.ID)
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var6)))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"block p-4\"><div class=\"flex justify-between items-center\"><div><h3 class=\"text-lg font-medium text-indigo-600\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"block p-5\"><div class=\"flex justify-between items-center\"><div class=\"flex items-center\"><div class=\"bg-indigo-100 p-3 rounded-lg mr-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 text-indigo-600\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2\"></path></svg></div><div><h3 class=\"text-lg font-medium text-gray-800 group-hover:text-indigo-600 transition-colors\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var6 string
-					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(project.Name)
+					var templ_7745c5c3_Var7 string
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(project.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 98, Col: 75}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 122, Col: 120}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</h3></div></div></a></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</h3></div></div><div class=\"text-gray-400 group-hover:text-indigo-500 transition-colors\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 5l7 7-7 7\"></path></svg></div></div></a></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"text-center py-10 border-2 border-dashed border-gray-300 rounded-lg\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"mx-auto h-12 w-12 text-gray-400\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z\"></path></svg><h3 class=\"mt-2 text-sm font-medium text-gray-900\">No projects yet</h3><p class=\"mt-1 text-sm text-gray-500\">Get started by creating a new project.</p><div class=\"mt-6\"><a href=\"/projects/new\" class=\"inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4 mr-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg> Create Project</a></div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"text-center py-16 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"mx-auto h-16 w-16 text-gray-400\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z\"></path></svg><h3 class=\"mt-4 text-lg font-medium text-gray-900\">No projects yet</h3><p class=\"mt-2 text-gray-500 max-w-sm mx-auto\">Get started by creating a new project to track your time and boost productivity.</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

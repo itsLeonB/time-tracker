@@ -8,13 +8,27 @@ import (
 )
 
 type UserTask struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	UserId    uuid.UUID
-	TaskId    uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Logs      []UserTaskLog `gorm:"foreignKey:UserTaskId"`
-	Task      Task          `gorm:"foreignKey:TaskId;references:ID"`
+	ID            uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserProjectId uuid.UUID
+	TaskId        uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Logs          []UserTaskLog `gorm:"foreignKey:UserTaskId"`
+	Task          Task          `gorm:"foreignKey:TaskId;references:ID"`
+}
+
+func (userTask *UserTask) GetStartTime() string {
+	if len(userTask.Logs) > 0 {
+		if userTask.Logs[0].Action == constant.LogAction.Start {
+			return userTask.Logs[0].CreatedAt.Format(time.RFC3339)
+		}
+	}
+
+	return ""
+}
+
+func (userTask *UserTask) IsActive() bool {
+	return len(userTask.Logs) > 0 && userTask.Logs[0].Action == "START"
 }
 
 func (userTask *UserTask) IsInProgress() bool {

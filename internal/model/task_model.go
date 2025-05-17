@@ -8,12 +8,10 @@ import (
 
 type Task struct {
 	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	ProjectID uuid.UUID
 	Number    string
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	UserTasks []UserTask `gorm:"foreignKey:TaskId"`
 }
 
 func (t *Task) TableName() string {
@@ -25,7 +23,6 @@ func (t *Task) IsZero() bool {
 }
 
 type TaskQueryOptions struct {
-	Number    string
-	ProjectID uuid.UUID
-	Date      time.Time
+	Number string
+	Date   time.Time
 }

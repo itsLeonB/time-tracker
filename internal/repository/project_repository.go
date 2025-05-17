@@ -20,7 +20,7 @@ func NewProjectRepository(db *gorm.DB) ProjectRepository {
 	return &projectRepositoryGorm{db}
 }
 
-func (pr *projectRepositoryGorm) Insert(ctx context.Context, project *model.Project) (*model.Project, error) {
+func (pr *projectRepositoryGorm) Insert(ctx context.Context, project *model.UserProject) (*model.UserProject, error) {
 	err := pr.db.WithContext(ctx).Create(project).Error
 	if err != nil {
 		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgInsertError))
@@ -29,8 +29,8 @@ func (pr *projectRepositoryGorm) Insert(ctx context.Context, project *model.Proj
 	return project, nil
 }
 
-func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]model.Project, error) {
-	var projects []model.Project
+func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]model.UserProject, error) {
+	var projects []model.UserProject
 
 	err := pr.db.WithContext(ctx).Find(&projects).Error
 	if err != nil {
@@ -40,8 +40,8 @@ func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]model.Project, e
 	return projects, nil
 }
 
-func (pr *projectRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model.Project, error) {
-	var project model.Project
+func (pr *projectRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model.UserProject, error) {
+	var project model.UserProject
 
 	err := pr.db.WithContext(ctx).First(&project, "id = ?", id).Error
 	if err != nil {
@@ -55,7 +55,7 @@ func (pr *projectRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*mo
 	return &project, nil
 }
 
-func (pr *projectRepositoryGorm) Update(ctx context.Context, project *model.Project) (*model.Project, error) {
+func (pr *projectRepositoryGorm) Update(ctx context.Context, project *model.UserProject) (*model.UserProject, error) {
 	err := pr.db.WithContext(ctx).Save(project).Error
 	if err != nil {
 		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgUpdateError))
@@ -64,7 +64,7 @@ func (pr *projectRepositoryGorm) Update(ctx context.Context, project *model.Proj
 	return project, nil
 }
 
-func (pr *projectRepositoryGorm) Delete(ctx context.Context, project *model.Project) error {
+func (pr *projectRepositoryGorm) Delete(ctx context.Context, project *model.UserProject) error {
 	err := pr.db.WithContext(ctx).Delete(project).Error
 	if err != nil {
 		return apperror.InternalServerError(eris.Wrap(err, apperror.MsgDeleteError))
@@ -73,8 +73,8 @@ func (pr *projectRepositoryGorm) Delete(ctx context.Context, project *model.Proj
 	return nil
 }
 
-func (pr *projectRepositoryGorm) Find(ctx context.Context, options dto.ProjectQueryParams) ([]model.Project, error) {
-	var projects []model.Project
+func (pr *projectRepositoryGorm) Find(ctx context.Context, options dto.UserProjectQueryParams) ([]model.UserProject, error) {
+	var projects []model.UserProject
 
 	query := pr.db.WithContext(ctx)
 
@@ -94,8 +94,8 @@ func (pr *projectRepositoryGorm) Find(ctx context.Context, options dto.ProjectQu
 	return projects, nil
 }
 
-func (pr *projectRepositoryGorm) GetByName(ctx context.Context, name string) (*model.Project, error) {
-	var project model.Project
+func (pr *projectRepositoryGorm) GetByName(ctx context.Context, name string) (*model.UserProject, error) {
+	var project model.UserProject
 
 	err := pr.db.WithContext(ctx).First(&project, "name = ?", name).Error
 	if err != nil {
@@ -109,8 +109,8 @@ func (pr *projectRepositoryGorm) GetByName(ctx context.Context, name string) (*m
 	return &project, nil
 }
 
-func (pr *projectRepositoryGorm) First(ctx context.Context, options model.ProjectQueryOptions) (model.Project, error) {
-	var project model.Project
+func (pr *projectRepositoryGorm) First(ctx context.Context, options model.ProjectQueryOptions) (model.UserProject, error) {
+	var project model.UserProject
 
 	query := pr.db.WithContext(ctx).Scopes(
 		util.FilterByColumns(options.Filters),

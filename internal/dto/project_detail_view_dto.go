@@ -6,7 +6,7 @@ import (
 
 type ProjectDetailViewDto struct {
 	User      model.User
-	Project   ProjectResponse
+	Project   UserProjectResponse
 	StartDate string
 	EndDate   string
 }

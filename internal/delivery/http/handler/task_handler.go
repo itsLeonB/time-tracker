@@ -1,14 +1,12 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/rotisserie/eris"
 )
 
@@ -87,32 +85,6 @@ func (th *TaskHandler) FindExternal() gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
-	}
-}
-
-func (th *TaskHandler) HandleAddToUserProject() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		projectId, err := util.GetUuidParam(ctx, "id")
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
-		addToProjectRequest, err := util.BindFormRequest[dto.AddToProjectRequest](ctx)
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
-		addToProjectRequest.ProjectID = projectId
-
-		_, err = th.taskService.AddToUserProject(ctx, addToProjectRequest)
-		if err != nil {
-			_ = ctx.Error(err)
-			return
-		}
-
-		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/projects/%s", projectId))
 	}
 }
 

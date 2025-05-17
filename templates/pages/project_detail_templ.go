@@ -10,6 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
+	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
@@ -56,7 +57,7 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.Project.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 22, Col: 87}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 23, Col: 87}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -69,7 +70,7 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.Project.TimeSpent.Hours)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 30, Col: 99}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 31, Col: 99}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -82,7 +83,7 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 43, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 44, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -95,7 +96,7 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.StartDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 54, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 55, Col: 45}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -108,7 +109,7 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.EndDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 64, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 65, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -140,7 +141,7 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/tasks", projectDetailViewDto.Project.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 98, Col: 94}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 99, Col: 94}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -151,9 +152,9 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(len(projectDetailViewDto.Project.Tasks))
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(len(projectDetailViewDto.Project.UserTasks))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 133, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 134, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -164,9 +165,9 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(countActiveTasks(projectDetailViewDto.Project.Tasks))
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(projectDetailViewDto.Project.ActiveTaskCount)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 137, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 138, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -176,20 +177,20 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if len(projectDetailViewDto.Project.Tasks) > 0 {
+			if len(projectDetailViewDto.Project.UserTasks) > 0 {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"space-y-4\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				for _, task := range projectDetailViewDto.Project.Tasks {
+				for _, userTask := range projectDetailViewDto.Project.UserTasks {
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"border border-gray-200 rounded-lg hover:shadow-md transition-all overflow-hidden\"><div class=\"p-4\"><div class=\"flex flex-col md:flex-row md:items-center md:justify-between gap-4\"><div><div class=\"flex items-center mb-1\"><span class=\"bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var12 string
-					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(task.Number)
+					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(userTask.TaskNumber)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 158, Col: 123}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 159, Col: 131}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 					if templ_7745c5c3_Err != nil {
@@ -199,7 +200,7 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					if isActiveTask(task) {
+					if userTask.IsActive {
 						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<span class=\"bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full\">Active</span>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
@@ -210,9 +211,9 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var13 string
-					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(task.Name)
+					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(userTask.TaskName)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 163, Col: 62}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 164, Col: 70}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 					if templ_7745c5c3_Err != nil {
@@ -223,9 +224,9 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var14 string
-					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(task.TimeSpent.Hours)
+					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(userTask.TimeSpent.Hours)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 166, Col: 42}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 167, Col: 46}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
@@ -236,9 +237,9 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var15 string
-					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("timer-%s", task.ID))
+					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("timer-%s", userTask.ID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 172, Col: 51}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 173, Col: 55}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
@@ -249,9 +250,9 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var16 string
-					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(task.StartTime())
+					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(userTask.StartTime)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 173, Col: 48}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 174, Col: 50}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 					if templ_7745c5c3_Err != nil {
@@ -261,15 +262,15 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					if len(task.UserTasks) > 0 && len(task.UserTasks[0].Logs) > 0 && task.UserTasks[0].Logs[0].Action == "START" {
+					if len(userTask.Logs) > 0 && userTask.Logs[0].Action == constant.LogAction.Start {
 						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<button hx-post=\"")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var17 string
-						templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, task.UserTasks[0].ID))
+						templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, userTask.ID))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 177, Col: 137}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 178, Col: 128}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 						if templ_7745c5c3_Err != nil {
@@ -285,9 +286,9 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var18 string
-						templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, task.UserTasks[0].ID))
+						templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(util.ConstructTemplUrl("/projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, userTask.ID))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 189, Col: 138}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 190, Col: 129}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 						if templ_7745c5c3_Err != nil {
@@ -303,9 +304,9 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var19 string
-					templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(task.CreatedAt))
+					templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(userTask.CreatedAt))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 205, Col: 49}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/project_detail.templ`, Line: 206, Col: 53}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 					if templ_7745c5c3_Err != nil {
@@ -338,35 +339,6 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 		}
 		return nil
 	})
-}
-
-// Helper functions
-func countActiveTasks(tasks []dto.TaskResponse) int {
-	count := 0
-	for _, task := range tasks {
-		if isActiveTask(task) {
-			count++
-		}
-	}
-	return count
-}
-
-func isActiveTask(task dto.TaskResponse) bool {
-	return len(task.UserTasks) > 0 && len(task.UserTasks[0].Logs) > 0 && task.UserTasks[0].Logs[0].Action == "START"
-}
-
-func calculateAvgTaskTime(tasks []dto.TaskResponse) string {
-	if len(tasks) == 0 {
-		return "0"
-	}
-
-	totalHours := 0.0
-	for _, task := range tasks {
-		totalHours += task.TimeSpent.Hours
-	}
-
-	avg := totalHours / float64(len(tasks))
-	return fmt.Sprintf("%.1f", avg)
 }
 
 func formatDate(date time.Time) string {
