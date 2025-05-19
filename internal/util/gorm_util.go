@@ -13,7 +13,7 @@ import (
 func PreloadRelations(relations []string) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		for _, relation := range relations {
-			db = db.Preload(relation)
+			db = db.Preload(relation, DefaultOrdering())
 		}
 
 		return db
@@ -106,5 +106,11 @@ func Join(joins []model.Join) func(db *gorm.DB) *gorm.DB {
 		}
 
 		return db
+	}
+}
+
+func DefaultOrdering() func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Order("created_at DESC")
 	}
 }

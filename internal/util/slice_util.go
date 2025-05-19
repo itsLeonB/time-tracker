@@ -16,6 +16,21 @@ func MapSlice[T any, U any](input []T, mapperFunc func(T) U) []U {
 	return output
 }
 
+func MapSliceWithError[T any, U any](input []T, mapperFunc func(T) (U, error)) ([]U, error) {
+	output := make([]U, len(input))
+
+	for i, v := range input {
+		mapped, err := mapperFunc(v)
+		if err != nil {
+			return nil, err
+		}
+
+		output[i] = mapped
+	}
+
+	return output, nil
+}
+
 func GroupBy[T any](items []T, fieldName string) (map[any][]T, error) {
 	result := make(map[any][]T)
 	for _, item := range items {

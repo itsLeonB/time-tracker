@@ -31,7 +31,10 @@ func (tr *taskRepositoryGorm) Insert(ctx context.Context, task *model.Task) (*mo
 func (tr *taskRepositoryGorm) GetAll(ctx context.Context) ([]model.Task, error) {
 	var tasks []model.Task
 
-	err := tr.db.WithContext(ctx).Find(&tasks).Error
+	err := tr.db.WithContext(ctx).
+		Scopes(util.DefaultOrdering()).
+		Find(&tasks).
+		Error
 	if err != nil {
 		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
@@ -42,7 +45,10 @@ func (tr *taskRepositoryGorm) GetAll(ctx context.Context) ([]model.Task, error) 
 func (tr *taskRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error) {
 	var task model.Task
 
-	err := tr.db.WithContext(ctx).First(&task, "id = ?", id).Error
+	err := tr.db.WithContext(ctx).
+		Scopes(util.DefaultOrdering()).
+		First(&task, "id = ?", id).
+		Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -57,7 +63,10 @@ func (tr *taskRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model
 func (tr *taskRepositoryGorm) GetByNumber(ctx context.Context, number string) (*model.Task, error) {
 	var task model.Task
 
-	err := tr.db.WithContext(ctx).First(&task, "number = ?", number).Error
+	err := tr.db.WithContext(ctx).
+		Scopes(util.DefaultOrdering()).
+		First(&task, "number = ?", number).
+		Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -90,7 +99,7 @@ func (tr *taskRepositoryGorm) Delete(ctx context.Context, task *model.Task) erro
 func (tr *taskRepositoryGorm) Find(ctx context.Context, options model.TaskQueryOptions) ([]model.Task, error) {
 	var tasks []model.Task
 
-	query := tr.db.WithContext(ctx)
+	query := tr.db.WithContext(ctx).Scopes(util.DefaultOrdering())
 
 	if options.Number != "" {
 		query = query.Where("number = ?", options.Number)

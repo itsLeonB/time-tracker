@@ -37,7 +37,7 @@ func NewProjectService(
 func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.UserProjectResponse, error) {
 	var projectResponse dto.UserProjectResponse
 
-	_, err := ps.userService.ValidateUser(ctx)
+	user, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return projectResponse, err
 	}
@@ -51,7 +51,8 @@ func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.User
 	}
 
 	newProject := &model.UserProject{
-		Name: name,
+		UserId: user.ID,
+		Name:   name,
 	}
 
 	insertedProject, err := ps.projectRepository.Insert(ctx, newProject)
@@ -59,7 +60,7 @@ func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.User
 		return projectResponse, err
 	}
 
-	return mapper.ProjectToResponse(*insertedProject), nil
+	return mapper.ProjectToResponse(*insertedProject)
 }
 
 func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]dto.UserProjectResponse, error) {
@@ -73,7 +74,7 @@ func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]dto.UserProjectResp
 		return nil, err
 	}
 
-	return util.MapSlice(projects, mapper.ProjectToResponse), nil
+	return util.MapSliceWithError(projects, mapper.ProjectToResponse)
 }
 
 func (ps *projectServiceImpl) GetByID(ctx context.Context, options *dto.QueryOptions) (dto.UserProjectResponse, error) {
@@ -89,7 +90,7 @@ func (ps *projectServiceImpl) GetByID(ctx context.Context, options *dto.QueryOpt
 		return projectResponse, err
 	}
 
-	return mapper.ProjectToResponse(*project), nil
+	return mapper.ProjectToResponse(*project)
 }
 
 func (ps *projectServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (dto.UserProjectResponse, error) {
@@ -112,7 +113,7 @@ func (ps *projectServiceImpl) Update(ctx context.Context, id uuid.UUID, name str
 		return projectResponse, err
 	}
 
-	return mapper.ProjectToResponse(*updatedProject), nil
+	return mapper.ProjectToResponse(*updatedProject)
 }
 
 func (ps *projectServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
@@ -140,24 +141,12 @@ func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, params dto.UserP
 	options := model.ProjectQueryOptions{}
 
 	options.Filters = map[string]any{
-		"projects.id":        params.ProjectID,
-		"user_tasks.user_id": params.UserId,
-	}
-
-	options.Joins = []model.Join{
-		{
-			Table: "tasks",
-			On:    "tasks.project_id = projects.id",
-		},
-		{
-			Table: "user_tasks",
-			On:    "user_tasks.task_id = tasks.id",
-		},
+		"user_projects.id": params.ProjectID,
 	}
 
 	options.PreloadRelations = []string{
-		"Tasks",
-		"Tasks.UserTasks",
+		"UserTasks",
+		"UserTasks.Task",
 	}
 
 	project, err := ps.projectRepository.First(ctx, options)
@@ -202,7 +191,7 @@ func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto
 	}
 	if project != nil {
 		// Found project, return
-		return mapper.ProjectToResponse(*project), nil
+		return mapper.ProjectToResponse(*project)
 	}
 
 	// Not found, insert new
@@ -215,7 +204,7 @@ func (ps *projectServiceImpl) GetOrCreate(ctx context.Context, name string) (dto
 		return projectResponse, err
 	}
 
-	return mapper.ProjectToResponse(*project), nil
+	return mapper.ProjectToResponse(*project)
 }
 
 func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.UserProjectResponse, error) {
@@ -232,7 +221,7 @@ func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID
 		return nil, err
 	}
 
-	return util.MapSlice(projects, mapper.ProjectToResponse), nil
+	return util.MapSliceWithError(projects, mapper.ProjectToResponse)
 }
 
 func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.UserProject, error) {

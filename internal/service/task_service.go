@@ -17,23 +17,17 @@ type taskServiceImpl struct {
 	taskRepository         repository.TaskRepository
 	userService            UserService
 	externalTrackerService ExternalTrackerService
-	projectService         ProjectService
-	userTaskService        UserTaskService
 }
 
 func NewTaskService(
 	taskRepository repository.TaskRepository,
 	userService UserService,
 	externalTrackerService ExternalTrackerService,
-	projectService ProjectService,
-	userTaskService UserTaskService,
 ) TaskService {
 	return &taskServiceImpl{
 		taskRepository,
 		userService,
 		externalTrackerService,
-		projectService,
-		userTaskService,
 	}
 }
 

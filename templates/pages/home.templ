@@ -69,7 +69,7 @@ templ Home(homeViewDto dto.HomeViewDto) {
 						</div>
 						<div id="newProjectForm" class="mb-6 bg-gray-50 rounded-lg p-5 border border-gray-200 hidden">
 							<form
-								hx-post="/projects"
+								hx-post="/user-projects"
 								hx-boost="true"
 								hx-push-url="true"
 								hx-history="false"
@@ -110,7 +110,7 @@ templ Home(homeViewDto dto.HomeViewDto) {
 							<div class="space-y-4">
 								for _, project := range homeViewDto.Projects {
 									<div class="border border-gray-200 rounded-lg hover:shadow-md transition-shadow group">
-										<a href={ util.ConstructTemplUrl("/projects/%s", project.ID) } class="block p-5">
+										<a href={ util.ConstructTemplUrl("/user-projects/%s", project.ID) } class="block p-5">
 											<div class="flex justify-between items-center">
 												<div class="flex items-center">
 													<div class="bg-indigo-100 p-3 rounded-lg mr-4">

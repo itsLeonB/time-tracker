@@ -28,8 +28,7 @@ func NewYoutrackRepository(conf *config.Youtrack) *YoutrackRepository {
 
 func (yr *YoutrackRepository) FindTask(ctx context.Context, queryOptions dto.YoutrackQueryOptions) ([]model.YoutrackTask, error) {
 	queryParams := map[string]string{
-		"fields":       "idReadable,summary,customFields(name,value(name))",
-		"customFields": "Epic",
+		"fields": "idReadable,summary",
 	}
 
 	if queryOptions.IdReadable != "" {

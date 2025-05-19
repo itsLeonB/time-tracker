@@ -2,7 +2,6 @@ package pages
 
 import (
 	"fmt"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
@@ -41,7 +40,7 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 					Filter Tasks by Date
 				</h2>
 				<form
-					hx-get={ util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID) }
+					hx-get={ util.ConstructTemplUrl("/user-projects/%s", projectDetailViewDto.Project.ID) }
 					hx-target="body"
 					hx-push-url="true"
 					class="flex flex-col md:flex-row items-end gap-4"
@@ -76,7 +75,7 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 						</button>
 						if projectDetailViewDto.StartDate != "" || projectDetailViewDto.EndDate != "" {
 							<a
-								href={ util.ConstructTemplUrl("/projects/%s", projectDetailViewDto.Project.ID) }
+								href={ util.ConstructTemplUrl("/user-projects/%s", projectDetailViewDto.Project.ID) }
 								class="rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 flex items-center"
 							>
 								<i class="fas fa-times mr-2"></i>
@@ -96,7 +95,7 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 							Add New Task
 						</h2>
 						<form
-							hx-post={ util.ConstructTemplUrl("/projects/%s/tasks", projectDetailViewDto.Project.ID) }
+							hx-post={ util.ConstructTemplUrl("/user-projects/%s/user-tasks", projectDetailViewDto.Project.ID) }
 							hx-boost="true"
 							hx-push-url="true"
 							hx-history="false"
@@ -173,9 +172,9 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 														id={ fmt.Sprintf("timer-%s", userTask.ID) }
 														data-start-time={ userTask.StartTime }
 													></div>
-													if len(userTask.Logs) > 0 && userTask.Logs[0].Action == constant.LogAction.Start {
+													if userTask.IsActive {
 														<button
-															hx-post={ util.ConstructTemplUrl("/projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, userTask.ID) }
+															hx-post={ util.ConstructTemplUrl("/user-projects/%s/user-tasks/%s/STOP", projectDetailViewDto.Project.ID, userTask.ID) }
 															hx-boost="true"
 															hx-push-url="true"
 															hx-history="false"
@@ -187,7 +186,7 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 														</button>
 													} else {
 														<button
-															hx-post={ util.ConstructTemplUrl("/projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, userTask.ID) }
+															hx-post={ util.ConstructTemplUrl("/user-projects/%s/user-tasks/%s/START", projectDetailViewDto.Project.ID, userTask.ID) }
 															hx-boost="true"
 															hx-push-url="true"
 															hx-history="false"

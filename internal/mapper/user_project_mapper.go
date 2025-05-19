@@ -8,13 +8,17 @@ import (
 	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
 )
 
-func ProjectToResponse(project model.UserProject) dto.UserProjectResponse {
+func ProjectToResponse(project model.UserProject) (dto.UserProjectResponse, error) {
 	timeSpent := dto.TimeSpent{}
 	activeTaskCount := 0
 	userTasks := make([]dto.UserTaskResponse, len(project.UserTasks))
 
 	for i, userTask := range project.UserTasks {
-		userTaskResponse := UserTaskToResponse(userTask)
+		userTaskResponse, err := UserTaskToResponse(userTask)
+		if err != nil {
+			return dto.UserProjectResponse{}, err
+		}
+
 		timeSpent.Add(userTaskResponse.TimeSpent)
 
 		if userTaskResponse.IsActive {
@@ -26,7 +30,7 @@ func ProjectToResponse(project model.UserProject) dto.UserProjectResponse {
 
 	avgHours := timeSpent.Hours / float64(len(userTasks))
 
-	return dto.UserProjectResponse{
+	userProjectResponse := dto.UserProjectResponse{
 		ID:              project.ID,
 		UserId:          project.UserId,
 		Name:            project.Name,
@@ -37,6 +41,8 @@ func ProjectToResponse(project model.UserProject) dto.UserProjectResponse {
 		ActiveTaskCount: activeTaskCount,
 		AverageTaskTime: fmt.Sprintf("%.1f", avgHours),
 	}
+
+	return userProjectResponse, nil
 }
 
 func PopulateProjectWithLogs(project model.UserProject, userTaskLogs []dto.UserTaskLogResponse) (dto.UserProjectResponse, error) {
@@ -49,7 +55,11 @@ func PopulateProjectWithLogs(project model.UserProject, userTaskLogs []dto.UserT
 	}
 
 	for i, userTask := range project.UserTasks {
-		populatedTask := PopulateUserTaskWithLogs(userTask, logsByUserTaskId[userTask.ID])
+		populatedTask, err := PopulateUserTaskWithLogs(userTask, logsByUserTaskId[userTask.ID])
+		if err != nil {
+			return dto.UserProjectResponse{}, err
+		}
+
 		timeSpent.Add(populatedTask.TimeSpent)
 
 		if populatedTask.IsActive {

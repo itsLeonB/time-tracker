@@ -28,7 +28,8 @@ func setupTemplRoutes(router *gin.Engine, handlers *provider.Handlers, services 
 	protectedRoutes.GET("/", handlers.Home.HandleHomePage())
 	protectedRoutes.GET("/logout", handlers.Auth.HandleLogout())
 
-	protectedRoutes.POST("/projects", handlers.Project.HandleNewProjectForm())
-	protectedRoutes.GET("/projects/:id", handlers.Project.HandleProjectDetailPage())
-	protectedRoutes.POST("/projects/:id/user-tasks/:userTaskId/:action", handlers.UserTask.HandleLogPost())
+	protectedRoutes.POST("/user-projects", handlers.Project.HandleNewProjectForm())
+	protectedRoutes.GET("/user-projects/:id", handlers.Project.HandleProjectDetailPage())
+	protectedRoutes.POST("/user-projects/:id/user-tasks", handlers.UserTask.HandleCreateForm())
+	protectedRoutes.POST("/user-projects/:id/user-tasks/:userTaskId/:action", handlers.UserTask.HandleLogPost())
 }

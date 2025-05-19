@@ -18,8 +18,8 @@ func (utl *UserTaskLog) TableName() string {
 	return "user_task_logs"
 }
 
-func (utl *UserTaskLog) IsEmpty() bool {
-	return utl.ID == uuid.Nil
+func (utl *UserTaskLog) IsZero() bool {
+	return utl.ID == uuid.Nil || utl.Action == ""
 }
 
 type UserTaskLogQueryOptions struct {

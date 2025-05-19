@@ -34,6 +34,7 @@ func (utr *userTaskRepositoryImpl) FindAll(ctx context.Context, options model.Us
 	query := utr.db.WithContext(ctx).Scopes(
 		util.PreloadRelations(options.PreloadRelations),
 		util.FilterByColumns(options.Filters),
+		util.DefaultOrdering(),
 	)
 
 	err := query.Find(&userTasks).Error

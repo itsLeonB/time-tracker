@@ -56,7 +56,7 @@ func (utlr *gormUserTaskLogRepository) FindAll(ctx context.Context, options mode
 		util.WithinTimeRanges(options.DatetimeRanges),
 	)
 
-	err := query.Order("created_at DESC").Find(&userTaskLog).Error
+	err := query.Find(&userTaskLog).Error
 	if err != nil {
 		return nil, eris.Wrap(err, apperror.MsgQueryError)
 	}

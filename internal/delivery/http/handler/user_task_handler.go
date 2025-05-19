@@ -111,6 +111,32 @@ func (uth *UserTaskHandler) HandleLog() gin.HandlerFunc {
 	}
 }
 
+func (uth *UserTaskHandler) HandleCreateForm() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userProjectId, err := util.GetUuidParam(ctx, "id")
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		request, err := util.BindFormRequest[dto.NewUserTaskRequest](ctx)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		request.UserProjectId = userProjectId
+
+		_, err = uth.userTaskService.Create(ctx, request)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/user-projects/%s", userProjectId))
+	}
+}
+
 func (uth *UserTaskHandler) HandleLogPost() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		projectId, err := util.GetUuidParam(ctx, "id")
@@ -142,6 +168,6 @@ func (uth *UserTaskHandler) HandleLogPost() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/projects/%s", projectId))
+		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/user-projects/%s", projectId))
 	}
 }

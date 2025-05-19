@@ -32,7 +32,10 @@ func (pr *projectRepositoryGorm) Insert(ctx context.Context, project *model.User
 func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]model.UserProject, error) {
 	var projects []model.UserProject
 
-	err := pr.db.WithContext(ctx).Find(&projects).Error
+	err := pr.db.WithContext(ctx).
+		Scopes(util.DefaultOrdering()).
+		Find(&projects).
+		Error
 	if err != nil {
 		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
 	}
@@ -43,7 +46,10 @@ func (pr *projectRepositoryGorm) GetAll(ctx context.Context) ([]model.UserProjec
 func (pr *projectRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model.UserProject, error) {
 	var project model.UserProject
 
-	err := pr.db.WithContext(ctx).First(&project, "id = ?", id).Error
+	err := pr.db.WithContext(ctx).
+		Scopes(util.DefaultOrdering()).
+		First(&project, "id = ?", id).
+		Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -76,7 +82,7 @@ func (pr *projectRepositoryGorm) Delete(ctx context.Context, project *model.User
 func (pr *projectRepositoryGorm) Find(ctx context.Context, options dto.UserProjectQueryParams) ([]model.UserProject, error) {
 	var projects []model.UserProject
 
-	query := pr.db.WithContext(ctx)
+	query := pr.db.WithContext(ctx).Scopes(util.DefaultOrdering())
 
 	if options.Name != "" {
 		query = query.Where("name = ?", options.Name)
@@ -97,7 +103,10 @@ func (pr *projectRepositoryGorm) Find(ctx context.Context, options dto.UserProje
 func (pr *projectRepositoryGorm) GetByName(ctx context.Context, name string) (*model.UserProject, error) {
 	var project model.UserProject
 
-	err := pr.db.WithContext(ctx).First(&project, "name = ?", name).Error
+	err := pr.db.WithContext(ctx).
+		Scopes(util.DefaultOrdering()).
+		First(&project, "name = ?", name).
+		Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -116,6 +125,7 @@ func (pr *projectRepositoryGorm) First(ctx context.Context, options model.Projec
 		util.FilterByColumns(options.Filters),
 		util.PreloadRelations(options.PreloadRelations),
 		util.Join(options.Joins),
+		util.DefaultOrdering(),
 	)
 
 	err := query.First(&project).Error

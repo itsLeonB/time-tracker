@@ -40,12 +40,12 @@ func (utls *userTaskLogServiceImpl) Create(ctx context.Context, request dto.NewU
 	}
 
 	// should always start with START action
-	if latestLog.IsEmpty() && request.Action == constant.LogAction.Stop {
+	if latestLog.IsZero() && request.Action == constant.LogAction.Stop {
 		return response, apperror.BadRequestError(eris.Errorf("User Task ID: %s is not yet started", request.UserTaskId))
 	}
 
 	// should alternate actions
-	if !latestLog.IsEmpty() && latestLog.Action == request.Action {
+	if !latestLog.IsZero() && latestLog.Action == request.Action {
 		return response, apperror.BadRequestError(eris.Errorf("user task ID: %s is already %s", request.UserTaskId, request.Action))
 	}
 

@@ -8,7 +8,8 @@ import (
 
 type NewUserTaskRequest struct {
 	UserProjectId uuid.UUID `json:"userProjectId"`
-	TaskId        uuid.UUID `json:"taskId" binding:"required"`
+	Number        string    `json:"number" form:"number"`
+	TaskId        uuid.UUID `json:"taskId"`
 }
 
 type UserTaskResponse struct {
