@@ -45,12 +45,15 @@ templ Base(title string, user *model.User) {
 						<!-- Desktop Navigation -->
 						<nav class="hidden md:flex items-center space-x-4">
 							if user != nil {
-								<div class="relative ml-3 group">
-									<button class="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 focus:outline-none">
+								<div class="relative ml-3" id="user-menu">
+									<button
+										class="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 focus:outline-none"
+										onclick="document.getElementById('dropdown-menu').classList.toggle('hidden')"
+									>
 										<span class="mr-1">{ getUserDisplayName(user) }</span>
 										<i class="fas fa-chevron-down text-xs"></i>
 									</button>
-									<div class="hidden group-hover:block absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg z-50">
+									<div id="dropdown-menu" class="hidden absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg z-50">
 										<div class="border-t border-gray-100 my-1"></div>
 										<a href="/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
 											<i class="fas fa-sign-out-alt mr-2"></i> Logout
@@ -81,6 +84,17 @@ templ Base(title string, user *model.User) {
 			</footer>
 			<!-- Scripts -->
 			<script src="/static/js/timer.js"></script>
+			<script>
+				// Close dropdown when clicking outside of it
+				document.addEventListener('click', function(event) {
+					const userMenu = document.getElementById('user-menu');
+					const dropdownMenu = document.getElementById('dropdown-menu');
+					
+					if (userMenu && dropdownMenu && !userMenu.contains(event.target)) {
+						dropdownMenu.classList.add('hidden');
+					}
+				});
+			</script>
 		</body>
 	</html>
 }

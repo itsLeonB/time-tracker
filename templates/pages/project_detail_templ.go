@@ -133,7 +133,7 @@ func ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) templ.Componen
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></form></div><!-- Task Management Section --><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\"><!-- Add Task Section --><div class=\"md:col-span-1\"><div class=\"bg-white shadow-sm rounded-lg p-6 h-full\"><h2 class=\"text-lg font-medium text-gray-800 mb-4 flex items-center\"><i class=\"fas fa-plus-circle text-indigo-600 mr-2\"></i> Add New Task</h2><form hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></form></div><!-- Task Management Section --><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\"><!-- Add Task Section --><div class=\"md:col-span-1\"><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-lg font-medium text-gray-800 mb-4 flex items-center\"><i class=\"fas fa-plus-circle text-indigo-600 mr-2\"></i> Add New Task</h2><form hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

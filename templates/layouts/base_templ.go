@@ -78,20 +78,20 @@ func Base(title string, user *model.User) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if user != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"relative ml-3 group\"><button class=\"flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 focus:outline-none\"><span class=\"mr-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"relative ml-3\" id=\"user-menu\"><button class=\"flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 focus:outline-none\" onclick=\"document.getElementById(&#39;dropdown-menu&#39;).classList.toggle(&#39;hidden&#39;)\"><span class=\"mr-1\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(getUserDisplayName(user))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 50, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 53, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span> <i class=\"fas fa-chevron-down text-xs\"></i></button><div class=\"hidden group-hover:block absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg z-50\"><div class=\"border-t border-gray-100 my-1\"></div><a href=\"/logout\" class=\"block px-4 py-2 text-sm text-red-600 hover:bg-gray-100\"><i class=\"fas fa-sign-out-alt mr-2\"></i> Logout</a></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span> <i class=\"fas fa-chevron-down text-xs\"></i></button><div id=\"dropdown-menu\" class=\"hidden absolute right-0 w-48 py-1 mt-2 bg-white rounded-md shadow-lg z-50\"><div class=\"border-t border-gray-100 my-1\"></div><a href=\"/logout\" class=\"block px-4 py-2 text-sm text-red-600 hover:bg-gray-100\"><i class=\"fas fa-sign-out-alt mr-2\"></i> Logout</a></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -116,7 +116,7 @@ func Base(title string, user *model.User) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(getCurrentYear())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 78, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 81, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -129,13 +129,13 @@ func Base(title string, user *model.User) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(config.LoadedGlobalConfig.AppName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 78, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layouts/base.templ`, Line: 81, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, ".</p></div></footer><!-- Scripts --><script src=\"/static/js/timer.js\"></script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, ".</p></div></footer><!-- Scripts --><script src=\"/static/js/timer.js\"></script><script>\n\t\t\t\t// Close dropdown when clicking outside of it\n\t\t\t\tdocument.addEventListener('click', function(event) {\n\t\t\t\t\tconst userMenu = document.getElementById('user-menu');\n\t\t\t\t\tconst dropdownMenu = document.getElementById('dropdown-menu');\n\t\t\t\t\t\n\t\t\t\t\tif (userMenu && dropdownMenu && !userMenu.contains(event.target)) {\n\t\t\t\t\t\tdropdownMenu.classList.add('hidden');\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
