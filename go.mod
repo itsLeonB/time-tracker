@@ -1,4 +1,4 @@
-module github.com/itsLeonB/catfeinated-time-tracker
+module github.com/itsLeonB/time-tracker
 
 go 1.23.2
 

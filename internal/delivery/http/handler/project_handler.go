@@ -6,12 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
-	"github.com/itsLeonB/catfeinated-time-tracker/templates/pages"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
+	"github.com/itsLeonB/time-tracker/internal/constant"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/service"
+	"github.com/itsLeonB/time-tracker/internal/util"
+	"github.com/itsLeonB/time-tracker/templates/pages"
 	"github.com/rotisserie/eris"
 )
 

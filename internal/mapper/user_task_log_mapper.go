@@ -3,8 +3,8 @@ package mapper
 import (
 	"time"
 
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/model"
 )
 
 func UserTaskLogToResponse(userTaskLog model.UserTaskLog) dto.UserTaskLogResponse {

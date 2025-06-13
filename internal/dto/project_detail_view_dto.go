@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/model"
 )
 
 type ProjectDetailViewDto struct {

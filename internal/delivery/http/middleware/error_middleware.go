@@ -4,9 +4,9 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	strategy "github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/middleware/strategy/error"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
+	strategy "github.com/itsLeonB/time-tracker/internal/delivery/http/middleware/strategy/error"
+	"github.com/itsLeonB/time-tracker/internal/dto"
 	"github.com/rotisserie/eris"
 )
 

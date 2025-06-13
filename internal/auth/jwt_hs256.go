@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
+	"github.com/itsLeonB/time-tracker/internal/config"
 	"github.com/rotisserie/eris"
 )
 

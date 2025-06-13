@@ -3,9 +3,9 @@ package mapper
 import (
 	"fmt"
 
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/util"
 )
 
 func ProjectToResponse(project model.UserProject) (dto.UserProjectResponse, error) {

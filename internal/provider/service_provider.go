@@ -1,9 +1,9 @@
 package provider
 
 import (
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/auth"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
+	"github.com/itsLeonB/time-tracker/internal/auth"
+	"github.com/itsLeonB/time-tracker/internal/config"
+	"github.com/itsLeonB/time-tracker/internal/service"
 )
 
 type Services struct {

@@ -9,8 +9,8 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/config"
+	"github.com/itsLeonB/time-tracker/internal/model"
 )
 
 func Base(title string, user *model.User) templ.Component {

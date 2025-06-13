@@ -6,10 +6,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
+	"github.com/itsLeonB/time-tracker/internal/config"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/util"
 )
 
 type YoutrackRepository struct {

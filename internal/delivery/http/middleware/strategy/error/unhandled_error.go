@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/dto"
 )
 
 type unhandledErrorStrategy struct{}

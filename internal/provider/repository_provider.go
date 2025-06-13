@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/config"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/repository"
+	"github.com/itsLeonB/time-tracker/internal/config"
+	"github.com/itsLeonB/time-tracker/internal/repository"
 	"gorm.io/gorm"
 )
 

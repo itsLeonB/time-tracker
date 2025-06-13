@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/constant"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/model"
 	"github.com/rotisserie/eris"
 )
 

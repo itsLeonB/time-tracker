@@ -4,8 +4,8 @@ import (
 	"reflect"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
+	"github.com/itsLeonB/time-tracker/internal/dto"
 )
 
 type ErrorStrategy interface {

@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
-	"github.com/itsLeonB/catfeinated-time-tracker/templates/pages"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/service"
+	"github.com/itsLeonB/time-tracker/templates/pages"
 )
 
 type HomeHandler struct {

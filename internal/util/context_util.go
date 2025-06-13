@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
+	"github.com/itsLeonB/time-tracker/internal/constant"
 	"github.com/rotisserie/eris"
 )
 

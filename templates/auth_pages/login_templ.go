@@ -8,7 +8,7 @@ package auth_pages
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
+import "github.com/itsLeonB/time-tracker/templates/layouts"
 
 func Login(errorMsg string, successMsg string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {

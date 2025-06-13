@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/constant"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/model"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/service"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
+	"github.com/itsLeonB/time-tracker/internal/constant"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/service"
 	"github.com/rotisserie/eris"
 )
 

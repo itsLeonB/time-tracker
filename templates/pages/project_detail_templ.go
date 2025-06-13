@@ -10,9 +10,9 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
-	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/util"
+	"github.com/itsLeonB/time-tracker/templates/layouts"
 	"time"
 )
 

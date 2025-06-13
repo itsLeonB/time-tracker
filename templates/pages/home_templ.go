@@ -9,9 +9,9 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/util"
-	"github.com/itsLeonB/catfeinated-time-tracker/templates/layouts"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/util"
+	"github.com/itsLeonB/time-tracker/templates/layouts"
 )
 
 func Home(homeViewDto dto.HomeViewDto) templ.Component {

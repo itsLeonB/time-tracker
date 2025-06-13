@@ -3,8 +3,8 @@ package strategy
 import (
 	"log"
 
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/apperror"
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/apperror"
+	"github.com/itsLeonB/time-tracker/internal/dto"
 	"github.com/rotisserie/eris"
 )
 

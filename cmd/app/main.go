@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/itsLeonB/catfeinated-time-tracker/internal/delivery/http/server"
+	"github.com/itsLeonB/time-tracker/internal/delivery/http/server"
 	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"
 )
