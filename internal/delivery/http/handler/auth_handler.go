@@ -1,8 +1,9 @@
 package handler
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -19,6 +20,23 @@ type AuthHandler struct {
 
 func NewAuthHandler(authService service.AuthService) *AuthHandler {
 	return &AuthHandler{authService}
+}
+
+// generateCSRFToken generates a random CSRF token
+func (ah *AuthHandler) generateCSRFToken() string {
+	bytes := make([]byte, 32)
+	rand.Read(bytes)
+	return hex.EncodeToString(bytes)
+}
+
+// validateCSRFToken validates the CSRF token from form and session
+func (ah *AuthHandler) validateCSRFToken(ctx *gin.Context) bool {
+	formToken := ctx.PostForm("_token")
+	sessionToken, err := ctx.Cookie("csrf_token")
+	if err != nil || formToken == "" || sessionToken == "" {
+		return false
+	}
+	return formToken == sessionToken
 }
 
 func (ah *AuthHandler) HandleRegister() gin.HandlerFunc {
@@ -50,7 +68,7 @@ func (ah *AuthHandler) HandleLogin() gin.HandlerFunc {
 			return
 		}
 
-		response, err := ah.authService.Login(ctx, request)
+		_, err = ah.authService.Login(ctx, request)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -58,7 +76,7 @@ func (ah *AuthHandler) HandleLogin() gin.HandlerFunc {
 
 		ctx.JSON(
 			http.StatusOK,
-			ezutil.NewResponse(appconstant.MsgLoginSuccess).WithData(response),
+			ezutil.NewResponse(appconstant.MsgLoginSuccess),
 		)
 	}
 }
@@ -70,32 +88,43 @@ func (ah *AuthHandler) HandleLoginPage() gin.HandlerFunc {
 			return
 		}
 
+		// Generate and set CSRF token - store in context for template
+		csrfToken := ah.generateCSRFToken()
+		ctx.SetCookie("csrf_token", csrfToken, 3600, "/", "", false, true)
+		ctx.Set("csrf_token", csrfToken)
+
 		ctx.HTML(http.StatusOK, "", auth_pages.Login("", ""))
 	}
 }
 
 func (ah *AuthHandler) HandleLoginForm() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request, err := ezutil.BindRequest[dto.LoginRequest](ctx, binding.Form)
-		if err != nil {
-			loginError(ctx, err)
+		// Validate CSRF token
+		if !ah.validateCSRFToken(ctx) {
+			ah.loginError(ctx, "Invalid CSRF token")
 			return
 		}
 
-		response, err := ah.authService.Login(ctx, request)
-		if err != nil {
-			loginError(ctx, err)
+		var loginRequest dto.LoginRequest
+		if err := ezutil.BindRequest[dto.LoginRequest](ctx, &loginRequest); err != nil {
+			ah.loginError(ctx, err.Error())
 			return
 		}
 
-		ctx.SetCookie("session_token", response.Token, int((24 * time.Hour).Nanoseconds()), "/", "", true, true)
+		result, err := ah.authService.Login(ctx, loginRequest)
+		if err != nil {
+			ah.loginError(ctx, err.Error())
+			return
+		}
+
+		ctx.SetCookie("session_token", result.Token, 24*60*60, "/", "", false, true)
 		ctx.Redirect(http.StatusSeeOther, "/")
 	}
 }
 
 func (ah *AuthHandler) HandleLogout() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.SetCookie("session_token", "", -1, "/", "", true, true)
+		ctx.SetCookie("session_token", "", -1, "/", "", false, true)
 		ctx.Redirect(http.StatusSeeOther, "/login")
 	}
 }
@@ -107,41 +136,63 @@ func (ah *AuthHandler) HandleRegisterPage() gin.HandlerFunc {
 			return
 		}
 
+		// Generate and set CSRF token - store in context for template
+		csrfToken := ah.generateCSRFToken()
+		ctx.SetCookie("csrf_token", csrfToken, 3600, "/", "", false, true)
+		ctx.Set("csrf_token", csrfToken)
+
 		ctx.HTML(http.StatusOK, "", auth_pages.Register(""))
 	}
 }
 
 func (ah *AuthHandler) HandleRegisterForm() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request, err := ezutil.BindRequest[dto.RegisterRequest](ctx, binding.Form)
-		if err != nil {
-			registerError(ctx, err)
+		// Validate CSRF token
+		if !ah.validateCSRFToken(ctx) {
+			ah.registerError(ctx, "Invalid CSRF token")
 			return
 		}
 
-		err = ah.authService.Register(ctx, request)
-		if err != nil {
-			registerError(ctx, err)
+		var registerRequest dto.RegisterRequest
+		if err := ezutil.BindRequest[dto.RegisterRequest](ctx, &registerRequest); err != nil {
+			ah.registerError(ctx, err.Error())
 			return
 		}
 
-		ctx.HTML(http.StatusOK, "", auth_pages.Login("", appconstant.MsgRegisterSuccess))
+		err := ah.authService.Register(ctx, registerRequest)
+		if err != nil {
+			ah.registerError(ctx, err.Error())
+			return
+		}
+
+		ctx.Redirect(http.StatusSeeOther, "/login")
 	}
 }
 
-func loginError(ctx *gin.Context, err error) {
-	ctx.HTML(http.StatusForbidden, "", auth_pages.Login(err.Error(), ""))
+func (ah *AuthHandler) loginError(ctx *gin.Context, errMsg string) {
+	csrfToken := ah.generateCSRFToken()
+	ctx.SetCookie("csrf_token", csrfToken, 3600, "/", "", false, true)
+	ctx.Set("csrf_token", csrfToken)
+	ctx.HTML(http.StatusBadRequest, "", auth_pages.Login(errMsg, ""))
 }
 
-func registerError(ctx *gin.Context, err error) {
-	ctx.HTML(http.StatusInternalServerError, "", auth_pages.Register(err.Error()))
+func (ah *AuthHandler) registerError(ctx *gin.Context, errMsg string) {
+	csrfToken := ah.generateCSRFToken()
+	ctx.SetCookie("csrf_token", csrfToken, 3600, "/", "", false, true)
+	ctx.Set("csrf_token", csrfToken)
+	ctx.HTML(http.StatusBadRequest, "", auth_pages.Register(errMsg))
 }
 
 func (ah *AuthHandler) isLoggedIn(ctx *gin.Context) (bool, error) {
 	cookie, err := ctx.Request.Cookie("session_token")
-	if err == nil {
-		return ah.authService.CheckToken(ctx, cookie.Value)
+	if err != nil {
+		return false, err
 	}
 
-	return false, nil
+	isValid, err := ah.authService.CheckToken(ctx, cookie.Value)
+	if err != nil {
+		return false, err
+	}
+
+	return isValid, nil
 }

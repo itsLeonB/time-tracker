@@ -22,13 +22,12 @@ func setupTemplRoutes(router *gin.Engine, handlers *provider.Handlers, services 
 
 	router.Static("/static", "./static")
 
-	// Public routes (no auth required)
 	router.GET("/login", handlers.Auth.HandleLoginPage())
 	router.GET("/register", handlers.Auth.HandleRegisterPage())
+
 	router.POST("/auth/login", handlers.Auth.HandleLoginForm())
 	router.POST("/auth/register", handlers.Auth.HandleRegisterForm())
 
-	// Protected routes (auth required)
 	protectedRoutes := router.Group("/", authMiddleware)
 
 	protectedRoutes.GET("/", handlers.Home.HandleHomePage())
@@ -61,14 +60,14 @@ func authorizeViaCookie(jwt ezutil.JWTService) gin.HandlerFunc {
 		cookie, err := ctx.Request.Cookie("session_token")
 		if err != nil {
 			ctx.Abort()
-			ctx.HTML(http.StatusForbidden, "", auth_pages.Login("Not logged in", "", ""))
+			ctx.HTML(http.StatusForbidden, "", auth_pages.Login("Not logged in", ""))
 			return
 		}
 
 		claims, err := jwt.VerifyToken(cookie.Value)
 		if err != nil {
 			ctx.Abort()
-			ctx.HTML(http.StatusForbidden, "", auth_pages.Login(err.Error(), "", ""))
+			ctx.HTML(http.StatusForbidden, "", auth_pages.Login(err.Error(), ""))
 			return
 		}
 

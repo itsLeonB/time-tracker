@@ -16,6 +16,14 @@ templ Register(errorMsg string) {
 					</div>
 				}
 				<form action="/auth/register" method="POST">
+					<input type="hidden" name="_token" id="csrf-token"/>
+					<script>
+						// Set CSRF token from cookie
+						document.getElementById('csrf-token').value = document.cookie
+							.split('; ')
+							.find(row => row.startsWith('csrf_token='))
+							?.split('=')[1] || '';
+					</script>
 					<div class="mb-4">
 						<label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
 						<input

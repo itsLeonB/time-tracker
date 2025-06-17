@@ -9,7 +9,7 @@ templ Login(errorMsg string, successMsg string) {
 	@layouts.Base("Login", entity.User{}) {
 		<div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
 			<div class="px-6 py-8">
-				<h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Sign In</h2>
+				<h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Login to Your Account</h2>
 				if errorMsg != "" {
 					<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
 						<span>{ errorMsg }</span>
@@ -21,14 +21,6 @@ templ Login(errorMsg string, successMsg string) {
 					</div>
 				}
 				<form action="/auth/login" method="POST">
-					<input type="hidden" name="_token" id="csrf-token"/>
-					<script>
-						// Set CSRF token from cookie
-						document.getElementById('csrf-token').value = document.cookie
-							.split('; ')
-							.find(row => row.startsWith('csrf_token='))
-							?.split('=')[1] || '';
-					</script>
 					<div class="mb-4">
 						<label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
 						<input
