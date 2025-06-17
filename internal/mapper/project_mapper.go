@@ -31,7 +31,7 @@ func ProjectToResponse(project entity.Project) (dto.ProjectResponse, error) {
 
 	userProjectResponse := dto.ProjectResponse{
 		ID:              project.ID,
-		UserId:          project.UserId,
+		UserId:          project.UserID,
 		Name:            project.Name,
 		CreatedAt:       project.CreatedAt,
 		UpdatedAt:       project.UpdatedAt,

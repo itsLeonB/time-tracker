@@ -22,8 +22,12 @@ func SetupHTTPServer(configs *ezutil.Config) *http.Server {
 	route.SetupRoutes(r, handlers, services)
 
 	return &http.Server{
-		Addr:    fmt.Sprintf(":%s", configs.App.Port),
-		Handler: r,
+		Addr:              fmt.Sprintf(":%s", configs.App.Port),
+		Handler:           r,
+		ReadTimeout:       configs.App.Timeout,
+		ReadHeaderTimeout: configs.App.Timeout,
+		WriteTimeout:      configs.App.Timeout,
+		IdleTimeout:       configs.App.Timeout,
 	}
 }
 
@@ -33,7 +37,7 @@ func DefaultConfigs() ezutil.Config {
 	cookieDuration, _ := time.ParseDuration("24h")
 	secretKey, err := ezutil.GenerateRandomString(32)
 	if err != nil {
-		log.Fatal("error generating secret key: %w", err)
+		log.Fatalf("error generating secret key: %s", err.Error())
 	}
 
 	appConfig := ezutil.App{

@@ -20,6 +20,6 @@ func (t *Task) TableName() string {
 	return "tasks"
 }
 
-func (t *Task) IsZero() bool {
+func (t Task) IsZero() bool {
 	return t.ID == uuid.Nil
 }

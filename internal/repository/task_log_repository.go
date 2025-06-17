@@ -43,7 +43,7 @@ func (tlr *taskLogRepositoryGorm) FindLatest(ctx context.Context, spec entity.Ta
 
 	err = db.
 		Scopes(ezutil.WhereBySpec(spec), util.DefaultOrdering()).
-		Find(&taskLog).
+		Take(&taskLog).
 		Error
 
 	if err != nil {

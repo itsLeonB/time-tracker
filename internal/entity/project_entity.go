@@ -8,7 +8,7 @@ import (
 
 type Project struct {
 	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	UserId    uuid.UUID
+	UserID    uuid.UUID
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -19,9 +19,9 @@ func (p *Project) TableName() string {
 	return "projects"
 }
 
-func (p *Project) IsZero() bool {
+func (p Project) IsZero() bool {
 	return p.ID == uuid.Nil ||
-		p.UserId == uuid.Nil ||
+		p.UserID == uuid.Nil ||
 		p.Name == ""
 }
 

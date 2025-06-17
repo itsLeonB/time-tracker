@@ -18,6 +18,6 @@ func (tl *TaskLog) TableName() string {
 	return "task_logs"
 }
 
-func (tl *TaskLog) IsZero() bool {
+func (tl TaskLog) IsZero() bool {
 	return tl.ID == uuid.Nil || tl.Action == ""
 }

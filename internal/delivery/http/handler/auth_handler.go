@@ -88,7 +88,7 @@ func (ah *AuthHandler) HandleLoginForm() gin.HandlerFunc {
 			return
 		}
 
-		ctx.SetCookie("session_token", response.Token, int((24 * time.Hour).Nanoseconds()), "/", "", true, true)
+		ctx.SetCookie("session_token", response.Token, int((24 * time.Hour).Seconds()), "/", "", true, true)
 		ctx.Redirect(http.StatusSeeOther, "/")
 	}
 }

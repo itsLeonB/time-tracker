@@ -2,6 +2,7 @@ package route
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,9 @@ func setupTemplRoutes(router *gin.Engine, handlers *provider.Handlers, services 
 
 	authMiddleware := authorizeViaCookie(services.JWT)
 
-	_ = router.SetTrustedProxies(nil)
+	if err := router.SetTrustedProxies(nil); err != nil {
+		log.Fatalf("router proxy setup failed: %v", err)
+	}
 
 	router.Static("/static", "./static")
 

@@ -1,7 +1,7 @@
 package appconstant
 
 const (
-	ContextUserID    = "userId"
+	ContextUserID    = "userID"
 	ContextProjectID = "projectID"
 	ContextTaskID    = "taskID"
 )

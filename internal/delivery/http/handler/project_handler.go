@@ -105,7 +105,7 @@ func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 
 		ctx.JSON(
 			http.StatusOK,
-			ezutil.NewResponse(appconstant.MsgInsertData).WithData(project),
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(project),
 		)
 	}
 }

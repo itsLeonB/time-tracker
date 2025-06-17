@@ -48,7 +48,7 @@ func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.Proj
 	}
 
 	newProject := entity.Project{
-		UserId: user.ID,
+		UserID: user.ID,
 		Name:   name,
 	}
 
@@ -89,7 +89,7 @@ func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, params dto.Proje
 
 func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.ProjectResponse, error) {
 	spec := entity.ProjectSpecification{}
-	spec.UserId = userId
+	spec.UserID = userId
 
 	projects, err := ps.projectRepository.FindAll(ctx, spec)
 	if err != nil {

@@ -14,6 +14,6 @@ type User struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-func (u *User) IsZero() bool {
+func (u User) IsZero() bool {
 	return u.ID == uuid.Nil
 }
