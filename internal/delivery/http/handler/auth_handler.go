@@ -88,10 +88,9 @@ func (ah *AuthHandler) HandleLoginPage() gin.HandlerFunc {
 			return
 		}
 
-		// Generate and set CSRF token - store in context for template
+		// Generate and set CSRF token
 		csrfToken := ah.generateCSRFToken()
 		ctx.SetCookie("csrf_token", csrfToken, 3600, "/", "", false, true)
-		ctx.Set("csrf_token", csrfToken)
 
 		ctx.HTML(http.StatusOK, "", auth_pages.Login("", ""))
 	}
@@ -106,7 +105,7 @@ func (ah *AuthHandler) HandleLoginForm() gin.HandlerFunc {
 		}
 
 		var loginRequest dto.LoginRequest
-		if err := ezutil.BindRequest[dto.LoginRequest](ctx, &loginRequest); err != nil {
+		if err := ezutil.BindRequest(ctx, &loginRequest); err != nil {
 			ah.loginError(ctx, err.Error())
 			return
 		}
@@ -136,10 +135,9 @@ func (ah *AuthHandler) HandleRegisterPage() gin.HandlerFunc {
 			return
 		}
 
-		// Generate and set CSRF token - store in context for template
+		// Generate and set CSRF token
 		csrfToken := ah.generateCSRFToken()
 		ctx.SetCookie("csrf_token", csrfToken, 3600, "/", "", false, true)
-		ctx.Set("csrf_token", csrfToken)
 
 		ctx.HTML(http.StatusOK, "", auth_pages.Register(""))
 	}
@@ -154,7 +152,7 @@ func (ah *AuthHandler) HandleRegisterForm() gin.HandlerFunc {
 		}
 
 		var registerRequest dto.RegisterRequest
-		if err := ezutil.BindRequest[dto.RegisterRequest](ctx, &registerRequest); err != nil {
+		if err := ezutil.BindRequest(ctx, &registerRequest); err != nil {
 			ah.registerError(ctx, err.Error())
 			return
 		}
@@ -172,14 +170,12 @@ func (ah *AuthHandler) HandleRegisterForm() gin.HandlerFunc {
 func (ah *AuthHandler) loginError(ctx *gin.Context, errMsg string) {
 	csrfToken := ah.generateCSRFToken()
 	ctx.SetCookie("csrf_token", csrfToken, 3600, "/", "", false, true)
-	ctx.Set("csrf_token", csrfToken)
 	ctx.HTML(http.StatusBadRequest, "", auth_pages.Login(errMsg, ""))
 }
 
 func (ah *AuthHandler) registerError(ctx *gin.Context, errMsg string) {
 	csrfToken := ah.generateCSRFToken()
 	ctx.SetCookie("csrf_token", csrfToken, 3600, "/", "", false, true)
-	ctx.Set("csrf_token", csrfToken)
 	ctx.HTML(http.StatusBadRequest, "", auth_pages.Register(errMsg))
 }
 
