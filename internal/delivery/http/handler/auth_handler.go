@@ -105,7 +105,7 @@ func (ah *AuthHandler) HandleLoginForm() gin.HandlerFunc {
 		}
 
 		var loginRequest dto.LoginRequest
-		if err := ezutil.BindRequest(ctx, &loginRequest); err != nil {
+		if err := ctx.ShouldBind(&loginRequest); err != nil {
 			ah.loginError(ctx, err.Error())
 			return
 		}
@@ -152,7 +152,7 @@ func (ah *AuthHandler) HandleRegisterForm() gin.HandlerFunc {
 		}
 
 		var registerRequest dto.RegisterRequest
-		if err := ezutil.BindRequest(ctx, &registerRequest); err != nil {
+		if err := ctx.ShouldBind(&registerRequest); err != nil {
 			ah.registerError(ctx, err.Error())
 			return
 		}
