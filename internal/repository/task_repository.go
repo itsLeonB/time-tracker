@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
-	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
+	"github.com/itsLeonB/time-tracker/internal/entity"
 	"github.com/itsLeonB/time-tracker/internal/util"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
@@ -19,103 +19,100 @@ func NewTaskRepository(db *gorm.DB) TaskRepository {
 	return &taskRepositoryGorm{db}
 }
 
-func (tr *taskRepositoryGorm) Insert(ctx context.Context, task *model.Task) (*model.Task, error) {
-	err := tr.db.WithContext(ctx).Create(task).Error
+func (tr *taskRepositoryGorm) Insert(ctx context.Context, task entity.Task) (entity.Task, error) {
+	db, err := tr.getGormInstance(ctx)
 	if err != nil {
-		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgInsertError))
+		return entity.Task{}, err
+	}
+
+	err = db.Create(&task).Error
+	if err != nil {
+		return entity.Task{}, eris.Wrap(err, appconstant.MsgInsertError)
 	}
 
 	return task, nil
 }
 
-func (tr *taskRepositoryGorm) GetAll(ctx context.Context) ([]model.Task, error) {
-	var tasks []model.Task
+func (tr *taskRepositoryGorm) FindAll(ctx context.Context, spec entity.Task) ([]entity.Task, error) {
+	var tasks []entity.Task
 
-	err := tr.db.WithContext(ctx).
-		Scopes(util.DefaultOrdering()).
+	db, err := tr.getGormInstance(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.
+		Scopes(util.DefaultOrdering(), ezutil.WhereBySpec(spec)).
 		Find(&tasks).
 		Error
+
 	if err != nil {
-		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
+		return nil, eris.Wrap(err, appconstant.MsgQueryError)
 	}
 
 	return tasks, nil
 }
 
-func (tr *taskRepositoryGorm) GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error) {
-	var task model.Task
+func (tr *taskRepositoryGorm) FindFirst(ctx context.Context, spec entity.Task) (entity.Task, error) {
+	var task entity.Task
 
-	err := tr.db.WithContext(ctx).
-		Scopes(util.DefaultOrdering()).
-		First(&task, "id = ?", id).
-		Error
+	db, err := tr.getGormInstance(ctx)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
-
-		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
+		return entity.Task{}, err
 	}
 
-	return &task, nil
-}
-
-func (tr *taskRepositoryGorm) GetByNumber(ctx context.Context, number string) (*model.Task, error) {
-	var task model.Task
-
-	err := tr.db.WithContext(ctx).
-		Scopes(util.DefaultOrdering()).
-		First(&task, "number = ?", number).
+	err = db.
+		Scopes(util.DefaultOrdering(), ezutil.WhereBySpec(spec)).
+		First(&task).
 		Error
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, nil
+			return entity.Task{}, nil
 		}
 
-		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
-	}
-
-	return &task, nil
-}
-
-func (tr *taskRepositoryGorm) Update(ctx context.Context, task *model.Task) (*model.Task, error) {
-	err := tr.db.WithContext(ctx).Save(task).Error
-	if err != nil {
-		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgUpdateError))
+		return entity.Task{}, eris.Wrap(err, appconstant.MsgQueryError)
 	}
 
 	return task, nil
 }
 
-func (tr *taskRepositoryGorm) Delete(ctx context.Context, task *model.Task) error {
-	err := tr.db.WithContext(ctx).Delete(task).Error
+func (tr *taskRepositoryGorm) Update(ctx context.Context, task entity.Task) (entity.Task, error) {
+	db, err := tr.getGormInstance(ctx)
 	if err != nil {
-		return apperror.InternalServerError(eris.Wrap(err, apperror.MsgDeleteError))
+		return entity.Task{}, err
 	}
 
-	return nil
+	err = db.Save(&task).Error
+	if err != nil {
+		return entity.Task{}, eris.Wrap(err, appconstant.MsgUpdateError)
+	}
+
+	return task, nil
 }
 
-func (tr *taskRepositoryGorm) Find(ctx context.Context, options model.TaskQueryOptions) ([]model.Task, error) {
-	var tasks []model.Task
-
-	query := tr.db.WithContext(ctx).Scopes(util.DefaultOrdering())
-
-	if options.Number != "" {
-		query = query.Where("number = ?", options.Number)
-	}
-
-	if !options.Date.IsZero() {
-		query = query.Where("created_at >= ? AND created_at <= ?",
-			util.StartOfDay(options.Date),
-			util.EndOfDay(options.Date),
-		)
-	}
-
-	err := query.Find(&tasks).Error
+func (tr *taskRepositoryGorm) Delete(ctx context.Context, task entity.Task) (entity.Task, error) {
+	db, err := tr.getGormInstance(ctx)
 	if err != nil {
-		return nil, apperror.InternalServerError(eris.Wrap(err, apperror.MsgQueryError))
+		return entity.Task{}, err
 	}
 
-	return tasks, nil
+	err = db.Delete(&task).Error
+	if err != nil {
+		return entity.Task{}, eris.Wrap(err, appconstant.MsgDeleteError)
+	}
+
+	return task, nil
+}
+
+func (tr *taskRepositoryGorm) getGormInstance(ctx context.Context) (*gorm.DB, error) {
+	tx, err := ezutil.GetTxFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if tx != nil {
+		return tx, nil
+	}
+
+	return tr.db.WithContext(ctx), nil
 }

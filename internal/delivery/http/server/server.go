@@ -1,72 +1,59 @@
 package server
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/config"
+	"github.com/itsLeonB/ezutil"
 	"github.com/itsLeonB/time-tracker/internal/delivery/http/route"
 	"github.com/itsLeonB/time-tracker/internal/provider"
 )
 
-type Server struct {
-	Router *gin.Engine
-	config *config.Config
-}
-
-func SetupServer() *Server {
-	configs := config.LoadConfig()
-
-	db := config.NewGormDB(configs.DB)
-	repositories := provider.ProvideRepositories(db, configs)
+func SetupHTTPServer(configs *ezutil.Config) *http.Server {
+	repositories := provider.ProvideRepositories(configs)
 	services := provider.ProvideServices(configs, repositories)
 	handlers := provider.ProvideHandlers(services)
 
 	gin.SetMode(configs.App.Env)
 	r := gin.Default()
-
 	route.SetupRoutes(r, handlers, services)
 
-	return &Server{
-		Router: r,
-		config: configs,
+	return &http.Server{
+		Addr:    fmt.Sprintf(":%s", configs.App.Port),
+		Handler: r,
 	}
 }
 
-func (s *Server) Serve() {
-	srv := http.Server{
-		Addr:    fmt.Sprintf(":%s", s.config.App.Port),
-		Handler: s.Router,
-	}
-
-	go func() {
-		err := srv.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
-			log.Fatalf("error server listen and serve: %s", err.Error())
-		}
-	}()
-
-	exit := make(chan os.Signal, 1)
-	signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
-	<-exit
-	log.Println("shutting down server...")
-
-	ctx, cancel := context.WithTimeout(
-		context.Background(),
-		s.config.App.Timeout,
-	)
-	defer cancel()
-
-	err := srv.Shutdown(ctx)
+func DefaultConfigs() ezutil.Config {
+	timeout, _ := time.ParseDuration("10s")
+	tokenDuration, _ := time.ParseDuration("24h")
+	cookieDuration, _ := time.ParseDuration("24h")
+	secretKey, err := ezutil.GenerateRandomString(32)
 	if err != nil {
-		log.Fatalf("error shutting down: %s", err.Error())
+		log.Fatal("error generating secret key: %w", err)
 	}
 
-	log.Println("server successfully shutdown")
+	appConfig := ezutil.App{
+		Env:        "debug",
+		Port:       "8080",
+		Timeout:    timeout,
+		ClientUrls: []string{"http://localhost:3000"},
+		Timezone:   "Asia/Jakarta",
+	}
+
+	authConfig := ezutil.Auth{
+		SecretKey:      secretKey,
+		TokenDuration:  tokenDuration,
+		CookieDuration: cookieDuration,
+		Issuer:         "time-tracker",
+		URL:            "http://localhost:8000",
+	}
+
+	return ezutil.Config{
+		App:  &appConfig,
+		Auth: &authConfig,
+	}
 }

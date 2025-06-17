@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/constant"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
 	"github.com/itsLeonB/time-tracker/internal/dto"
 	"github.com/itsLeonB/time-tracker/internal/service"
-	"github.com/itsLeonB/time-tracker/internal/util"
 	"github.com/itsLeonB/time-tracker/templates/pages"
-	"github.com/rotisserie/eris"
 )
 
 type ProjectHandler struct {
@@ -32,12 +31,9 @@ func NewProjectHandler(
 
 func (ph *ProjectHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(dto.NewUserProjectRequest)
-		err := ctx.ShouldBindJSON(request)
+		request, err := ezutil.BindRequest[dto.NewProjectRequest](ctx, binding.JSON)
 		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, apperror.MsgBindJsonError),
-			))
+			_ = ctx.Error(err)
 			return
 		}
 
@@ -47,13 +43,16 @@ func (ph *ProjectHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(project))
+		ctx.JSON(
+			http.StatusCreated,
+			ezutil.NewResponse(appconstant.MsgInsertData).WithData(project),
+		)
 	}
 }
 
 func (ph *ProjectHandler) HandleGetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		userId, err := util.GetUuidFromCtx(ctx, constant.ContextUserID)
+		userId, err := ezutil.GetAndParseFromContext[uuid.UUID](ctx, appconstant.ContextUserID)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -65,32 +64,38 @@ func (ph *ProjectHandler) HandleGetAll() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(projects))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(projects),
+		)
 	}
 }
 
 func (ph *ProjectHandler) HandleGetById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		userId, err := util.GetUuidFromCtx(ctx, constant.ContextUserID)
+		userId, err := ezutil.GetAndParseFromContext[uuid.UUID](ctx, appconstant.ContextUserID)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		project, _, err := ph.getUserProjectById(ctx, userId)
+		project, _, err := ph.getProjectById(ctx, userId)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(project))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(project),
+		)
 	}
 }
 
 func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		name := ctx.Query("name")
-		options := dto.UserProjectQueryParams{Name: name}
+		options := dto.ProjectQueryParams{Name: name}
 
 		project, err := ph.projectService.FirstByQuery(ctx, options)
 		if err != nil {
@@ -98,7 +103,10 @@ func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(project))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgInsertData).WithData(project),
+		)
 	}
 }
 
@@ -110,17 +118,17 @@ func (ph *ProjectHandler) HandleProjectDetailPage() gin.HandlerFunc {
 			return
 		}
 
-		project, params, err := ph.getUserProjectById(ctx, user.ID)
+		project, params, err := ph.getProjectById(ctx, user.ID)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
 		viewDto := dto.ProjectDetailViewDto{
-			User:      *user,
+			User:      user,
 			Project:   project,
-			StartDate: util.FormatTime(params.StartDatetime, time.DateOnly),
-			EndDate:   util.FormatTime(params.EndDatetime, time.DateOnly),
+			StartDate: ezutil.FormatTimeNullable(params.StartDatetime, time.DateOnly),
+			EndDate:   ezutil.FormatTimeNullable(params.EndDatetime, time.DateOnly),
 		}
 
 		ctx.HTML(http.StatusOK, "", pages.ProjectDetail(viewDto))
@@ -135,7 +143,7 @@ func (ph *ProjectHandler) HandleNewProjectForm() gin.HandlerFunc {
 			return
 		}
 
-		request, err := util.BindFormRequest[dto.NewUserProjectRequest](ctx)
+		request, err := ezutil.BindRequest[dto.NewProjectRequest](ctx, binding.Form)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
@@ -151,25 +159,24 @@ func (ph *ProjectHandler) HandleNewProjectForm() gin.HandlerFunc {
 	}
 }
 
-func (ph *ProjectHandler) getUserProjectById(ctx *gin.Context, userId uuid.UUID) (dto.UserProjectResponse, dto.QueryParams, error) {
-	id, err := util.GetUuidParam(ctx, "id")
+func (ph *ProjectHandler) getProjectById(ctx *gin.Context, userId uuid.UUID) (dto.ProjectResponse, dto.QueryParams, error) {
+	id, err := ezutil.GetRequiredPathParam[uuid.UUID](ctx, appconstant.ContextProjectID)
 	if err != nil {
-		return dto.UserProjectResponse{}, dto.QueryParams{}, err
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
 	}
 
-	params, err := util.GetDatetimeParams(ctx, "start", "end")
+	params, err := ezutil.BindRequest[dto.QueryParams](ctx, binding.Query)
 	if err != nil {
-		return dto.UserProjectResponse{}, dto.QueryParams{}, err
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
 	}
 
-	params.ProjectID = id
 	params.UserId = userId
-
-	projectParams := dto.UserProjectQueryParams{QueryParams: params}
+	projectParams := dto.ProjectQueryParams{QueryParams: params}
+	projectParams.ID = id
 
 	project, err := ph.projectService.FirstByQuery(ctx, projectParams)
 	if err != nil {
-		return dto.UserProjectResponse{}, dto.QueryParams{}, err
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
 	}
 
 	return project, params, nil

@@ -3,55 +3,63 @@ package repository
 import (
 	"context"
 
-	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
+	"github.com/itsLeonB/time-tracker/internal/entity"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
-type userRepositoryImpl struct {
+type userRepositoryGorm struct {
 	db *gorm.DB
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepositoryImpl{db}
+	return &userRepositoryGorm{db}
 }
 
-func (ur *userRepositoryImpl) FindByEmail(ctx context.Context, email string) (*model.User, error) {
-	var user model.User
+func (ur *userRepositoryGorm) Insert(ctx context.Context, user entity.User) (entity.User, error) {
+	db, err := ur.getGormInstance(ctx)
+	if err != nil {
+		return entity.User{}, err
+	}
 
-	err := ur.db.WithContext(ctx).First(&user, "email = ?", email).Error
+	err = db.Create(&user).Error
+	if err != nil {
+		return entity.User{}, eris.Wrap(err, appconstant.MsgInsertError)
+	}
+
+	return user, nil
+}
+
+func (ur *userRepositoryGorm) FindFirst(ctx context.Context, spec entity.User) (entity.User, error) {
+	var user entity.User
+
+	db, err := ur.getGormInstance(ctx)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	err = db.Scopes(ezutil.WhereBySpec(spec)).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, nil
+			return entity.User{}, nil
 		}
 
-		return nil, eris.Wrap(err, apperror.MsgQueryError)
+		return entity.User{}, eris.Wrap(err, appconstant.MsgQueryError)
 	}
 
-	return &user, nil
+	return user, nil
 }
 
-func (ur *userRepositoryImpl) Insert(ctx context.Context, user *model.User) error {
-	err := ur.db.WithContext(ctx).Create(user).Error
+func (us *userRepositoryGorm) getGormInstance(ctx context.Context) (*gorm.DB, error) {
+	tx, err := ezutil.GetTxFromContext(ctx)
 	if err != nil {
-		return eris.Wrap(err, apperror.MsgInsertError)
+		return nil, err
+	}
+	if tx != nil {
+		return tx, nil
 	}
 
-	return nil
-}
-
-func (ur *userRepositoryImpl) FindByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
-	var user model.User
-	err := ur.db.WithContext(ctx).First(&user, "id = ?", id).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
-
-		return nil, eris.Wrap(err, apperror.MsgQueryError)
-	}
-
-	return &user, nil
+	return us.db.WithContext(ctx), nil
 }

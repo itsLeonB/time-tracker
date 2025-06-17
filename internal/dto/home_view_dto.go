@@ -1,10 +1,10 @@
 package dto
 
 import (
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/entity"
 )
 
 type HomeViewDto struct {
-	User     model.User
-	Projects []UserProjectResponse
+	User     entity.User
+	Projects []ProjectResponse
 }

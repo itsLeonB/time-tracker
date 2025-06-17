@@ -2,10 +2,10 @@ package layouts
 
 import (
 	"github.com/itsLeonB/time-tracker/internal/config"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/entity"
 )
 
-templ Base(title string, user *model.User) {
+templ Base(title string, user entity.User) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -44,7 +44,7 @@ templ Base(title string, user *model.User) {
 						</div>
 						<!-- Desktop Navigation -->
 						<nav class="hidden md:flex items-center space-x-4">
-							if user != nil {
+							if !user.IsZero() {
 								<div class="relative ml-3" id="user-menu">
 									<button
 										class="flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 focus:outline-none"
@@ -100,8 +100,8 @@ templ Base(title string, user *model.User) {
 }
 
 // Helper functions
-func getUserDisplayName(user *model.User) string {
-	if user == nil {
+func getUserDisplayName(user entity.User) string {
+	if user.IsZero() {
 		return ""
 	}
 	// Use email as display name if no name is set

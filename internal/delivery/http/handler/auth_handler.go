@@ -5,57 +5,61 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/auth"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
 	"github.com/itsLeonB/time-tracker/internal/dto"
-	"github.com/itsLeonB/time-tracker/internal/util"
+	"github.com/itsLeonB/time-tracker/internal/service"
 	"github.com/itsLeonB/time-tracker/templates/auth_pages"
-	"github.com/rotisserie/eris"
 )
 
 type AuthHandler struct {
-	authService auth.AuthService
+	authService service.AuthService
 }
 
-func NewAuthHandler(authService auth.AuthService) *AuthHandler {
+func NewAuthHandler(authService service.AuthService) *AuthHandler {
 	return &AuthHandler{authService}
 }
 
 func (ah *AuthHandler) HandleRegister() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var request dto.RegisterRequest
-		err := ctx.ShouldBindJSON(&request)
-		if err != nil {
-			_ = ctx.Error(eris.Wrap(err, apperror.MsgBindJsonError))
-			return
-		}
-
-		response, err := ah.authService.Register(ctx, &request)
+		request, err := ezutil.BindRequest[dto.RegisterRequest](ctx, binding.JSON)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(response))
+		err = ah.authService.Register(ctx, request)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.JSON(
+			http.StatusCreated,
+			ezutil.NewResponse(appconstant.MsgRegisterSuccess),
+		)
 	}
 }
 
 func (ah *AuthHandler) HandleLogin() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var request dto.LoginRequest
-		err := ctx.ShouldBindJSON(&request)
-		if err != nil {
-			_ = ctx.Error(eris.Wrap(err, apperror.MsgBindJsonError))
-			return
-		}
-
-		response, err := ah.authService.Login(ctx, &request)
+		request, err := ezutil.BindRequest[dto.LoginRequest](ctx, binding.JSON)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(response))
+		response, err := ah.authService.Login(ctx, request)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgLoginSuccess).WithData(response),
+		)
 	}
 }
 
@@ -72,13 +76,13 @@ func (ah *AuthHandler) HandleLoginPage() gin.HandlerFunc {
 
 func (ah *AuthHandler) HandleLoginForm() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request, err := util.BindFormRequest[dto.LoginRequest](ctx)
+		request, err := ezutil.BindRequest[dto.LoginRequest](ctx, binding.Form)
 		if err != nil {
 			loginError(ctx, err)
 			return
 		}
 
-		response, err := ah.authService.Login(ctx, &request)
+		response, err := ah.authService.Login(ctx, request)
 		if err != nil {
 			loginError(ctx, err)
 			return
@@ -109,19 +113,19 @@ func (ah *AuthHandler) HandleRegisterPage() gin.HandlerFunc {
 
 func (ah *AuthHandler) HandleRegisterForm() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request, err := util.BindFormRequest[dto.RegisterRequest](ctx)
+		request, err := ezutil.BindRequest[dto.RegisterRequest](ctx, binding.Form)
 		if err != nil {
 			registerError(ctx, err)
 			return
 		}
 
-		response, err := ah.authService.Register(ctx, &request)
+		err = ah.authService.Register(ctx, request)
 		if err != nil {
 			registerError(ctx, err)
 			return
 		}
 
-		ctx.HTML(http.StatusOK, "", auth_pages.Login("", response.Message))
+		ctx.HTML(http.StatusOK, "", auth_pages.Login("", appconstant.MsgRegisterSuccess))
 	}
 }
 

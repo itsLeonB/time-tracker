@@ -7,19 +7,25 @@ import (
 )
 
 type NewTaskRequest struct {
-	Number string `json:"number" binding:"required,min=3"`
-	Name   string `json:"name" binding:"required,min=3"`
+	ProjectID uuid.UUID `json:"projectId"`
+	Number    string    `json:"number" form:"number" binding:"required,min=3"`
+	Name      string    `json:"name" form:"name" binding:"required,min=3"`
 }
 
 type TaskResponse struct {
-	ID        uuid.UUID `json:"id"`
-	Number    string    `json:"number"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID        uuid.UUID         `json:"id"`
+	ProjectID uuid.UUID         `json:"projectId"`
+	Number    string            `json:"number"`
+	Name      string            `json:"name"`
+	CreatedAt time.Time         `json:"createdAt"`
+	UpdatedAt time.Time         `json:"updatedAt"`
+	TimeSpent TimeSpent         `json:"timeSpent"`
+	Logs      []TaskLogResponse `json:"logs"`
+	IsActive  bool              `json:"isActive"`
+	StartTime string            `json:"startTime"`
 }
 
 type TaskQueryParams struct {
+	QueryParams
 	Number string
-	Date   time.Time
 }

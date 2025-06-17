@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/constant"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
+	"github.com/itsLeonB/time-tracker/internal/entity"
 	"github.com/itsLeonB/time-tracker/internal/repository"
 	"github.com/rotisserie/eris"
 )
@@ -19,32 +20,32 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 	return &userServiceImpl{userRepository}
 }
 
-func (us *userServiceImpl) FindByEmail(ctx context.Context, email string) (*model.User, error) {
-	return us.userRepository.FindByEmail(ctx, email)
-}
-
-func (us *userServiceImpl) Create(ctx context.Context, user *model.User) error {
-	return us.userRepository.Insert(ctx, user)
-}
-
-func (us *userServiceImpl) ValidateUser(ctx context.Context) (*model.User, error) {
-	id := ctx.Value(constant.ContextUserID)
-	if id == nil {
-		return nil, eris.Errorf("id is not set in context")
-	}
-
-	userID, err := uuid.Parse(id.(string))
+func (us *userServiceImpl) ValidateUser(ctx context.Context) (entity.User, error) {
+	userID, err := ezutil.GetAndParseFromContext[uuid.UUID](ctx.(*gin.Context), appconstant.ContextUserID)
 	if err != nil {
-		return nil, eris.Wrap(err, "error parsing UUID")
+		return entity.User{}, err
 	}
 
-	user, err := us.userRepository.FindByID(ctx, userID)
+	spec := entity.User{ID: userID}
+
+	user, err := us.userRepository.FindFirst(ctx, spec)
 	if err != nil {
-		return nil, err
+		return entity.User{}, err
 	}
-	if user == nil {
-		return nil, apperror.NotFoundError(eris.Errorf("user not found"))
+	if user.IsZero() {
+		return entity.User{}, ezutil.NotFoundError(eris.Errorf("user not found"))
 	}
 
 	return user, nil
+}
+
+func (us *userServiceImpl) ExistsByID(ctx context.Context, id uuid.UUID) (bool, error) {
+	spec := entity.User{ID: id}
+
+	user, err := us.userRepository.FindFirst(ctx, spec)
+	if err != nil {
+		return false, err
+	}
+
+	return !user.IsZero(), nil
 }

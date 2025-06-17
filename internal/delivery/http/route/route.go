@@ -6,11 +6,6 @@ import (
 )
 
 func SetupRoutes(router *gin.Engine, handlers *provider.Handlers, services *provider.Services) {
-	router.HandleMethodNotAllowed = true
-	router.ContextWithFallback = true
-
-	router.NoRoute(handlers.Root.NotFound())
-
-	setupApiRoutes(router, handlers, services, "/api")
+	setupApiRoutes(router, handlers, services)
 	setupTemplRoutes(router, handlers, services)
 }

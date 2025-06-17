@@ -10,10 +10,10 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"github.com/itsLeonB/time-tracker/internal/config"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/entity"
 )
 
-func Base(title string, user *model.User) templ.Component {
+func Base(title string, user entity.User) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -77,7 +77,7 @@ func Base(title string, user *model.User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if user != nil {
+		if !user.IsZero() {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"relative ml-3\" id=\"user-menu\"><button class=\"flex items-center text-sm font-medium text-gray-600 hover:text-indigo-600 focus:outline-none\" onclick=\"document.getElementById(&#39;dropdown-menu&#39;).classList.toggle(&#39;hidden&#39;)\"><span class=\"mr-1\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -144,8 +144,8 @@ func Base(title string, user *model.User) templ.Component {
 }
 
 // Helper functions
-func getUserDisplayName(user *model.User) string {
-	if user == nil {
+func getUserDisplayName(user entity.User) string {
+	if user.IsZero() {
 		return ""
 	}
 	// Use email as display name if no name is set

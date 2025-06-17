@@ -2,43 +2,144 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/delivery/http/middleware"
-	strategy "github.com/itsLeonB/time-tracker/internal/delivery/http/middleware/strategy/error"
+	"github.com/google/uuid"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
 	"github.com/itsLeonB/time-tracker/internal/provider"
+	"github.com/itsLeonB/time-tracker/internal/service"
+	"github.com/rotisserie/eris"
 )
 
-func setupApiRoutes(router *gin.Engine, handlers *provider.Handlers, services *provider.Services, path string) {
-	errorStrategyMap := strategy.NewErrorStrategyMap()
-	apiRoutes := router.Group(path, middleware.HandleError(errorStrategyMap))
+func setupApiRoutes(router *gin.Engine, handlers *provider.Handlers, services *provider.Services) {
+	// Middlewares
+	tokenCheckFunc := newTokenCheckFunc(services.JWT, services.User)
+	authMiddleware := ezutil.NewAuthMiddleware("Bearer", tokenCheckFunc)
+	errorMiddleware := ezutil.NewErrorMiddleware()
 
-	apiRoutes.GET("", handlers.Root.Root())
-	apiRoutes.GET("/health", handlers.Root.HealthCheck())
+	routeConfigs := []ezutil.RouteConfig{
+		{
+			Group: "/api",
+			Handlers: []gin.HandlerFunc{
+				errorMiddleware,
+			},
+			Versions: []ezutil.RouteVersionConfig{
+				{
+					Version:  1,
+					Handlers: []gin.HandlerFunc{},
+					Groups: []ezutil.RouteGroupConfig{
+						{
+							Group:    "/",
+							Handlers: []gin.HandlerFunc{},
+							Endpoints: []ezutil.EndpointConfig{
+								{
+									Method:   "GET",
+									Endpoint: "/",
+									Handlers: []gin.HandlerFunc{handlers.Root.Root()},
+								},
+								{
+									Method:   "GET",
+									Endpoint: "/health",
+									Handlers: []gin.HandlerFunc{handlers.Root.HealthCheck()},
+								},
+							},
+						},
+						{
+							Group:    "/auth",
+							Handlers: []gin.HandlerFunc{},
+							Endpoints: []ezutil.EndpointConfig{
+								{
+									Method:   "POST",
+									Endpoint: "/register",
+									Handlers: []gin.HandlerFunc{
+										handlers.Auth.HandleRegister(),
+									},
+								},
+								{
+									Method:   "POST",
+									Endpoint: "/login",
+									Handlers: []gin.HandlerFunc{
+										handlers.Auth.HandleLogin(),
+									},
+								},
+							},
+						},
+						{
+							Group:    "/",
+							Handlers: []gin.HandlerFunc{authMiddleware},
+							Endpoints: []ezutil.EndpointConfig{
+								{
+									Method:   "POST",
+									Endpoint: "/projects",
+									Handlers: []gin.HandlerFunc{handlers.Project.Create()},
+								},
+								{
+									Method:   "GET",
+									Endpoint: "/projects",
+									Handlers: []gin.HandlerFunc{handlers.Project.HandleGetAll()},
+								},
+								{
+									Method:   "GET",
+									Endpoint: "/projects/:id",
+									Handlers: []gin.HandlerFunc{handlers.Project.HandleGetById()},
+								},
+								{
+									Method:   "GET",
+									Endpoint: "/projects/first",
+									Handlers: []gin.HandlerFunc{handlers.Project.FirstByQuery()},
+								},
+								{
+									Method:   "POST",
+									Endpoint: "/tasks",
+									Handlers: []gin.HandlerFunc{handlers.Task.Create()},
+								},
+								{
+									Method:   "GET",
+									Endpoint: "/tasks",
+									Handlers: []gin.HandlerFunc{handlers.Task.HandleFind()},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 
-	apiRoutes.POST("/test", handlers.Root.TestReadData())
+	ezutil.SetupRoutes(router, routeConfigs)
+}
 
-	authRoutes := apiRoutes.Group("/auth")
-	authRoutes.POST("/register", handlers.Auth.HandleRegister())
-	authRoutes.POST("/login", handlers.Auth.HandleLogin())
+func newTokenCheckFunc(jwtService ezutil.JWTService, userService service.UserService) func(ctx *gin.Context, token string) (bool, map[string]any, error) {
+	return func(ctx *gin.Context, token string) (bool, map[string]any, error) {
+		claims, err := jwtService.VerifyToken(token)
+		if err != nil {
+			return false, nil, err
+		}
 
-	authenticatedRoutes := apiRoutes.Group("", middleware.Authorize(services.JWT))
+		tokenUserId, exists := claims.Data[appconstant.ContextUserID]
+		if !exists {
+			return false, nil, eris.New("missing user ID from token")
+		}
+		stringUserID, ok := tokenUserId.(string)
+		if !ok {
+			return false, nil, eris.New("error asserting userID, is not a string")
+		}
+		userID, err := ezutil.Parse[uuid.UUID](stringUserID)
+		if err != nil {
+			return false, nil, err
+		}
 
-	projectRoutes := authenticatedRoutes.Group("/projects")
-	projectRoutes.POST("", handlers.Project.Create())
-	projectRoutes.GET("", handlers.Project.HandleGetAll())
-	projectRoutes.GET("/:id", handlers.Project.HandleGetById())
-	projectRoutes.GET("/first", handlers.Project.FirstByQuery())
+		exists, err = userService.ExistsByID(ctx, userID)
+		if err != nil {
+			return false, nil, err
+		}
+		if !exists {
+			return false, nil, ezutil.UnauthorizedError(appconstant.MsgAuthUserNotFound)
+		}
 
-	taskRoutes := authenticatedRoutes.Group("/tasks")
-	taskRoutes.POST("", handlers.Task.Create())
-	taskRoutes.GET("", handlers.Task.HandleFind())
+		authData := map[string]any{
+			appconstant.ContextUserID: userID,
+		}
 
-	externalTrackerRoutes := authenticatedRoutes.Group("/external")
-	externalTaskRoutes := externalTrackerRoutes.Group("/tasks")
-	externalTaskRoutes.GET("", handlers.Task.FindExternal())
-
-	userTaskRoutes := authenticatedRoutes.Group("/user-tasks")
-	userTaskRoutes.POST("", handlers.UserTask.HandleCreate())
-	userTaskRoutes.GET("", handlers.UserTask.HandleFindAll())
-	userTaskRoutes.GET("/:id", handlers.UserTask.HandleGetById())
-	userTaskRoutes.POST("/:id/logs", handlers.UserTask.HandleLog())
+		return true, authData, nil
+	}
 }

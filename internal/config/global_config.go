@@ -6,8 +6,8 @@ type GlobalConfig struct {
 
 var LoadedGlobalConfig *GlobalConfig
 
-func loadGlobalConfig() {
+func init() {
 	LoadedGlobalConfig = &GlobalConfig{
-		AppName: getEnvWithDefault("APP_NAME", "Catfeinated Time Tracker"),
+		AppName: "Time Tracker",
 	}
 }

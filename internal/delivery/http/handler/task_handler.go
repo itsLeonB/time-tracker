@@ -1,38 +1,35 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/google/uuid"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
 	"github.com/itsLeonB/time-tracker/internal/dto"
 	"github.com/itsLeonB/time-tracker/internal/service"
-	"github.com/rotisserie/eris"
 )
 
 type TaskHandler struct {
-	taskService         service.TaskService
-	externalTaskService service.ExternalTrackerService
+	taskService service.TaskService
 }
 
 func NewTaskHandler(
 	taskService service.TaskService,
-	externalTrackerService service.ExternalTrackerService,
 ) *TaskHandler {
 	return &TaskHandler{
 		taskService,
-		externalTrackerService,
 	}
 }
 
 func (th *TaskHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(dto.NewTaskRequest)
-		err := ctx.ShouldBindJSON(request)
+		request, err := ezutil.BindRequest[dto.NewTaskRequest](ctx, binding.JSON)
 		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, apperror.MsgBindJsonError),
-			))
+			_ = ctx.Error(err)
 			return
 		}
 
@@ -42,7 +39,10 @@ func (th *TaskHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, dto.NewSuccessJSON(task))
+		ctx.JSON(
+			http.StatusCreated,
+			ezutil.NewResponse(appconstant.MsgInsertData).WithData(task),
+		)
 	}
 }
 
@@ -54,7 +54,10 @@ func (th *TaskHandler) GetAll() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(tasks),
+		)
 	}
 }
 
@@ -68,23 +71,36 @@ func (th *TaskHandler) HandleFind() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(tasks),
+		)
 	}
 }
 
-func (th *TaskHandler) FindExternal() gin.HandlerFunc {
+func (th *TaskHandler) HandleCreate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		number := ctx.Query("number")
+		projectID, exists, err := ezutil.GetPathParam[uuid.UUID](ctx, appconstant.ContextProjectID)
+		if err != nil || !exists {
+			_ = ctx.Error(err)
+			return
+		}
 
-		queryOptions := dto.ExternalQueryOptions{Number: number}
-
-		tasks, err := th.externalTaskService.FindTask(ctx, queryOptions)
+		request, err := ezutil.BindRequest[dto.NewTaskRequest](ctx, binding.Form)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusOK, dto.NewSuccessJSON(tasks))
+		request.ProjectID = projectID
+
+		_, err = th.taskService.Create(ctx, request)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/projects/%s", projectID))
 	}
 }
 

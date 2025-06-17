@@ -1,13 +1,13 @@
 package pages
 
 import (
+	"github.com/itsLeonB/ezutil"
 	"github.com/itsLeonB/time-tracker/internal/dto"
-	"github.com/itsLeonB/time-tracker/internal/util"
 	"github.com/itsLeonB/time-tracker/templates/layouts"
 )
 
 templ Home(homeViewDto dto.HomeViewDto) {
-	@layouts.Base("Dashboard", &homeViewDto.User) {
+	@layouts.Base("Dashboard", homeViewDto.User) {
 		<div class="max-w-7xl mx-auto px-4 py-6">
 			<!-- Welcome Section with Stats -->
 			<div class="bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg rounded-xl p-8 mb-8 text-white overflow-hidden relative">
@@ -69,7 +69,7 @@ templ Home(homeViewDto dto.HomeViewDto) {
 						</div>
 						<div id="newProjectForm" class="mb-6 bg-gray-50 rounded-lg p-5 border border-gray-200 hidden">
 							<form
-								hx-post="/user-projects"
+								hx-post="/projects"
 								hx-boost="true"
 								hx-push-url="true"
 								hx-history="false"
@@ -110,7 +110,7 @@ templ Home(homeViewDto dto.HomeViewDto) {
 							<div class="space-y-4">
 								for _, project := range homeViewDto.Projects {
 									<div class="border border-gray-200 rounded-lg hover:shadow-md transition-shadow group">
-										<a href={ util.ConstructTemplUrl("/user-projects/%s", project.ID) } class="block p-5">
+										<a href={ ezutil.GetTemplSafeUrl("/projects/%s", project.ID) } class="block p-5">
 											<div class="flex justify-between items-center">
 												<div class="flex items-center">
 													<div class="bg-indigo-100 p-3 rounded-lg mr-4">

@@ -3,46 +3,30 @@ package repository
 import (
 	"context"
 
-	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/dto"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/entity"
 )
 
 type UserRepository interface {
-	FindByEmail(ctx context.Context, email string) (*model.User, error)
-	Insert(ctx context.Context, user *model.User) error
-	FindByID(ctx context.Context, id uuid.UUID) (*model.User, error)
+	Insert(ctx context.Context, user entity.User) (entity.User, error)
+	FindFirst(ctx context.Context, spec entity.User) (entity.User, error)
 }
 
 type ProjectRepository interface {
-	Insert(ctx context.Context, project *model.UserProject) (*model.UserProject, error)
-	GetAll(ctx context.Context) ([]model.UserProject, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*model.UserProject, error)
-	Update(ctx context.Context, project *model.UserProject) (*model.UserProject, error)
-	Delete(ctx context.Context, project *model.UserProject) error
-	Find(ctx context.Context, options dto.UserProjectQueryParams) ([]model.UserProject, error)
-	GetByName(ctx context.Context, name string) (*model.UserProject, error)
-	First(ctx context.Context, options model.ProjectQueryOptions) (model.UserProject, error)
+	Insert(ctx context.Context, project entity.Project) (entity.Project, error)
+	FindAll(ctx context.Context, spec entity.ProjectSpecification) ([]entity.Project, error)
+	FindFirst(ctx context.Context, spec entity.ProjectSpecification) (entity.Project, error)
+	FindFirstPopulated(ctx context.Context, spec entity.ProjectSpecification) (entity.Project, error)
 }
 
 type TaskRepository interface {
-	Insert(ctx context.Context, task *model.Task) (*model.Task, error)
-	GetAll(ctx context.Context) ([]model.Task, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error)
-	GetByNumber(ctx context.Context, number string) (*model.Task, error)
-	Update(ctx context.Context, task *model.Task) (*model.Task, error)
-	Delete(ctx context.Context, task *model.Task) error
-	Find(ctx context.Context, options model.TaskQueryOptions) ([]model.Task, error)
+	Insert(ctx context.Context, task entity.Task) (entity.Task, error)
+	FindAll(ctx context.Context, spec entity.Task) ([]entity.Task, error)
+	FindFirst(ctx context.Context, spec entity.Task) (entity.Task, error)
+	Update(ctx context.Context, task entity.Task) (entity.Task, error)
+	Delete(ctx context.Context, task entity.Task) (entity.Task, error)
 }
 
-type UserTaskRepository interface {
-	Insert(ctx context.Context, userTask model.UserTask) (model.UserTask, error)
-	FindAll(ctx context.Context, options model.UserTaskQueryOptions) ([]model.UserTask, error)
-	FindById(ctx context.Context, id uuid.UUID) (model.UserTask, error)
-}
-
-type UserTaskLogRepository interface {
-	Insert(ctx context.Context, userTaskLog model.UserTaskLog) (model.UserTaskLog, error)
-	FindLatest(ctx context.Context, options model.UserTaskLogQueryOptions) (model.UserTaskLog, error)
-	FindAll(ctx context.Context, options model.UserTaskLogQueryOptions) ([]model.UserTaskLog, error)
+type TaskLogRepository interface {
+	Insert(ctx context.Context, taskLog entity.TaskLog) (entity.TaskLog, error)
+	FindLatest(ctx context.Context, spec entity.TaskLog) (entity.TaskLog, error)
 }
