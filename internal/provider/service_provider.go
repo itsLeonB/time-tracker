@@ -21,7 +21,7 @@ func ProvideServices(configs *ezutil.Config, repositories *Repositories) *Servic
 	authService := service.NewAuthService(hashService, jwtService, repositories.User, repositories.Transactor)
 	userTaskLogService := service.NewTaskLogService(repositories.UserTaskLog)
 	taskService := service.NewTaskService(repositories.Task, userService)
-	projectService := service.NewProjectService(repositories.Project, userService, userTaskLogService)
+	projectService := service.NewProjectService(repositories.Project, userService)
 
 	return &Services{
 		JWT:     jwtService,

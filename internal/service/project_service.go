@@ -15,18 +15,15 @@ import (
 type projectServiceImpl struct {
 	projectRepository repository.ProjectRepository
 	userService       UserService
-	taskLogService    TaskLogService
 }
 
 func NewProjectService(
 	projectRepository repository.ProjectRepository,
 	userService UserService,
-	taskLogService TaskLogService,
 ) ProjectService {
 	return &projectServiceImpl{
 		projectRepository,
 		userService,
-		taskLogService,
 	}
 }
 
@@ -38,6 +35,7 @@ func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.Proj
 
 	spec := entity.ProjectSpecification{}
 	spec.Name = name
+	spec.UserID = user.ID
 
 	existingProject, err := ps.projectRepository.FindFirst(ctx, spec)
 	if err != nil {
