@@ -10,24 +10,27 @@ import (
 func ProjectToResponse(project entity.Project) (dto.ProjectResponse, error) {
 	timeSpent := dto.TimeSpent{}
 	activeTaskCount := 0
+	var avgHours float64 = 0
 	userTasks := make([]dto.TaskResponse, len(project.Tasks))
 
-	for i, task := range project.Tasks {
-		taskResponse, err := TaskToResponseWithError(task)
-		if err != nil {
-			return dto.ProjectResponse{}, err
+	if len(project.Tasks) > 0 {
+		for i, task := range project.Tasks {
+			taskResponse, err := TaskToResponseWithError(task)
+			if err != nil {
+				return dto.ProjectResponse{}, err
+			}
+
+			timeSpent.Add(taskResponse.TimeSpent)
+
+			if taskResponse.IsActive {
+				activeTaskCount++
+			}
+
+			userTasks[i] = taskResponse
 		}
 
-		timeSpent.Add(taskResponse.TimeSpent)
-
-		if taskResponse.IsActive {
-			activeTaskCount++
-		}
-
-		userTasks[i] = taskResponse
+		avgHours = timeSpent.Hours / float64(len(userTasks))
 	}
-
-	avgHours := timeSpent.Hours / float64(len(userTasks))
 
 	userProjectResponse := dto.ProjectResponse{
 		ID:              project.ID,

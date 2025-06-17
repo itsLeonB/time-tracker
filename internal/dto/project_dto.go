@@ -7,7 +7,7 @@ import (
 )
 
 type NewProjectRequest struct {
-	Name string `json:"name" form:"name" binding:"required"`
+	Name string `json:"name" form:"name" binding:"required,min=3"`
 }
 
 type ProjectQueryParams struct {

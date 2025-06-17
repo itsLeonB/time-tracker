@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/ezutil"
@@ -28,6 +29,10 @@ func NewProjectService(
 }
 
 func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.ProjectResponse, error) {
+	if strings.TrimSpace(name) == "" {
+		return dto.ProjectResponse{}, ezutil.BadRequestError(eris.New("project name must not be empty"))
+	}
+
 	user, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
 		return dto.ProjectResponse{}, err
