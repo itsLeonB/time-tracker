@@ -3,36 +3,30 @@ package repository
 import (
 	"context"
 
-	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/time-tracker/internal/entity"
 )
 
 type UserRepository interface {
-	FindByEmail(ctx context.Context, email string) (*model.User, error)
-	Insert(ctx context.Context, user *model.User) error
-	FindByID(ctx context.Context, id uuid.UUID) (*model.User, error)
+	Insert(ctx context.Context, user entity.User) (entity.User, error)
+	FindFirst(ctx context.Context, spec entity.User) (entity.User, error)
 }
 
 type ProjectRepository interface {
-	Insert(ctx context.Context, project *model.Project) (*model.Project, error)
-	GetAll(ctx context.Context) ([]*model.Project, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*model.Project, error)
-	Update(ctx context.Context, project *model.Project) (*model.Project, error)
-	Delete(ctx context.Context, project *model.Project) error
-	Find(ctx context.Context, options *model.FindProjectOptions) ([]*model.Project, error)
-	GetByName(ctx context.Context, name string) (*model.Project, error)
+	Insert(ctx context.Context, project entity.Project) (entity.Project, error)
+	FindAll(ctx context.Context, spec entity.ProjectSpecification) ([]entity.Project, error)
+	FindFirst(ctx context.Context, spec entity.ProjectSpecification) (entity.Project, error)
+	FindFirstPopulated(ctx context.Context, spec entity.ProjectSpecification) (entity.Project, error)
 }
 
 type TaskRepository interface {
-	Insert(ctx context.Context, task *model.Task) (*model.Task, error)
-	GetAll(ctx context.Context) ([]*model.Task, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*model.Task, error)
-	GetByNumber(ctx context.Context, number string) (*model.Task, error)
-	Update(ctx context.Context, task *model.Task) (*model.Task, error)
-	Delete(ctx context.Context, task *model.Task) error
-	Log(ctx context.Context, task *model.Task, action string) (*model.TaskLog, error)
-	GetLatestLog(ctx context.Context, task *model.Task) (*model.TaskLog, error)
-	GetLogs(ctx context.Context, task *model.Task) ([]*model.TaskLog, error)
-	Find(ctx context.Context, options *model.QueryOptions) ([]*model.Task, error)
-	GetInProgress(ctx context.Context, projectID uuid.UUID) ([]*model.Task, error)
+	Insert(ctx context.Context, task entity.Task) (entity.Task, error)
+	FindAll(ctx context.Context, spec entity.Task) ([]entity.Task, error)
+	FindFirst(ctx context.Context, spec entity.Task) (entity.Task, error)
+	Update(ctx context.Context, task entity.Task) (entity.Task, error)
+	Delete(ctx context.Context, task entity.Task) (entity.Task, error)
+}
+
+type TaskLogRepository interface {
+	Insert(ctx context.Context, taskLog entity.TaskLog) (entity.TaskLog, error)
+	FindLatest(ctx context.Context, spec entity.TaskLog) (entity.TaskLog, error)
 }

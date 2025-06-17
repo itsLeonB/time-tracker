@@ -2,165 +2,102 @@ package service
 
 import (
 	"context"
+	"strings"
 
 	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/internal/entity"
+	"github.com/itsLeonB/time-tracker/internal/mapper"
 	"github.com/itsLeonB/time-tracker/internal/repository"
 	"github.com/rotisserie/eris"
 )
 
 type projectServiceImpl struct {
 	projectRepository repository.ProjectRepository
-	taskService       TaskService
 	userService       UserService
-	taskRepository    repository.TaskRepository
 }
 
 func NewProjectService(
 	projectRepository repository.ProjectRepository,
-	taskService TaskService,
 	userService UserService,
-	taskRepository repository.TaskRepository,
 ) ProjectService {
 	return &projectServiceImpl{
 		projectRepository,
-		taskService,
 		userService,
-		taskRepository,
 	}
 }
 
-func (ps *projectServiceImpl) Create(ctx context.Context, name string) (*model.Project, error) {
+func (ps *projectServiceImpl) Create(ctx context.Context, name string) (dto.ProjectResponse, error) {
+	if strings.TrimSpace(name) == "" {
+		return dto.ProjectResponse{}, ezutil.BadRequestError(eris.New("project name must not be empty"))
+	}
+
 	user, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
-		return nil, err
+		return dto.ProjectResponse{}, err
 	}
 
-	existingProject, err := ps.projectRepository.GetByName(ctx, name)
+	spec := entity.ProjectSpecification{}
+	spec.Name = name
+	spec.UserID = user.ID
+
+	existingProject, err := ps.projectRepository.FindFirst(ctx, spec)
 	if err != nil {
-		return nil, err
+		return dto.ProjectResponse{}, err
 	}
-	if existingProject != nil {
-		return nil, apperror.ConflictError(eris.Errorf("project with name: %s already exists", name))
+	if !existingProject.IsZero() {
+		return dto.ProjectResponse{}, ezutil.ConflictError(eris.Errorf("project with name: %s already exists", name))
 	}
 
-	newProject := &model.Project{
+	newProject := entity.Project{
 		UserID: user.ID,
 		Name:   name,
 	}
 
-	return ps.projectRepository.Insert(ctx, newProject)
+	insertedProject, err := ps.projectRepository.Insert(ctx, newProject)
+	if err != nil {
+		return dto.ProjectResponse{}, err
+	}
+
+	return mapper.ProjectToResponse(insertedProject)
 }
 
-func (ps *projectServiceImpl) GetAll(ctx context.Context) ([]*model.Project, error) {
+func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, params dto.ProjectQueryParams) (dto.ProjectResponse, error) {
 	_, err := ps.userService.ValidateUser(ctx)
 	if err != nil {
-		return nil, err
+		return dto.ProjectResponse{}, err
 	}
 
-	return ps.projectRepository.GetAll(ctx)
+	spec := entity.ProjectSpecification{}
+	spec.ID = params.ID
+	spec.Start = params.StartDatetime
+	spec.End = params.EndDatetime
+
+	project, err := ps.projectRepository.FindFirstPopulated(ctx, spec)
+	if err != nil {
+		return dto.ProjectResponse{}, err
+	}
+	if project.IsZero() {
+		return dto.ProjectResponse{}, ezutil.NotFoundError(eris.Errorf("project not found"))
+	}
+
+	projectResponse, err := mapper.ProjectToResponse(project)
+	if err != nil {
+		return dto.ProjectResponse{}, err
+	}
+
+	return projectResponse, nil
 }
 
-func (ps *projectServiceImpl) GetByID(ctx context.Context, options *model.QueryOptions) (*model.Project, error) {
-	_, err := ps.userService.ValidateUser(ctx)
+func (ps *projectServiceImpl) FindByUserId(ctx context.Context, userId uuid.UUID) ([]dto.ProjectResponse, error) {
+	spec := entity.ProjectSpecification{}
+	spec.UserID = userId
+
+	projects, err := ps.projectRepository.FindAll(ctx, spec)
 	if err != nil {
 		return nil, err
 	}
 
-	project, err := ps.getProject(ctx, options.Params.ProjectID)
-	if err != nil {
-		return nil, err
-	}
-
-	tasks, err := ps.taskService.Find(ctx, options)
-	if err != nil {
-		return nil, err
-	}
-
-	timeSpent := new(model.TimeSpent)
-	for _, task := range tasks {
-		project.TotalPoints += task.Points
-		timeSpent.Add(task.TimeSpent)
-	}
-
-	project.TimeSpent = timeSpent
-
-	return project, nil
-}
-
-func (ps *projectServiceImpl) Update(ctx context.Context, id uuid.UUID, name string) (*model.Project, error) {
-	_, err := ps.userService.ValidateUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	project, err := ps.getProject(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	project.Name = name
-
-	return ps.projectRepository.Update(ctx, project)
-}
-
-func (ps *projectServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
-	_, err := ps.userService.ValidateUser(ctx)
-	if err != nil {
-		return err
-	}
-
-	project, err := ps.getProject(ctx, id)
-	if err != nil {
-		return err
-	}
-
-	return ps.projectRepository.Delete(ctx, project)
-}
-
-func (ps *projectServiceImpl) FirstByQuery(ctx context.Context, options *model.FindProjectOptions) (*model.Project, error) {
-	_, err := ps.userService.ValidateUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	projects, err := ps.projectRepository.Find(ctx, options)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(projects) == 0 {
-		return nil, nil
-	}
-
-	return projects[0], nil
-}
-
-func (ps *projectServiceImpl) GetInProgressTasks(ctx context.Context, id uuid.UUID) ([]*model.Task, error) {
-	_, err := ps.getProject(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	tasks, err := ps.taskRepository.GetInProgress(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return tasks, nil
-}
-
-func (ps *projectServiceImpl) getProject(ctx context.Context, id uuid.UUID) (*model.Project, error) {
-	project, err := ps.projectRepository.GetByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	if project == nil {
-		return nil, apperror.NotFoundError(
-			eris.Errorf("project with ID: %s not found", id),
-		)
-	}
-
-	return project, nil
+	return ezutil.MapSliceWithError(projects, mapper.ProjectToResponse)
 }

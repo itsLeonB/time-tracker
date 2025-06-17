@@ -1,37 +1,34 @@
 package provider
 
 import (
-	"github.com/itsLeonB/time-tracker/internal/auth"
-	"github.com/itsLeonB/time-tracker/internal/config"
+	"github.com/itsLeonB/ezutil"
 	"github.com/itsLeonB/time-tracker/internal/service"
-	strategy "github.com/itsLeonB/time-tracker/internal/service/strategy/point"
 )
 
 type Services struct {
+	JWT     ezutil.JWTService
 	User    service.UserService
-	Hasher  auth.Hasher
-	JWT     auth.JWT
-	Auth    auth.AuthService
+	Auth    service.AuthService
 	Project service.ProjectService
 	Task    service.TaskService
+	TaskLog service.TaskLogService
 }
 
-func ProvideServices(configs *config.Config, repositories *Repositories) *Services {
-	pointStrategy := strategy.NewHourBasedPointStrategy()
-
+func ProvideServices(configs *ezutil.Config, repositories *Repositories) *Services {
 	userService := service.NewUserService(repositories.User)
-	hasher := auth.NewHasherBcrypt(10)
-	jwt := auth.NewJWTHS256(configs.Auth)
-	authService := auth.NewAuthService(hasher, jwt, userService)
-	taskService := service.NewTaskService(repositories.Task, pointStrategy, userService)
-	projectService := service.NewProjectService(repositories.Project, taskService, userService, repositories.Task)
+	hashService := ezutil.NewHashService(10)
+	jwtService := ezutil.NewJwtService(configs.Auth)
+	authService := service.NewAuthService(hashService, jwtService, repositories.User, repositories.Transactor)
+	userTaskLogService := service.NewTaskLogService(repositories.UserTaskLog)
+	taskService := service.NewTaskService(repositories.Task, userService)
+	projectService := service.NewProjectService(repositories.Project, userService)
 
 	return &Services{
+		JWT:     jwtService,
 		User:    userService,
-		Hasher:  hasher,
-		JWT:     jwt,
 		Auth:    authService,
 		Project: projectService,
 		Task:    taskService,
+		TaskLog: userTaskLogService,
 	}
 }

@@ -1,32 +1,35 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
+	"github.com/itsLeonB/time-tracker/internal/dto"
 	"github.com/itsLeonB/time-tracker/internal/service"
-	"github.com/rotisserie/eris"
 )
 
 type TaskHandler struct {
 	taskService service.TaskService
 }
 
-func NewTaskHandler(taskService service.TaskService) *TaskHandler {
-	return &TaskHandler{taskService}
+func NewTaskHandler(
+	taskService service.TaskService,
+) *TaskHandler {
+	return &TaskHandler{
+		taskService,
+	}
 }
 
 func (th *TaskHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(model.NewTaskRequest)
-		err := ctx.ShouldBindJSON(request)
+		request, err := ezutil.BindRequest[dto.NewTaskRequest](ctx, binding.JSON)
 		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, apperror.MsgBindJsonError),
-			))
+			_ = ctx.Error(err)
 			return
 		}
 
@@ -36,7 +39,10 @@ func (th *TaskHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(task))
+		ctx.JSON(
+			http.StatusCreated,
+			ezutil.NewResponse(appconstant.MsgInsertData).WithData(task),
+		)
 	}
 }
 
@@ -48,95 +54,63 @@ func (th *TaskHandler) GetAll() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(tasks),
+		)
 	}
 }
 
-func (th *TaskHandler) Log() gin.HandlerFunc {
+func (th *TaskHandler) HandleFind() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(model.NewLogRequest)
-		err := ctx.ShouldBindJSON(request)
-		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, apperror.MsgBindJsonError),
-			))
-			return
-		}
+		queryParams := constructQueryParams(ctx)
 
-		parsedId, err := uuid.Parse(ctx.Param("id"))
-		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, "error parsing UUID"),
-			))
-			return
-		}
-
-		log, err := th.taskService.Log(ctx, parsedId, request.Action)
+		tasks, err := th.taskService.Find(ctx, queryParams)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(log))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(tasks),
+		)
 	}
 }
 
-func (th *TaskHandler) LogByNumber() gin.HandlerFunc {
+func (th *TaskHandler) HandleCreate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(model.LogByNumberRequest)
-		err := ctx.ShouldBindJSON(request)
-		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, apperror.MsgBindJsonError),
-			))
+		projectID, exists, err := ezutil.GetPathParam[uuid.UUID](ctx, appconstant.ContextProjectID)
+		if err != nil || !exists {
+			_ = ctx.Error(err)
 			return
 		}
 
-		log, err := th.taskService.LogByNumber(ctx, request.Number, request.Action)
+		request, err := ezutil.BindRequest[dto.NewTaskRequest](ctx, binding.Form)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(log))
-	}
-}
+		request.ProjectID = projectID
 
-func (th *TaskHandler) Find() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		queryOptions := constructQueryOptions(ctx)
-		tasks, err := th.taskService.Find(ctx, queryOptions)
+		_, err = th.taskService.Create(ctx, request)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/projects/%s", projectID))
 	}
-
 }
 
-func constructQueryOptions(ctx *gin.Context) *model.QueryOptions {
-	options := new(model.QueryOptions)
+func constructQueryParams(ctx *gin.Context) dto.TaskQueryParams {
+	var queryParams dto.TaskQueryParams
 
-	withLogs := ctx.Query("withLogs")
-	if withLogs == "true" {
-		options.WithLogs = true
-	}
-
-	params := constructQueryParams(ctx)
-	if params != nil {
-		options.Params = params
-	}
-
-	return options
-}
-
-func constructQueryParams(ctx *gin.Context) *model.QueryParams {
 	number := ctx.Query("number")
-	if number == "" {
-		return nil
+	if number != "" {
+		queryParams.Number = number
 	}
 
-	return &model.QueryParams{Number: number}
+	return queryParams
 }

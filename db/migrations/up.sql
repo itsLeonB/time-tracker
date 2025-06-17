@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS projects (
 
 CREATE TABLE IF NOT EXISTS tasks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     number TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -34,12 +33,6 @@ CREATE TABLE IF NOT EXISTS task_logs (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);
-
-CREATE INDEX IF NOT EXISTS idx_tasks_number ON tasks(number);
-
-CREATE INDEX IF NOT EXISTS idx_task_logs_task_id ON task_logs(task_id);
-
-ALTER TABLE projects ADD CONSTRAINT unique_projects_name_user_id UNIQUE (user_id, name);
-
-ALTER TABLE tasks ADD CONSTRAINT unique_tasks_number_user_id UNIQUE (user_id, number);
+CREATE INDEX IF NOT EXISTS idx_projects_user_id_name ON projects(user_id, name);
+CREATE INDEX IF NOT EXISTS idx_tasks_project_id_number_created_at ON tasks(project_id, number);
+CREATE INDEX IF NOT EXISTS idx_task_logs_task_id_created_at ON task_logs(task_id, created_at DESC);

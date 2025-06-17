@@ -4,29 +4,31 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/ezutil"
 )
 
 type RootHandler struct{}
 
 func (h *RootHandler) Root() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON("time-tracker"))
+		ctx.JSON(http.StatusOK, ezutil.NewResponse("time-tracker"))
 	}
 }
 
 func (h *RootHandler) HealthCheck() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON("app is healthy"))
+		ctx.JSON(http.StatusOK, ezutil.NewResponse("app is healthy"))
 	}
 }
 
 func (h *RootHandler) NotFound() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.JSON(http.StatusNotFound, model.NewErrorJSON(&model.ErrorResponse{
-			Type:    "RouteNotFoundError",
-			Message: "Route is not found",
-		}))
+		ctx.JSON(
+			http.StatusNotFound,
+			ezutil.NewErrorResponse(ezutil.AppError{
+				Type:    "RouteNotFoundError",
+				Message: "Route is not found",
+			}),
+		)
 	}
-
 }

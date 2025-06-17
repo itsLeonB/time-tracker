@@ -5,29 +5,35 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
-	"github.com/itsLeonB/time-tracker/internal/apperror"
-	"github.com/itsLeonB/time-tracker/internal/model"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/appconstant"
+	"github.com/itsLeonB/time-tracker/internal/dto"
 	"github.com/itsLeonB/time-tracker/internal/service"
-	"github.com/rotisserie/eris"
+	"github.com/itsLeonB/time-tracker/templates/pages"
 )
 
 type ProjectHandler struct {
 	projectService service.ProjectService
+	userService    service.UserService
 }
 
-func NewProjectHandler(projectService service.ProjectService) *ProjectHandler {
-	return &ProjectHandler{projectService}
+func NewProjectHandler(
+	projectService service.ProjectService,
+	userService service.UserService,
+) *ProjectHandler {
+	return &ProjectHandler{
+		projectService,
+		userService,
+	}
 }
 
 func (ph *ProjectHandler) Create() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		request := new(model.NewProjectRequest)
-		err := ctx.ShouldBindJSON(request)
+		request, err := ezutil.BindRequest[dto.NewProjectRequest](ctx, binding.JSON)
 		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, apperror.MsgBindJsonError),
-			))
+			_ = ctx.Error(err)
 			return
 		}
 
@@ -37,68 +43,59 @@ func (ph *ProjectHandler) Create() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, model.NewSuccessJSON(project))
+		ctx.JSON(
+			http.StatusCreated,
+			ezutil.NewResponse(appconstant.MsgInsertData).WithData(project),
+		)
 	}
 }
 
-func (ph *ProjectHandler) GetAll() gin.HandlerFunc {
+func (ph *ProjectHandler) HandleGetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		projects, err := ph.projectService.GetAll(ctx)
+		userId, err := ezutil.GetAndParseFromContext[uuid.UUID](ctx, appconstant.ContextUserID)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(projects))
-	}
-}
-
-func (ph *ProjectHandler) GetByID() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		id := ctx.Param("id")
-		parsedId, err := uuid.Parse(id)
-		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, "error parsing UUID"),
-			))
-			return
-		}
-
-		options := model.QueryOptions{
-			Params: &model.QueryParams{
-				ProjectID: parsedId,
-			},
-		}
-
-		date := ctx.Query("date")
-		if date == "today" {
-			options.Params.Date = time.Now()
-		} else if date != "" {
-			timestamp, err := time.Parse(time.DateOnly, date)
-			if err != nil {
-				_ = ctx.Error(apperror.BadRequestError(
-					eris.Wrap(err, "error parsing date"),
-				))
-				return
-			}
-
-			options.Params.Date = timestamp
-		}
-
-		project, err := ph.projectService.GetByID(ctx, &options)
+		projects, err := ph.projectService.FindByUserId(ctx, userId)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(project))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(projects),
+		)
+	}
+}
+
+func (ph *ProjectHandler) HandleGetById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userId, err := ezutil.GetAndParseFromContext[uuid.UUID](ctx, appconstant.ContextUserID)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		project, _, err := ph.getProjectById(ctx, userId)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(project),
+		)
 	}
 }
 
 func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		name := ctx.Query("name")
-		options := &model.FindProjectOptions{Name: name}
+		options := dto.ProjectQueryParams{Name: name}
 
 		project, err := ph.projectService.FirstByQuery(ctx, options)
 		if err != nil {
@@ -106,27 +103,81 @@ func (ph *ProjectHandler) FirstByQuery() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(project))
+		ctx.JSON(
+			http.StatusOK,
+			ezutil.NewResponse(appconstant.MsgGetData).WithData(project),
+		)
 	}
 }
 
-func (ph *ProjectHandler) HandleGetInProgressTasks() gin.HandlerFunc {
+func (ph *ProjectHandler) HandleProjectDetailPage() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		id := ctx.Param("id")
-		parsedId, err := uuid.Parse(id)
-		if err != nil {
-			_ = ctx.Error(apperror.BadRequestError(
-				eris.Wrap(err, "error parsing UUID"),
-			))
-			return
-		}
-
-		tasks, err := ph.projectService.GetInProgressTasks(ctx, parsedId)
+		user, err := ph.userService.ValidateUser(ctx)
 		if err != nil {
 			_ = ctx.Error(err)
 			return
 		}
 
-		ctx.JSON(http.StatusOK, model.NewSuccessJSON(tasks))
+		project, params, err := ph.getProjectById(ctx, user.ID)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		viewDto := dto.ProjectDetailViewDto{
+			User:      user,
+			Project:   project,
+			StartDate: ezutil.FormatTimeNullable(params.StartDatetime, time.DateOnly),
+			EndDate:   ezutil.FormatTimeNullable(params.EndDatetime, time.DateOnly),
+		}
+
+		ctx.HTML(http.StatusOK, "", pages.ProjectDetail(viewDto))
 	}
+}
+
+func (ph *ProjectHandler) HandleNewProjectForm() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		_, err := ph.userService.ValidateUser(ctx)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		request, err := ezutil.BindRequest[dto.NewProjectRequest](ctx, binding.Form)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		_, err = ph.projectService.Create(ctx, request.Name)
+		if err != nil {
+			_ = ctx.Error(err)
+			return
+		}
+
+		ctx.Redirect(http.StatusSeeOther, "/")
+	}
+}
+
+func (ph *ProjectHandler) getProjectById(ctx *gin.Context, userId uuid.UUID) (dto.ProjectResponse, dto.QueryParams, error) {
+	id, err := ezutil.GetRequiredPathParam[uuid.UUID](ctx, appconstant.ContextProjectID)
+	if err != nil {
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
+	}
+
+	params, err := ezutil.BindRequest[dto.QueryParams](ctx, binding.Query)
+	if err != nil {
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
+	}
+
+	params.UserId = userId
+	projectParams := dto.ProjectQueryParams{QueryParams: params}
+	projectParams.ID = id
+
+	project, err := ph.projectService.FirstByQuery(ctx, projectParams)
+	if err != nil {
+		return dto.ProjectResponse{}, dto.QueryParams{}, err
+	}
+
+	return project, params, nil
 }

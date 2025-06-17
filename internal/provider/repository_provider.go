@@ -1,20 +1,24 @@
 package provider
 
 import (
+	"github.com/itsLeonB/ezutil"
 	"github.com/itsLeonB/time-tracker/internal/repository"
-	"gorm.io/gorm"
 )
 
 type Repositories struct {
-	User    repository.UserRepository
-	Project repository.ProjectRepository
-	Task    repository.TaskRepository
+	Transactor  ezutil.Transactor
+	User        repository.UserRepository
+	Project     repository.ProjectRepository
+	Task        repository.TaskRepository
+	UserTaskLog repository.TaskLogRepository
 }
 
-func ProvideRepositories(db *gorm.DB) *Repositories {
+func ProvideRepositories(configs *ezutil.Config) *Repositories {
 	return &Repositories{
-		User:    repository.NewUserRepository(db),
-		Project: repository.NewProjectRepository(db),
-		Task:    repository.NewTaskRepository(db),
+		Transactor:  ezutil.NewTransactor(configs.GORM),
+		User:        repository.NewUserRepository(configs.GORM),
+		Project:     repository.NewProjectRepository(configs.GORM),
+		Task:        repository.NewTaskRepository(configs.GORM),
+		UserTaskLog: repository.NewTaskLogRepository(configs.GORM),
 	}
 }

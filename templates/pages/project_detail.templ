@@ -1,0 +1,250 @@
+package pages
+
+import (
+	"fmt"
+	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/time-tracker/internal/dto"
+	"github.com/itsLeonB/time-tracker/templates/layouts"
+	"time"
+)
+
+templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
+	@layouts.Base(fmt.Sprintf("Project: %s", projectDetailViewDto.Project.Name), projectDetailViewDto.User) {
+		<div class="space-y-6">
+			<!-- Project Header -->
+			<div class="bg-white shadow-sm rounded-lg p-6">
+				<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+					<div>
+						<div class="flex items-center">
+							<a href="/" class="text-indigo-600 hover:text-indigo-800 mr-2">
+								<i class="fas fa-arrow-left text-sm"></i>
+							</a>
+							<h1 class="text-2xl font-bold text-gray-800">{ projectDetailViewDto.Project.Name }</h1>
+						</div>
+					</div>
+					<div class="flex items-center">
+						<div class="bg-indigo-100 px-4 py-2 rounded-lg flex items-center">
+							<i class="fas fa-clock text-indigo-600 mr-2"></i>
+							<div>
+								<span class="text-sm text-indigo-600 font-medium">Total Time</span>
+								<p class="text-lg font-bold text-indigo-800">{ projectDetailViewDto.Project.TimeSpent.Hours } hours</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Date Range Filter -->
+			<div class="bg-white shadow-sm rounded-lg p-6">
+				<h2 class="text-lg font-medium text-gray-800 mb-4 flex items-center">
+					<i class="fas fa-filter text-indigo-600 mr-2"></i>
+					Filter Tasks by Date
+				</h2>
+				<form
+					hx-get={ ezutil.GetTemplSafeUrl("/projects/%s", projectDetailViewDto.Project.ID) }
+					hx-target="body"
+					hx-push-url="true"
+					class="flex flex-col md:flex-row items-end gap-4"
+				>
+					<div class="w-full md:w-auto">
+						<label for="start" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+						<input
+							type="date"
+							id="start"
+							name="start"
+							value={ projectDetailViewDto.StartDate }
+							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+						/>
+					</div>
+					<div class="w-full md:w-auto">
+						<label for="end" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+						<input
+							type="date"
+							id="end"
+							name="end"
+							value={ projectDetailViewDto.EndDate }
+							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+						/>
+					</div>
+					<div class="flex space-x-2">
+						<button
+							type="submit"
+							class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 flex items-center"
+						>
+							<i class="fas fa-search mr-2"></i>
+							Apply Filter
+						</button>
+						if projectDetailViewDto.StartDate != "" || projectDetailViewDto.EndDate != "" {
+							<a
+								href={ ezutil.GetTemplSafeUrl("/projects/%s", projectDetailViewDto.Project.ID) }
+								class="rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 flex items-center"
+							>
+								<i class="fas fa-times mr-2"></i>
+								Clear
+							</a>
+						}
+					</div>
+				</form>
+			</div>
+			<!-- Task Management Section -->
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				<!-- Add Task Section -->
+				<div class="md:col-span-1">
+					<div class="bg-white shadow-sm rounded-lg p-6">
+						<h2 class="text-lg font-medium text-gray-800 mb-4 flex items-center">
+							<i class="fas fa-plus-circle text-indigo-600 mr-2"></i>
+							Add New Task
+						</h2>
+						<form
+							hx-post={ ezutil.GetTemplSafeUrl("/projects/%s/tasks", projectDetailViewDto.Project.ID) }
+							hx-boost="true"
+							hx-push-url="true"
+							hx-history="false"
+							hx-target="body"
+							class="space-y-4"
+						>
+							<div>
+								<label for="number" class="block text-sm font-medium text-gray-700 mb-1">Number</label>
+								<input
+									type="text"
+									id="number"
+									name="number"
+									minlength="3"
+									required
+									title="Task number must be at least 3 characters"
+									class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+									placeholder="Enter task number (min 3 characters)"
+								/>
+								<p class="mt-1 text-xs text-gray-500">Example: ABC-123, TASK-456</p>
+							</div>
+							<div>
+								<label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+								<input
+									type="text"
+									id="name"
+									name="name"
+									minlength="3"
+									required
+									title="Task name must be at least 3 characters"
+									class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+									placeholder="Enter task name (min 3 characters)"
+								/>
+							</div>
+							<button
+								type="submit"
+								class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 flex items-center justify-center"
+							>
+								<i class="fas fa-plus mr-2"></i>
+								Add Task
+							</button>
+						</form>
+						<!-- Quick Stats -->
+						<div class="mt-8 pt-6 border-t border-gray-200">
+							<h3 class="text-sm font-semibold text-gray-600 mb-4">Quick Stats</h3>
+							<div class="space-y-3">
+								<div class="flex justify-between items-center">
+									<span class="text-sm text-gray-600">Total Tasks</span>
+									<span class="font-medium">{ len(projectDetailViewDto.Project.Tasks) }</span>
+								</div>
+								<div class="flex justify-between items-center">
+									<span class="text-sm text-gray-600">Active Tasks</span>
+									<span class="font-medium">{ projectDetailViewDto.Project.ActiveTaskCount }</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Tasks List Section -->
+				<div class="md:col-span-2">
+					<div class="bg-white shadow-sm rounded-lg p-6">
+						<h2 class="text-lg font-medium text-gray-800 mb-4 flex items-center">
+							<i class="fas fa-tasks text-indigo-600 mr-2"></i>
+							Project Tasks
+						</h2>
+						if len(projectDetailViewDto.Project.Tasks) > 0 {
+							<div class="space-y-4">
+								for _, task := range projectDetailViewDto.Project.Tasks {
+									<div class="border border-gray-200 rounded-lg hover:shadow-md transition-all overflow-hidden">
+										<div class="p-4">
+											<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+												<div>
+													<div class="flex items-center mb-1">
+														<span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">{ task.Number }</span>
+														if task.IsActive {
+															<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Active</span>
+														}
+													</div>
+													<h3 class="font-medium text-gray-800">{ task.Name }</h3>
+													<div class="mt-2 flex items-center text-sm text-gray-500">
+														<i class="fas fa-clock mr-1 text-gray-400"></i>
+														<span>{ task.TimeSpent.Hours } hours logged</span>
+													</div>
+												</div>
+												<div class="flex flex-col items-end gap-2">
+													<div
+														class="text-xl font-mono font-bold bg-gray-100 px-3 py-1 rounded-md"
+														id={ fmt.Sprintf("timer-%s", task.ID) }
+														data-start-time={ task.StartTime }
+													></div>
+													<form
+														hx-post={ ezutil.GetTemplSafeUrl("/projects/%s/tasks/%s/logs", projectDetailViewDto.Project.ID, task.ID) }
+														hx-boost="true"
+														hx-push-url="true"
+														hx-history="false"
+														hx-target="body"
+													>
+														<input
+															type="hidden"
+															name="action"
+															value={ func() string {
+			if task.IsActive {
+				return "STOP"
+			}
+			return "START"
+		}() }
+														/>
+														if task.IsActive {
+															<button
+																type="submit"
+																class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 flex items-center"
+															>
+																<i class="fas fa-stop-circle mr-2"></i>
+																Stop Timer
+															</button>
+														} else {
+															<button
+																type="submit"
+																class="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 flex items-center"
+															>
+																<i class="fas fa-play-circle mr-2"></i>
+																Start Timer
+															</button>
+														}
+													</form>
+												</div>
+											</div>
+										</div>
+										<div class="bg-gray-50 px-4 py-3 flex justify-between items-center">
+											<div class="text-xs text-gray-500">
+												Added on { formatDate(task.CreatedAt) }
+											</div>
+										</div>
+									</div>
+								}
+							</div>
+						} else {
+							<div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+								<i class="fas fa-clipboard-list text-gray-400 text-4xl mb-3"></i>
+								<h3 class="text-base font-medium text-gray-900">No tasks yet</h3>
+								<p class="mt-1 text-sm text-gray-500">Get started by adding your first task.</p>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}
+
+func formatDate(date time.Time) string {
+	return date.Format(time.RFC822)
+}
