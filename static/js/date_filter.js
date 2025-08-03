@@ -10,7 +10,9 @@ function bootstrapListener() {
   }
 }
 
-function setDatetimeFormValues() {
+function setDatetimeFormValues(e) {
+  e.preventDefault();
+
   const startDate = document.querySelector('#start').value;
   const endDate = document.querySelector('#end').value;
 
@@ -36,4 +38,6 @@ function setDatetimeFormValues() {
   if (endDateTime) {
     document.querySelector('#endDateTime').value = toIsoWithOffset(endDateTime);
   }
+
+  e.target.submit();
 }
