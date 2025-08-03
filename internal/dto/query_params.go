@@ -7,7 +7,7 @@ import (
 )
 
 type QueryParams struct {
-	StartDatetime time.Time `form:"start" time_format:"2006-01-02"`
-	EndDatetime   time.Time `form:"end" time_format:"2006-01-02"`
+	StartDatetime time.Time `form:"startDateTime" time_format:"2006-01-02T15:04:05Z07:00"`
+	EndDatetime   time.Time `form:"endDateTime" time_format:"2006-01-02T15:04:05Z07:00"`
 	UserId        uuid.UUID
 }

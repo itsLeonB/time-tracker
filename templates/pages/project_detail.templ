@@ -44,7 +44,10 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 					hx-target="body"
 					hx-push-url="true"
 					class="flex flex-col md:flex-row items-end gap-4"
+					id="datetime-filter"
 				>
+					<input type="hidden" name="startDateTime" id="startDateTime"/>
+					<input type="hidden" name="endDateTime" id="endDateTime"/>
 					<div class="w-full md:w-auto">
 						<label for="start" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
 						<input
@@ -225,7 +228,7 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 										</div>
 										<div class="bg-gray-50 px-4 py-3 flex justify-between items-center">
 											<div class="text-xs text-gray-500">
-												Added on { formatDate(task.CreatedAt) }
+												Added on <span data-timestamp={ formatDate(task.CreatedAt) }></span>
 											</div>
 										</div>
 									</div>
@@ -246,5 +249,5 @@ templ ProjectDetail(projectDetailViewDto dto.ProjectDetailViewDto) {
 }
 
 func formatDate(date time.Time) string {
-	return date.Format(time.RFC822)
+	return date.Format(time.RFC3339)
 }

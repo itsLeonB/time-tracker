@@ -3,7 +3,7 @@ module github.com/itsLeonB/time-tracker
 go 1.24.4
 
 require (
-	github.com/a-h/templ v0.3.898
+	github.com/a-h/templ v0.3.924
 	github.com/gin-gonic/gin v1.10.1
 	github.com/google/uuid v1.6.0
 	github.com/itsLeonB/ezutil v0.10.0
